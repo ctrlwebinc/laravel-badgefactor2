@@ -9,12 +9,13 @@ on:
 jobs:
   laravel-tests:
     runs-on: ubuntu-latest
-    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}
+    name: PHP ${{ matrix.php-versions }} - Laravel ${{ matrix.laravel }}
     strategy:
         fail-fast: true
         matrix:
             operating-system: ['ubuntu-latest']
             php-versions: ['8.0', '8.1']
+            laravel-versions: ['8.0']
             phpunit-versions: ['latest']
             dependency-version: [prefer-lowest, prefer-stable]
             include:
