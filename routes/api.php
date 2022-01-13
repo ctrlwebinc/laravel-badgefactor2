@@ -15,5 +15,5 @@ use Illuminate\Support\Facades\Route;
 
 Route::resources([
     'badge-pages' => BadgePageController::class,
-    'learners' =>  LearnerController::class,
+    'learners'    => LearnerController::class,
 ]);

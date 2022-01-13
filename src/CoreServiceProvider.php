@@ -8,7 +8,6 @@ use Illuminate\Support\ServiceProvider;
 
 class CoreServiceProvider extends ServiceProvider
 {
-
     /**
      * Bootstrap any package services.
      *
@@ -35,41 +34,44 @@ class CoreServiceProvider extends ServiceProvider
     {
         $this->publishes(
             [
-            __DIR__.'/Console/stubs/BadgeFactor2ServiceProvider.stub' =>
-                app_path('Providers/BadgeFactor2ServiceProvider.php'),
-            ], 'bf2-provider'
+                __DIR__.'/Console/stubs/BadgeFactor2ServiceProvider.stub' => app_path('Providers/BadgeFactor2ServiceProvider.php'),
+            ],
+            'bf2-provider'
         );
 
         $this->publishes(
             [
-            __DIR__.'/../config/badgefactor2.php' => config_path('badgefactor2.php'),
-            ], 'bf2-config'
+                __DIR__.'/../config/badgefactor2.php' => config_path('badgefactor2.php'),
+            ],
+            'bf2-config'
         );
 
         $this->publishes(
             [
-            __DIR__.'/../public' => public_path('vendor/badgefactor2'),
-            ], 'bf2-assets'
+                __DIR__.'/../public' => public_path('vendor/badgefactor2'),
+            ],
+            'bf2-assets'
         );
 
         $this->publishes(
             [
-            __DIR__.'/../resources/lang' =>
-                resource_path('lang/vendor/badgefactor2'),
-            ], 'bf2-lang'
+                __DIR__.'/../resources/lang' => resource_path('lang/vendor/badgefactor2'),
+            ],
+            'bf2-lang'
         );
 
         $this->publishes(
             [
-            __DIR__.'/../resources/views/partials' =>
-                resource_path('views/vendor/badgefactor2/partials'),
-            ], 'bf2-views'
+                __DIR__.'/../resources/views/partials' => resource_path('views/vendor/badgefactor2/partials'),
+            ],
+            'bf2-views'
         );
 
         $this->publishes(
             [
-            __DIR__.'/../database/migrations' => database_path('migrations'),
-            ], 'bf2-migrations'
+                __DIR__.'/../database/migrations' => database_path('migrations'),
+            ],
+            'bf2-migrations'
         );
     }
 
@@ -108,8 +110,8 @@ class CoreServiceProvider extends ServiceProvider
     {
         return [
             'namespace' => 'Ctrlweb\BadgeFactor2\Http\Controllers',
-            'domain' => config('badgefactor2.domain', null),
-            'prefix' => 'bf2-api',
+            'domain'    => config('badgefactor2.domain', null),
+            'prefix'    => 'bf2-api',
             //'middleware' => 'bf2',
         ];
     }
