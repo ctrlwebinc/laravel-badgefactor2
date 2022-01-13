@@ -1,0 +1,54 @@
+{
+    "name": "ctrlwebinc/badgefactor2-laravel",
+    "description": "A marvellous bridge between Laravel and Badgr.",
+    "keywords": [
+      "laravel",
+      "badgr",
+      "open-badge"
+    ],
+    "license": "MIT",
+    "authors": [
+      {
+        "name": "Daniel Le Blanc",
+        "email": "daniel@ctrlweb.ca"
+      }
+    ],
+    "require": {
+      "php": "^7.4.27|^8.0"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+      "psr-4": {
+        "Ctrlweb\\BadgeFactor2\\": "src/"
+      }
+    },
+    "autoload-dev": {
+      "psr-4": {
+        "Ctrlweb\\BadgeFactor2\\Tests\\": "tests/"
+      }
+    },
+    "extra": {
+      "branch-alias": {
+        "dev-master": "3.x-dev"
+      },
+      "laravel": {
+        "providers": [
+          "Ctrlweb\\BadgeFactor2\\CoreServiceProvider"
+        ],
+        "aliases": {
+          "BadgeFactor2": "Ctrlweb\\BadgeFactor2\\BadgeFactor2"
+        }
+      }
+    },
+    "config": {
+      "sort-packages": true
+    },
+    "scripts": {
+    },
+    "repositories": [
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "version": "0.0.1"
+  }
