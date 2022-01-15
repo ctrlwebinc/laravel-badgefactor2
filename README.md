@@ -12,7 +12,7 @@
 
 ## Migration from WordPress
 
-To migrate users from WordPress, you need to make a few modififactions to a few classes in you app :
+To migrate users from WordPress, you need to make a few modifications to a few classes in you app :
 
 ### App\Providers\EventServiceProvider
 
