@@ -54,7 +54,7 @@ class MigrateWordPressLearners extends Command
                 WHERE um.meta_key = 'wp_capabilities'
                 AND um.meta_value LIKE ?
                 AND u.user_status = 0",
-                ["%s:22:\"badgefactor2_use_badgr\"%"]
+                ['%s:22:"badgefactor2_use_badgr"%']
             );
         foreach ($users as $wpUser) {
 
@@ -73,10 +73,10 @@ class MigrateWordPressLearners extends Command
                     'email' => $wpUser->user_email,
                 ],
                 [
-                    'name' => $wpUser->user_nicename,
-                    'password' => Hash::make($wpUser->user_pass),
-                    'created_at' => $wpUser->user_registered,
-                    'wp_id' => $wpUser->ID,
+                    'name'        => $wpUser->user_nicename,
+                    'password'    => Hash::make($wpUser->user_pass),
+                    'created_at'  => $wpUser->user_registered,
+                    'wp_id'       => $wpUser->ID,
                     'wp_password' => $wpUser->user_pass,
                 ]
             );
@@ -86,11 +86,11 @@ class MigrateWordPressLearners extends Command
                     'user_id' => $user->id,
                 ],
                 [
-                    'first_name' => $usermeta->firstWhere('meta_key', 'first_name')->meta_value,
-                    'last_name' => $usermeta->firstWhere('meta_key', 'last_name')->meta_value,
+                    'first_name'  => $usermeta->firstWhere('meta_key', 'first_name')->meta_value,
+                    'last_name'   => $usermeta->firstWhere('meta_key', 'last_name')->meta_value,
                     'description' => $usermeta->firstWhere('meta_key', 'description')->meta_value,
-                    'website' => '',
-                    'slug' => $wpUser->user_login,
+                    'website'     => '',
+                    'slug'        => $wpUser->user_login,
                 ]
             );
         }

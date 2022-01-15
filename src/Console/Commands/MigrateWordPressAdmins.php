@@ -3,7 +3,6 @@
 namespace Ctrlweb\BadgeFactor2\Console\Commands;
 
 use App\Models\User;
-use Ctrlweb\BadgeFactor2\Models\Learner;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -54,10 +53,9 @@ class MigrateWordPressAdmins extends Command
                 WHERE um.meta_key = 'wp_capabilities'
                 AND um.meta_value LIKE ?
                 AND u.user_status = 0",
-                ["%s:13:\"administrator\"%"]
+                ['%s:13:"administrator"%']
             );
         foreach ($users as $wpUser) {
-
             $usermeta = collect(
                 DB::connection($wordpressDb)
                     ->select(
@@ -73,10 +71,10 @@ class MigrateWordPressAdmins extends Command
                     'email' => $wpUser->user_email,
                 ],
                 [
-                    'name' => $wpUser->user_nicename,
-                    'password' => Hash::make($wpUser->user_pass),
-                    'created_at' => $wpUser->user_registered,
-                    'wp_id' => $wpUser->ID,
+                    'name'        => $wpUser->user_nicename,
+                    'password'    => Hash::make($wpUser->user_pass),
+                    'created_at'  => $wpUser->user_registered,
+                    'wp_id'       => $wpUser->ID,
                     'wp_password' => $wpUser->user_pass,
                 ]
             );

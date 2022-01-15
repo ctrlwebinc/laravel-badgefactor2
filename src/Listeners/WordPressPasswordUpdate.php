@@ -4,8 +4,8 @@ namespace Ctrlweb\BadgeFactor2\Listeners;
 
 use App\Models\User;
 use Hautelook\Phpass\PasswordHash;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\Attempting;
+use Illuminate\Support\Facades\Hash;
 
 class WordPressPasswordUpdate
 {
@@ -25,11 +25,11 @@ class WordPressPasswordUpdate
     {
         $passwordHash = new PasswordHash(8, true);
         // If the hash is md5 or phpass, verify and update if necessary.
-        if (( 32 >= strlen($this->_user->wp_password) && md5($value) === $this->_user->wp_password )
-            || ( $passwordHash->CheckPassword($value, $this->_user->wp_password) )
+        if ((32 >= strlen($this->_user->wp_password) && md5($value) === $this->_user->wp_password)
+            || ($passwordHash->CheckPassword($value, $this->_user->wp_password))
         ) {
             $this->_user->password = Hash::make($value);
             $this->_user->save();
         }
-   }
+    }
 }
