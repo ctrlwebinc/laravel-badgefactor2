@@ -8,21 +8,21 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
-class MigrateWordPressLearners extends Command
+class MigrateWordPressAdmins extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'bf2:migrate-wp-learners';
+    protected $signature = 'bf2:migrate-wp-admins';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Migrates learners from a WordPress site to Laravel.';
+    protected $description = 'Migrates administrators from a WordPress site to Laravel.';
 
     /**
      * Create a new command instance.
@@ -54,7 +54,7 @@ class MigrateWordPressLearners extends Command
                 WHERE um.meta_key = 'wp_capabilities'
                 AND um.meta_value LIKE ?
                 AND u.user_status = 0",
-                ["%s:22:\"badgefactor2_use_badgr\"%"]
+                ["%s:13:\"administrator\"%"]
             );
         foreach ($users as $wpUser) {
 
@@ -78,19 +78,6 @@ class MigrateWordPressLearners extends Command
                     'created_at' => $wpUser->user_registered,
                     'wp_id' => $wpUser->ID,
                     'wp_password' => $wpUser->user_pass,
-                ]
-            );
-
-            $learner = Learner::updateOrCreate(
-                [
-                    'user_id' => $user->id,
-                ],
-                [
-                    'first_name' => $usermeta->firstWhere('meta_key', 'first_name')->meta_value,
-                    'last_name' => $usermeta->firstWhere('meta_key', 'last_name')->meta_value,
-                    'description' => $usermeta->firstWhere('meta_key', 'description')->meta_value,
-                    'website' => '',
-                    'slug' => $wpUser->user_login,
                 ]
             );
         }

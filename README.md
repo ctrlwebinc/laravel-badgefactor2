@@ -10,6 +10,48 @@
 
 ## Usage
 
+## Migration from WordPress
+
+To migrate users from WordPress, you need to make a few modififactions to a few classes in you app :
+
+### App\Providers\EventServiceProvider
+
+```php
+...
+use Illuminate\Auth\Events\Attempting;
+use Ctrlweb\BadgeFactor2\Listeners\WordPressPasswordUpdate;
+
+    protected $listen = [
+        Attempting::class => [
+            WordPressPasswordUpdate::class,
+        ],
+        ...
+    ];
+```
+
+### App\Models\User
+
+```php
+protected $fillable = [
+    ...
+    'created_at',
+    'wp_id',
+    'wp_password',
+];
+
+protected $hidden = [
+    ...
+    'wp_password',
+];
+```
+
+### Migration
+
+```php
+$table->unsignedBigInteger('wp_id')->nullable();
+$table->string('wp_password', 60)->nullable();
+```            
+
 ## Overview
 
 ## Tools
