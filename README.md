@@ -8,6 +8,21 @@
 **Laravel BadgeFactor2** is a Laravel package which allows to use the Badgr Server project in Laravel.
 ## Installation
 
+You install the package via composer:
+```bash
+composer require ctrlwebinc/laravel-badgefactor2
+```
+
+Add the following provider in your `config\app.php` file:
+
+```php
+        /*
+         * Package Service Providers...
+         */
+        Spatie\Permission\PermissionServiceProvider::class,
+        ...
+```
+
 ## Usage
 
 ## Migration from WordPress
@@ -59,12 +74,12 @@ $table->string('wp_password', 60)->nullable();
 ## Credits
 
 
-[ico-version]: https://img.shields.io/packagist/v/ctrlwebinc/badgefactor2-laravel.svg
-[ico-downloads]: https://img.shields.io/packagist/dt/ctrlwebinc/badgefactor2-laravel.svg
+[ico-version]: https://img.shields.io/packagist/v/ctrlwebinc/laravel-badgefactor2.svg
+[ico-downloads]: https://img.shields.io/packagist/dt/ctrlwebinc/laravel-badgefactor2.svg
 [ico-styleci]: https://styleci.io/repos/438762514/shield?style=flat
-[ico-github-actions]: https://github.com/ctrlwebinc/badgefactor2-laravel/actions/workflows/laravel.yml/badge.svg
+[ico-github-actions]: https://github.com/ctrlwebinc/laravel-badgefactor2/actions/workflows/laravel.yml/badge.svg
 
-[link-packagist]: https://packagist.org/packages/ctrlwebinc/badgefactor2-laravel
-[link-downloads]: https://packagist.org/packages/ctrlwebinc/badgefactor2-laravel
+[link-packagist]: https://packagist.org/packages/ctrlwebinc/laravel-badgefactor2
+[link-downloads]: https://packagist.org/packages/ctrlwebinc/laravel-badgefactor2
 [link-styleci]: https://styleci.io/repos/438762514
-[link-github-actions]: https://github.com/ctrlwebinc/badgefactor2-laravel/actions
+[link-github-actions]: https://github.com/ctrlwebinc/laravel-badgefactor2/actions

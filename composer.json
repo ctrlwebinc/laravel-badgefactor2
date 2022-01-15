@@ -1,5 +1,5 @@
 {
-    "name": "ctrlwebinc/badgefactor2-laravel",
+    "name": "ctrlwebinc/laravel-badgefactor2",
     "description": "A marvellous bridge between Laravel and Badgr.",
     "keywords": [
       "laravel",
@@ -14,8 +14,9 @@
       }
     ],
     "require": {
-      "php": "^7.4.27|^8.0",
-      "bordoni/phpass": "dev-main"
+        "php": "^7.4.27|^8.0",
+        "bordoni/phpass": "dev-main",
+        "spatie/laravel-permission": "^5.5"
     },
     "require-dev": {
         "orchestra/testbench": "^6.0",
