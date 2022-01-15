@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Hash;
 
 class WordPressPasswordUpdate
 {
-
     private $_user;
 
     public function handle(Attempting $event)

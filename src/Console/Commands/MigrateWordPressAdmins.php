@@ -79,6 +79,7 @@ class MigrateWordPressAdmins extends Command
                 ]
             );
         }
+
         return 0;
     }
 }

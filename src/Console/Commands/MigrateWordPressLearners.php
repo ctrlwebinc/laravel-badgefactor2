@@ -57,7 +57,6 @@ class MigrateWordPressLearners extends Command
                 ['%s:22:"badgefactor2_use_badgr"%']
             );
         foreach ($users as $wpUser) {
-
             $usermeta = collect(
                 DB::connection($wordpressDb)
                     ->select(
@@ -94,6 +93,7 @@ class MigrateWordPressLearners extends Command
                 ]
             );
         }
+
         return 0;
     }
 }
