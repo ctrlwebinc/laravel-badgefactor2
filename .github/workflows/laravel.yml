@@ -42,4 +42,10 @@ jobs:
               path: ~/.composer/cache/files
               key: dependencies-${{ matrix.dependency-version }}-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
         - name: Execute tests
-          run: vendor/bin/phpunit
+          run: vendor/bin/phpunit --coverage-clover coverage.xml
+          env:
+            XDEBUG_MODE: coverage
+        - name: Upload coverage to Codecov
+          uses: codecov/codecov-action@v2
+          with:
+            token: ${{ secrets.CODECOV_TOKEN }}

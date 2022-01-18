@@ -16,7 +16,7 @@
     "require": {
         "php": "^7.4.27|^8.0",
         "bordoni/phpass": "dev-main",
-        "spatie/laravel-permission": "^5.5"
+        "doctrine/dbal": "^2.9"
     },
     "require-dev": {
         "orchestra/testbench": "^6.0",
@@ -43,7 +43,10 @@
       }
     },
     "config": {
-      "sort-packages": true
+      "sort-packages": true,
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true
+        }
     },
     "scripts": {
     },
