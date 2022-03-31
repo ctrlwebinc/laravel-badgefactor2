@@ -2,10 +2,10 @@
 
 namespace Ctrlweb\BadgeFactor2;
 
-use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWordPressAdmins;
-use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWordPressLearners;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWooCommerceData;
+use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWordPressUsers;
 
 class CoreServiceProvider extends ServiceProvider
 {
@@ -19,8 +19,8 @@ class CoreServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->registerPublishing();
             $this->commands([
-                MigrateWordPressAdmins::class,
-                MigrateWordPressLearners::class,
+                MigrateWordPressUsers::class,
+                MigrateWooCommerceData::class,
             ]);
         }
 
