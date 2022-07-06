@@ -13,7 +13,6 @@ class BillingInfo extends Model
 
     public $incrementing = false;
 
-
     /**
      * The attributes that are mass assignable.
      *

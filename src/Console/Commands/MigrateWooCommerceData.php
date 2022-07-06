@@ -3,10 +3,8 @@
 namespace Ctrlweb\BadgeFactor2\Console\Commands;
 
 use Ctrlweb\BadgeFactor2\Models\User;
-use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 
 class MigrateWooCommerceData extends Command
 {
@@ -184,7 +182,7 @@ class MigrateWooCommerceData extends Command
                         $userRole = UserRole::firstOrCreate(
                             [
                                 'user' => $wcOrder->customer_user_id,
-                                'role' => 'client'
+                                'role' => 'client',
                             ]
                         );
                     }
@@ -201,7 +199,6 @@ class MigrateWooCommerceData extends Command
                 dd($wcOrderItems);
             }
         );
-
 
         $this->info("\nAll done!");
     }

@@ -2,8 +2,8 @@
 
 namespace Ctrlweb\BadgeFactor2\Console\Commands;
 
-use Ctrlweb\BadgeFactor2\Models\User;
 use Carbon\Carbon;
+use Ctrlweb\BadgeFactor2\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -70,21 +70,20 @@ class MigrateWordPressUsers extends Command
                         'email' => $wpUser->user_email,
                     ],
                     [
-                        'name'        => $wpUser->display_name,
-                        'first_name'  => $userMeta->firstWhere('meta_key', 'first_name')->meta_value,
-                        'last_name'   => $userMeta->firstWhere('meta_key', 'last_name')->meta_value,
+                        'name' => $wpUser->display_name,
+                        'first_name' => $userMeta->firstWhere('meta_key', 'first_name')->meta_value,
+                        'last_name' => $userMeta->firstWhere('meta_key', 'last_name')->meta_value,
                         'description' => $userMeta->firstWhere('meta_key', 'description')->meta_value,
-                        'website'     => '',
-                        'slug'        => $wpUser->user_nicename,
-                        'password'    => Hash::make($wpUser->user_pass),
-                        'created_at'  => Carbon::parse($wpUser->user_registered)
+                        'website' => '',
+                        'slug' => $wpUser->user_nicename,
+                        'password' => Hash::make($wpUser->user_pass),
+                        'created_at' => Carbon::parse($wpUser->user_registered)
                             ->setTimeZone(config('app.timezone'))
                             ->toDateTimeString(),
-                        'wp_id'       => $wpUser->ID,
+                        'wp_id' => $wpUser->ID,
                         'wp_password' => $wpUser->user_pass,
                     ]
                 );
-
 
                 // Identify and transfer WordPress capabilities.
                 if ($userMeta->firstwhere('meta_key', 'wp_capabilities')->meta_value) {
@@ -119,7 +118,6 @@ class MigrateWordPressUsers extends Command
                                 $user->roles()->updateOrCreate(['role' => 'learner-free']);
                             } else {
                                 // Give access to specific courses.
-
                             }
                         }
                     }
@@ -127,9 +125,6 @@ class MigrateWordPressUsers extends Command
             }
         );
 
-
         $this->info("\nAll done!");
     }
-
-
 }

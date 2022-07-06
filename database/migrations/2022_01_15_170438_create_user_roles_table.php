@@ -17,7 +17,7 @@ class CreateUserRolesTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->enum('role', ['admin', 'learner-free', 'learner', 'approver', 'issuer']);
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->primary(['user_id','role']);
+            $table->primary(['user_id', 'role']);
         });
     }
 

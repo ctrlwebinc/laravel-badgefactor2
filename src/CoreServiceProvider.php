@@ -2,10 +2,10 @@
 
 namespace Ctrlweb\BadgeFactor2;
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\ServiceProvider;
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWooCommerceData;
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWordPressUsers;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\ServiceProvider;
 
 class CoreServiceProvider extends ServiceProvider
 {
@@ -112,8 +112,8 @@ class CoreServiceProvider extends ServiceProvider
     {
         return [
             'namespace' => 'Ctrlweb\BadgeFactor2\Http\Controllers',
-            'domain'    => config('badgefactor2.domain', null),
-            'prefix'    => 'bf2-api',
+            'domain' => config('badgefactor2.domain', null),
+            'prefix' => 'bf2-api',
             //'middleware' => 'bf2',
         ];
     }

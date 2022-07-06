@@ -5,7 +5,6 @@ namespace Ctrlweb\Badgefactor2\Models;
 use Ctrlweb\BadgeFactor2\Models\BillingInfo;
 use Ctrlweb\BadgeFactor2\Models\Course;
 use Ctrlweb\BadgeFactor2\Models\UserRole;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -59,7 +58,7 @@ class User extends Authenticatable
     ];
 
     protected $with = [
-        'roles', 'billingInfo'
+        'roles', 'billingInfo',
     ];
 
     public function courses()

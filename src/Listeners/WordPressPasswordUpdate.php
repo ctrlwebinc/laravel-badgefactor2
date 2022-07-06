@@ -14,7 +14,7 @@ class WordPressPasswordUpdate
     public function handle(Attempting $event)
     {
         $this->_user = User::where('email', $event->credentials['email'])->first();
-        if (!$this->_user) {
+        if (! $this->_user) {
             return;
         }
         $this->checkAndUpdate($event->credentials['password']);
