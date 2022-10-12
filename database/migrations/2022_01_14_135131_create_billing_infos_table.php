@@ -14,7 +14,6 @@ class CreateBillingInfosTable extends Migration
     public function up()
     {
         Schema::create('billing_infos', function (Blueprint $table) {
-            $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('first_name');
             $table->string('last_name');
@@ -29,7 +28,8 @@ class CreateBillingInfosTable extends Migration
             $table->string('email');
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->primary('user_id');
         });
     }
 

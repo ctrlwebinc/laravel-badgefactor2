@@ -2,7 +2,7 @@
 
 namespace Ctrlweb\BadgeFactor2\Listeners;
 
-use App\Models\User;
+use Ctrlweb\BadgeFactor2\Models\User;
 use Hautelook\Phpass\PasswordHash;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Support\Facades\Hash;
@@ -14,7 +14,7 @@ class WordPressPasswordUpdate
     public function handle(Attempting $event)
     {
         $this->_user = User::where('email', $event->credentials['email'])->first();
-        if (!$this->_user) {
+        if (! $this->_user) {
             return;
         }
         $this->checkAndUpdate($event->credentials['password']);

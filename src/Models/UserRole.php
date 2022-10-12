@@ -2,12 +2,19 @@
 
 namespace Ctrlweb\BadgeFactor2\Models;
 
+use Ctrlweb\Badgefactor2\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Learner extends Model
+class UserRole extends Model
 {
     use HasFactory;
+
+    protected $primaryKey = null;
+
+    public $incrementing = false;
+
+    public $timestamps = false;
 
     /**
      * The attributes that are mass assignable.
@@ -16,13 +23,11 @@ class Learner extends Model
      */
     protected $fillable = [
         'user_id',
-        'first_name',
-        'last_name',
-        'description',
-        'website',
-        'email',
-        'email_verified_at',
-        'password',
-        'slug',
+        'role',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

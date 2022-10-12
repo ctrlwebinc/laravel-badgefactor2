@@ -9,6 +9,10 @@ class BillingInfo extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = null;
+
+    public $incrementing = false;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -27,4 +31,9 @@ class BillingInfo extends Model
         'phone',
         'email',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
