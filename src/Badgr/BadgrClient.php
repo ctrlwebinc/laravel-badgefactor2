@@ -4,6 +4,8 @@ namespace Ctrlweb\BadgeFactor2\Badgr;
 
 use Carbon\CarbonInterface;
 use Ctrlweb\BadgeFactor2\Events\BadgrTokenRefreshed;
+use Exception;
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use League\OAuth2\Client\Provider\GenericProvider;
@@ -65,7 +67,7 @@ class BadgrClient
 
     /**
      * BadgrClient constructor
-     * 
+     *
      * @param string $clientId The client ID for authentication
      * @param string $clientSecret The client secret for authentication
      * @return void
@@ -83,14 +85,12 @@ class BadgrClient
 
     /**
      * Get the HTTP client
-     * 
-     * @param array $config The configuration array
-     * @param array $token The token array
-     * @throws \Exception If the base URL is not set in the config array
-     * @return 
+     *
+     * @param array|null $accessToken
+     * @return PendingRequest|mixed
+     * @throws Exception If the base URL is not set in the config array
      */
-
-    public function getHttpClient(?array $accessToken = null)
+    public function getHttpClient(?array $accessToken = null): mixed
     {
 
         if ($this->httpClient === null) {
@@ -125,11 +125,11 @@ class BadgrClient
             return $this->authProvider;
         }
         if (!$this->clientId || !$this->clientSecret) {
-            throw new \Exception('Client ID & Client Secret are required.');
+            throw new Exception('Client ID & Client Secret are required.');
         }
 
         if (!$this->redirectUri) {
-            throw new \Exception('Redirect URI is required.');
+            throw new Exception('Redirect URI is required.');
         }
 
         return new GenericProvider([
@@ -160,7 +160,7 @@ class BadgrClient
 
     /**
      * Get Access Token using authorization code
-     * 
+     *
      * @param string $code The authorization code
      * @return mixed access token object or array
      */
@@ -194,14 +194,14 @@ class BadgrClient
     private function accessTokenHasExpired($accessToken)
     {
         if (!isset($accessToken['access_token']) && isset($accessToken['expires_at'])) {
-            throw new \Exception("The provided access token is invalid");
+            throw new Exception("The provided access token is invalid");
         }
 
         if (!($accessToken['expires_at'] instanceof CarbonInterface)) {
             try {
                 $accessToken['expires_at'] = Carbon::parse($accessToken['expires_at']);
-            } catch (\Exception $e) {
-                throw new \Exception("Token expiration date is not in a valid format.");
+            } catch (Exception $e) {
+                throw new Exception("Token expiration date is not in a valid format.");
             }
         }
 
