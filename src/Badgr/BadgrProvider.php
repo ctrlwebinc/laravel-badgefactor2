@@ -3,6 +3,8 @@
 namespace Ctrlweb\BadgeFactor2\Badgr;
 
 use Exception;
+use GuzzleHttp\Promise\PromiseInterface;
+use Illuminate\Http\Client\Response;
 
 class BadgrProvider
 {
@@ -92,15 +94,7 @@ class BadgrProvider
 
         $response = $this->getClient()->get('/v2/users/' . $entityId);
 
-        if (null !== $response && $response->status() === 200) {
-            $response = $response->json();
-
-            if (isset($response['status']['success']) && true === $response['status']['success'] && isset($response['result'][0])) {
-                return $response['result'][0];
-            }
-        }
-
-        return false;
+        return $this->getFirstResult($response);
     }
 
     /**
@@ -150,6 +144,112 @@ class BadgrProvider
         $response = $this->getClient()->put('/v2/users/' . $entityId, $payload);
 
         if (null !== $response && $response->status() === 200) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return array|bool
+     * @throws Exception
+     */
+    public function getAllIssuers(): array|bool
+    {
+        $response = $this->getClient()->get('/v2/issuers');
+
+        if (null !== $response && $response->status() === 200) {
+            $response = $response->json();
+            if (isset($response['status']['success']) && true === $response['status']['success'] &&
+                isset($response['result']) && is_array($response['result'])) {
+                return $response['result'];
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return int|bool
+     * @throws Exception
+     */
+    public function getAllIssuersCount(): int|bool
+    {
+        $response = $this->getClient()->get('/v2/issuers_count');
+
+        if (null !== $response && $response->status() === 200) {
+            $response = $response->json();
+            if (isset($response['status']['success']) && true === $response['status']['success'] &&
+                isset($response['count']) && is_numeric($response['count'])) {
+                return $response['count'];
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $name
+     * @return array|bool
+     * @throws Exception
+     */
+    public function getIssuerByName($name): array|bool
+    {
+        $issuers = $this->getAllIssuers();
+        if ($issuers) {
+            $issuers = collect($issuers);
+            return $issuers->filter(function ($issuer) use ($name) {
+                if (strtolower($issuer['name']) === strtolower($name)) {
+                    return $issuer;
+                }
+                return null;
+            })->filter()->first();
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $entityId
+     * @return mixed
+     * @throws Exception
+     */
+    public function getIssuerBySlug(string $entityId): mixed
+    {
+
+        $response = $this->getClient()->get('/v2/issuers/' . $entityId);
+
+        return $this->getFirstResult($response);
+    }
+
+    /**
+     * @param PromiseInterface|Response $response
+     * @return false|mixed
+     */
+    private function getFirstResult(PromiseInterface|Response $response): mixed
+    {
+        if ($response->status() === 200) {
+            $response = $response->json();
+
+            if (isset($response['status']['success']) && true === $response['status']['success'] && isset($response['result'][0])) {
+                return $response['result'][0];
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $entityId
+     * @return bool
+     * @throws Exception
+     */
+    public function deleteIssuer(string $entityId): bool
+    {
+
+        $response = $this->getClient()->delete('/v2/issuers/' . $entityId);
+
+        if (null !== $response && ($response->status() === 204 || $response->status() === 404)) {
             return true;
         }
 
