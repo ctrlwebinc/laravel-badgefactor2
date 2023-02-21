@@ -18,6 +18,14 @@ class BadgrProvider
     }
 
     /**
+     * @throws Exception
+     */
+    public function getClient()
+    {
+        return $this->client->getHttpClient();
+    }
+
+    /**
      * @param PromiseInterface|Response $response
      * @return false|mixed
      */
@@ -25,7 +33,8 @@ class BadgrProvider
     {
         if ($response->status() === 201) {
             $response = $response->json();
-            if (isset($response['status']['success']) && true === $response['status']['success'] && isset($response['result'][0]['entityId'])) {
+            if (isset($response['status']['success']) && true === $response['status']['success'] &&
+                isset($response['result'][0]['entityId'])) {
                 return $response['result'][0]['entityId'];
             }
         }
@@ -38,7 +47,7 @@ class BadgrProvider
      * @param PromiseInterface|Response $response
      * @return array|false
      */
-    public function getResultArray(PromiseInterface|Response $response): array|false
+    public function getResult(PromiseInterface|Response $response): array|false
     {
         if ($response->status() === 200) {
             $response = $response->json();
@@ -106,14 +115,6 @@ class BadgrProvider
     }
 
     /**
-     * @throws Exception
-     */
-    public function getClient()
-    {
-        return $this->client->getHttpClient();
-    }
-
-    /**
      * @param string $entityId
      * @param string $oldPassword
      * @param string $newPassword
@@ -147,9 +148,7 @@ class BadgrProvider
      */
     public function getUser(string $entityId): mixed
     {
-
         $response = $this->getClient()->get('/v2/users/' . $entityId);
-
         return $this->getFirstResult($response);
     }
 
@@ -216,7 +215,7 @@ class BadgrProvider
     {
         $response = $this->getClient()->get('/v2/issuers');
 
-        return $this->getResultArray($response);
+        return $this->getResult($response);
     }
 
     /**
@@ -343,7 +342,9 @@ class BadgrProvider
      * @return bool
      * @throws Exception
      */
-    public function updateIssuer(string $entityId, string $name, string $email, string $url, ?string $description = null, ?string $image = null): bool
+    public function updateIssuer(
+        string  $entityId, string $name, string $email, string $url,
+        ?string $description = null, ?string $image = null): bool
     {
         $payload = [
             'name' => $name,
@@ -368,7 +369,15 @@ class BadgrProvider
         return false;
     }
 
-    public function addBadgeClass(string $badgeClassName, string $issuerId, string $description, string $image = null)
+    /**
+     * @param string $badgeClassName
+     * @param string $issuerId
+     * @param string $description
+     * @param string|null $image
+     * @return false|mixed
+     * @throws Exception
+     */
+    public function addBadgeClass(string $badgeClassName, string $issuerId, string $description, string $image = null): mixed
     {
         $payload = [
             'name' => $badgeClassName,
@@ -385,17 +394,25 @@ class BadgrProvider
         return $this->getEntityId($response);
     }
 
-    public function getAllBadgeClassesByIssuerSlug(string $issuerId)
+    /**
+     * @param string $issuerId
+     * @return bool|array
+     * @throws Exception
+     */
+    public function getAllBadgeClassesByIssuerSlug(string $issuerId): bool|array
     {
-
         $response = $this->getClient()->get('/v2/issuers/' . $issuerId . '/badgeclasses');
 
-        return $this->getResultArray($response);
+        return $this->getResult($response);
     }
 
-    public function getAllBadgeClassesByIssuerSlugCount(string $issuerId)
+    /**
+     * @param string $issuerId
+     * @return false|int
+     * @throws Exception
+     */
+    public function getAllBadgeClassesByIssuerSlugCount(string $issuerId): bool|int
     {
-
         $response = $this->getClient()->put('/v2/badgeclasses_count/issuer/' . $issuerId);
 
         return $this->getCount($response);
@@ -403,15 +420,13 @@ class BadgrProvider
 
     public function getAllBadgeClasses(): bool
     {
-
         $response = $this->getClient()->get('/v2/badgeclasses');
 
-        return $this->getResultArray($response);
+        return $this->getResult($response);
     }
 
     public function getAllBadgeClassesCount()
     {
-
         $response = $this->getClient()->get('/v2/badgeclasses_count');
 
         return $this->getCount($response);
