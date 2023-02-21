@@ -18,6 +18,61 @@ class BadgrProvider
     }
 
     /**
+     * @param PromiseInterface|Response $response
+     * @return false|mixed
+     */
+    private function getEntityId(PromiseInterface|Response $response): mixed
+    {
+        if ($response->status() === 201) {
+            $response = $response->json();
+            if (isset($response['status']['success']) && true === $response['status']['success'] && isset($response['result'][0]['entityId'])) {
+                return $response['result'][0]['entityId'];
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @param PromiseInterface|Response $response
+     * @return array|false
+     */
+    public function getResultArray(PromiseInterface|Response $response): array|false
+    {
+        if ($response->status() === 200) {
+            $response = $response->json();
+            if (
+                isset($response['status']['success']) && true === $response['status']['success'] &&
+                isset($response['result']) && is_array($response['result'])
+            ) {
+                return $response['result'];
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param PromiseInterface|Response $response
+     * @return false|int
+     */
+    public function getCount(PromiseInterface|Response $response): int|false
+    {
+        if ($response->status() === 200) {
+            $response = $response->json();
+            if (
+                isset($response['status']['success']) && true === $response['status']['success'] &&
+                isset($response['count']) && is_numeric($response['count'])
+            ) {
+                return intval($response['count']);
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @param string $firstName
      * @param string $lastName
      * @param string $email
@@ -161,17 +216,7 @@ class BadgrProvider
     {
         $response = $this->getClient()->get('/v2/issuers');
 
-        if (null !== $response && $response->status() === 200) {
-            $response = $response->json();
-            if (
-                isset($response['status']['success']) && true === $response['status']['success'] &&
-                isset($response['result']) && is_array($response['result'])
-            ) {
-                return $response['result'];
-            }
-        }
-
-        return false;
+        return $this->getResultArray($response);
     }
 
     /**
@@ -345,17 +390,7 @@ class BadgrProvider
 
         $response = $this->getClient()->get('/v2/issuers/' . $issuerId . '/badgeclasses');
 
-        if (null !== $response && $response->status() === 200) {
-            $response = $response->json();
-            if (
-                isset($response['status']['success']) && true === $response['status']['success'] &&
-                isset($response['result']) && is_array($response['result'])
-            ) {
-                return $response['result'];
-            }
-        }
-
-        return false;
+        return $this->getResultArray($response);
     }
 
     public function getAllBadgeClassesByIssuerSlugCount(string $issuerId)
@@ -363,17 +398,7 @@ class BadgrProvider
 
         $response = $this->getClient()->put('/v2/badgeclasses_count/issuer/' . $issuerId);
 
-        if (null !== $response && $response->status() === 200) {
-            $response = $response->json();
-            if (
-                isset($response['status']['success']) && true === $response['status']['success']  &&
-                isset($response['count']) && is_numeric($response['count'])
-            ) {
-                return intval($response['count']);
-            }
-        }
-
-        return false;
+        return $this->getCount($response);
     }
 
     public function getAllBadgeClasses(): bool
@@ -381,17 +406,7 @@ class BadgrProvider
 
         $response = $this->getClient()->get('/v2/badgeclasses');
 
-        if (null !== $response && $response->status() === 200) {
-            $response = $response->json();
-            if (
-                isset($response['status']['success']) && true === $response['status']['success'] &&
-                isset($response['result']) && is_array($response['result'])
-            ) {
-                return $response['result'];
-            }
-        }
-
-        return false;
+        return $this->getResultArray($response);
     }
 
     public function getAllBadgeClassesCount()
@@ -399,17 +414,7 @@ class BadgrProvider
 
         $response = $this->getClient()->get('/v2/badgeclasses_count');
 
-        if (null !== $response && $response->status() === 200) {
-            $response = $response->json();
-            if (
-                isset($response['status']['success']) && true === $response['status']['success']  &&
-                isset($response['count']) && is_numeric($response['count'])
-            ) {
-                return intval($response['count']);
-            }
-        }
-
-        return false;
+        return $this->getCount($response);
     }
 
     public function getBadgeClassByBadgeClassSlug(string $badgeClassId)
@@ -471,33 +476,26 @@ class BadgrProvider
             ]
         ];
 
-        if($issuedOn instanceof CarbonInterface) {
+        if ($issuedOn instanceof CarbonInterface) {
             $payload['issuedOn'] = $issuedOn->format('c');
         }
 
-        if(null !== $evidenceNarrative || null !== $evidenceUrl) {
+        if (null !== $evidenceNarrative || null !== $evidenceUrl) {
             $evidence = [];
-            if(!)
+
+            if (null !== $evidenceNarrative) {
+                $evidence['narrative'] = $evidenceNarrative;
+            }
+
+            if (null !== $evidenceUrl) {
+                $evidence['url'] = $evidenceUrl;
+            }
+
+            $payload['evidence'] = $evidence;
         }
 
         $response = $this->getClient()->post('/v2/badgeclasses/' . $badgeClassId . '/assertions', $payload);
 
         return $this->getEntityId($response);
-    }
-
-    /**
-     * @param PromiseInterface|Response $response
-     * @return false|mixed
-     */
-    private function getEntityId(PromiseInterface|Response $response): mixed
-    {
-        if ($response->status() === 201) {
-            $response = $response->json();
-            if (isset($response['status']['success']) && true === $response['status']['success'] && isset($response['result'][0]['entityId'])) {
-                return $response['result'][0]['entityId'];
-            }
-        }
-
-        return false;
     }
 }
