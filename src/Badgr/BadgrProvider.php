@@ -2,6 +2,7 @@
 
 namespace Ctrlweb\BadgeFactor2\Badgr;
 
+use Carbon\CarbonInterface;
 use Exception;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Response;
@@ -110,8 +111,10 @@ class BadgrProvider
         if (null !== $response && $response->status() === 200) {
             $response = $response->json();
 
-            if (isset($response['status']['success']) && true === $response['status']['success'] &&
-                isset($response['result'][0]) && isset($response['result'][0]->recipient)) {
+            if (
+                isset($response['status']['success']) && true === $response['status']['success'] &&
+                isset($response['result'][0]) && isset($response['result'][0]->recipient)
+            ) {
                 return true;
             }
         }
@@ -160,8 +163,10 @@ class BadgrProvider
 
         if (null !== $response && $response->status() === 200) {
             $response = $response->json();
-            if (isset($response['status']['success']) && true === $response['status']['success'] &&
-                isset($response['result']) && is_array($response['result'])) {
+            if (
+                isset($response['status']['success']) && true === $response['status']['success'] &&
+                isset($response['result']) && is_array($response['result'])
+            ) {
                 return $response['result'];
             }
         }
@@ -179,8 +184,10 @@ class BadgrProvider
 
         if (null !== $response && $response->status() === 200) {
             $response = $response->json();
-            if (isset($response['status']['success']) && true === $response['status']['success'] &&
-                isset($response['count']) && is_numeric($response['count'])) {
+            if (
+                isset($response['status']['success']) && true === $response['status']['success'] &&
+                isset($response['count']) && is_numeric($response['count'])
+            ) {
                 return $response['count'];
             }
         }
@@ -251,6 +258,244 @@ class BadgrProvider
 
         if (null !== $response && ($response->status() === 204 || $response->status() === 404)) {
             return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @param string $name
+     * @param string $email
+     * @param string $url
+     * @param string $description
+     * @param string|null $image
+     * @return mixed
+     * @throws Exception
+     */
+    public function addIssuer(string $name, string $email, string $url, string $description, ?string $image = null): mixed
+    {
+        $payload = [
+            'name' => $name,
+            'image' => $image,
+            'email' => $email,
+            'url' => $url,
+            'description' => $description,
+        ];
+
+        $response = $this->getClient()->post('/v2/issuers', $payload);
+
+        return $this->getEntityId($response);
+    }
+
+    /**
+     * @param string $entityId
+     * @param string $name
+     * @param string $email
+     * @param string $url
+     * @param string|null $description
+     * @param string|null $image
+     * @return bool
+     * @throws Exception
+     */
+    public function updateIssuer(string $entityId, string $name, string $email, string $url, ?string $description = null, ?string $image = null): bool
+    {
+        $payload = [
+            'name' => $name,
+            'email' => $email,
+            'url' => $url,
+        ];
+
+        if (null !== $image) {
+            $payload['image'] = $image;
+        }
+
+        if (null !== $description) {
+            $payload['description'] = $description;
+        }
+
+        $response = $this->getClient()->put('/v2/issuers/' . $entityId, $payload);
+
+        if (null !== $response && $response->status() === 200) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function addBadgeClass(string $badgeClassName, string $issuerId, string $description, string $image = null)
+    {
+        $payload = [
+            'name' => $badgeClassName,
+            'issuer' => $issuerId,
+            'description' => $description,
+        ];
+
+        if (null !== $image) {
+            $payload['image'] = $image;
+        }
+
+        $response = $this->getClient()->post('/v2/badgeclasses', $payload);
+
+        return $this->getEntityId($response);
+    }
+
+    public function getAllBadgeClassesByIssuerSlug(string $issuerId)
+    {
+
+        $response = $this->getClient()->get('/v2/issuers/' . $issuerId . '/badgeclasses');
+
+        if (null !== $response && $response->status() === 200) {
+            $response = $response->json();
+            if (
+                isset($response['status']['success']) && true === $response['status']['success'] &&
+                isset($response['result']) && is_array($response['result'])
+            ) {
+                return $response['result'];
+            }
+        }
+
+        return false;
+    }
+
+    public function getAllBadgeClassesByIssuerSlugCount(string $issuerId)
+    {
+
+        $response = $this->getClient()->put('/v2/badgeclasses_count/issuer/' . $issuerId);
+
+        if (null !== $response && $response->status() === 200) {
+            $response = $response->json();
+            if (
+                isset($response['status']['success']) && true === $response['status']['success']  &&
+                isset($response['count']) && is_numeric($response['count'])
+            ) {
+                return intval($response['count']);
+            }
+        }
+
+        return false;
+    }
+
+    public function getAllBadgeClasses(): bool
+    {
+
+        $response = $this->getClient()->get('/v2/badgeclasses');
+
+        if (null !== $response && $response->status() === 200) {
+            $response = $response->json();
+            if (
+                isset($response['status']['success']) && true === $response['status']['success'] &&
+                isset($response['result']) && is_array($response['result'])
+            ) {
+                return $response['result'];
+            }
+        }
+
+        return false;
+    }
+
+    public function getAllBadgeClassesCount()
+    {
+
+        $response = $this->getClient()->get('/v2/badgeclasses_count');
+
+        if (null !== $response && $response->status() === 200) {
+            $response = $response->json();
+            if (
+                isset($response['status']['success']) && true === $response['status']['success']  &&
+                isset($response['count']) && is_numeric($response['count'])
+            ) {
+                return intval($response['count']);
+            }
+        }
+
+        return false;
+    }
+
+    public function getBadgeClassByBadgeClassSlug(string $badgeClassId)
+    {
+
+        $response = $this->getClient()->get('/v2/badgeclasses/' . $badgeClassId);
+
+        if (null !== $response && $response->status() === 200) {
+            $response = $response->json();
+            if (
+                isset($response['status']['success']) && true === $response['status']['success'] &&
+                isset($response['result']) && isset($response['result'][0])
+            ) {
+                return $response['result'][0];
+            }
+        }
+
+        return false;
+    }
+
+    public function updateBadgeClass(string $badgeClassId, string $name, ?string $description = null, ?string $image = null): bool
+    {
+        $payload = [
+            'name' => $name,
+            'description' => $description,
+        ];
+
+        if (null !== $image) {
+            $payload['image'] = $image;
+        }
+
+        $response = $this->getClient()->put('/v2/badgeclasses/' . $badgeClassId, $payload);
+
+        if (null !== $response && $response->status() === 200) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function deleteBadgeClass(string $badgeClassId): bool
+    {
+
+        $response = $this->getClient()->delete('/v2/badgeclasses/' . $badgeClassId);
+
+        if (null !== $response && ($response->status() === 200 || $response->status() === 404)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function addAssertion(string $badgeClassId, string $recipientIdentifier, string $recipientType = 'email', mixed $issuedOn = null, ?string $evidenceUrl = null, ?string $evidenceNarrative = null): mixed
+    {
+        $payload = [
+            'recipient' => [
+                'identity' => $recipientIdentifier,
+                'type' => $recipientType
+            ]
+        ];
+
+        if($issuedOn instanceof CarbonInterface) {
+            $payload['issuedOn'] = $issuedOn->format('c');
+        }
+
+        if(null !== $evidenceNarrative || null !== $evidenceUrl) {
+            $evidence = [];
+            if(!)
+        }
+
+        $response = $this->getClient()->post('/v2/badgeclasses/' . $badgeClassId . '/assertions', $payload);
+
+        return $this->getEntityId($response);
+    }
+
+    /**
+     * @param PromiseInterface|Response $response
+     * @return false|mixed
+     */
+    private function getEntityId(PromiseInterface|Response $response): mixed
+    {
+        if ($response->status() === 201) {
+            $response = $response->json();
+            if (isset($response['status']['success']) && true === $response['status']['success'] && isset($response['result'][0]['entityId'])) {
+                return $response['result'][0]['entityId'];
+            }
         }
 
         return false;
