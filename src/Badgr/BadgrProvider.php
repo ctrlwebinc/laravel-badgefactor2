@@ -418,6 +418,10 @@ class BadgrProvider
         return $this->getCount($response);
     }
 
+    /**
+     * @return bool
+     * @throws Exception
+     */
     public function getAllBadgeClasses(): bool
     {
         $response = $this->getClient()->get('/v2/badgeclasses');
@@ -425,14 +429,23 @@ class BadgrProvider
         return $this->getResult($response);
     }
 
-    public function getAllBadgeClassesCount()
+    /**
+     * @return false|int
+     * @throws Exception
+     */
+    public function getAllBadgeClassesCount(): bool|int
     {
         $response = $this->getClient()->get('/v2/badgeclasses_count');
 
         return $this->getCount($response);
     }
 
-    public function getBadgeClassByBadgeClassSlug(string $badgeClassId)
+    /**
+     * @param string $badgeClassId
+     * @return false|mixed
+     * @throws Exception
+     */
+    public function getBadgeClassByBadgeClassSlug(string $badgeClassId): mixed
     {
 
         $response = $this->getClient()->get('/v2/badgeclasses/' . $badgeClassId);
@@ -450,7 +463,18 @@ class BadgrProvider
         return false;
     }
 
-    public function updateBadgeClass(string $badgeClassId, string $name, ?string $description = null, ?string $image = null): bool
+    /**
+     * @param string $badgeClassId
+     * @param string $name
+     * @param string|null $description
+     * @param string|null $image
+     * @return bool
+     * @throws Exception
+     */
+    public function updateBadgeClass(
+        string  $badgeClassId, string $name,
+        ?string $description = null, ?string $image = null
+    ): bool
     {
         $payload = [
             'name' => $name,
@@ -470,6 +494,11 @@ class BadgrProvider
         return false;
     }
 
+    /**
+     * @param string $badgeClassId
+     * @return bool
+     * @throws Exception
+     */
     public function deleteBadgeClass(string $badgeClassId): bool
     {
 
@@ -482,7 +511,21 @@ class BadgrProvider
         return false;
     }
 
-    public function addAssertion(string $badgeClassId, string $recipientIdentifier, string $recipientType = 'email', mixed $issuedOn = null, ?string $evidenceUrl = null, ?string $evidenceNarrative = null): mixed
+    /**
+     * @param string $badgeClassId
+     * @param string $recipientIdentifier
+     * @param string $recipientType
+     * @param mixed|null $issuedOn
+     * @param string|null $evidenceUrl
+     * @param string|null $evidenceNarrative
+     * @return mixed
+     * @throws Exception
+     */
+    public function addAssertion(
+        string  $badgeClassId, string $recipientIdentifier,
+        string  $recipientType = 'email', mixed $issuedOn = null,
+        ?string $evidenceUrl = null, ?string $evidenceNarrative = null
+    ): mixed
     {
         $payload = [
             'recipient' => [
