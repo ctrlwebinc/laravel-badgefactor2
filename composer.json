@@ -53,6 +53,5 @@
     "repositories": [
     ],
     "minimum-stability": "dev",
-    "prefer-stable": true,
-    "version": "0.0.2"
+    "prefer-stable": true
   }
