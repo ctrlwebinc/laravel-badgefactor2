@@ -504,7 +504,7 @@ class BadgrProvider
 
         $response = $this->getClient()->delete('/v2/badgeclasses/' . $badgeClassId);
 
-        if (null !== $response && ($response->status() === 200 || $response->status() === 404)) {
+        if (null !== $response && ($response->status() === 204 || $response->status() === 404)) {
             return true;
         }
 
