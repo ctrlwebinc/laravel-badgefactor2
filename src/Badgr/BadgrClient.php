@@ -123,7 +123,7 @@ class BadgrClient
      * @param array $config
      * @return GenericProvider
      */
-    private function makeAuthProvider(array $config = [])
+    private function makeAuthProvider()
     {
         if ($this->authProvider instanceof GenericProvider) {
             return $this->authProvider;
@@ -143,7 +143,7 @@ class BadgrClient
             'urlAuthorize' =>  $this->serverUrl . '/o/authorize',
             'urlAccessToken' => $this->serverUrl . '/o/token',
             'urlResourceOwnerDetails' => $this->serverUrl . '/o/resource',
-            'scopes' => $config['scopes'] ?? null,
+            'scopes' => $this->scopes ?? null,
         ]);
     }
 
