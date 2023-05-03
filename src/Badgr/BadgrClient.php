@@ -92,15 +92,14 @@ class BadgrClient
      */
     public function getHttpClient(?array $accessToken = null): mixed
     {
-
         if ($this->httpClient === null) {
             $this->httpClient = Http::baseUrl($this->serverUrl);
         }
 
-        if ($accessToken) {
+        if ($this->accessToken) {
             try {
-                if ($this->accessTokenHasExpired($accessToken)) {
-                    $accessToken = $this->fetchAccessTokenUsingRefreshToken($accessToken['refresh_token']);
+                if ($this->accessTokenHasExpired($this->accessToken)) {
+                    $accessToken = $this->fetchAccessTokenUsingRefreshToken($this->accessToken['refresh_token']);
                 }
             } catch (\Exception $e) {
                 throw new \Exception("The Badgr access token does not exist. Please log in again");
@@ -111,6 +110,8 @@ class BadgrClient
             } else {
                 $this->httpClient = $this->httpClient->withToken($accessToken['access_token']);
             }
+
+            $this->accessToken = $accessToken;
         }
 
         return $this->httpClient;
