@@ -95,6 +95,10 @@ class BadgrClient
         if ($this->httpClient === null) {
             $this->httpClient = Http::baseUrl($this->serverUrl);
         }
+        
+        if (!$this->accessToken || $this->accessToken !== $accessToken) {
+            $this->accessToken = $accessToken;
+        }
 
         if ($this->accessToken) {
             try {
