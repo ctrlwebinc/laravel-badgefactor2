@@ -7,6 +7,7 @@ use Ctrlweb\BadgeFactor2\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class MigrateWordPressUsers extends Command
 {
@@ -63,65 +64,121 @@ class MigrateWordPressUsers extends Command
                             [$wpUser->ID]
                         )
                 );
-
-                // Create user.
-                $user = User::updateOrCreate(
-                    [
-                        'email' => $wpUser->user_email,
-                    ],
-                    [
-                        'name' => $wpUser->display_name,
-                        'first_name' => $userMeta->firstWhere('meta_key', 'first_name')->meta_value,
-                        'last_name' => $userMeta->firstWhere('meta_key', 'last_name')->meta_value,
-                        'description' => $userMeta->firstWhere('meta_key', 'description')->meta_value,
-                        'website' => '',
-                        'slug' => $wpUser->user_nicename,
-                        'password' => Hash::make($wpUser->user_pass),
-                        'created_at' => Carbon::parse($wpUser->user_registered)
-                            ->setTimeZone(config('app.timezone'))
-                            ->toDateTimeString(),
-                        'wp_id' => $wpUser->ID,
-                        'wp_password' => $wpUser->user_pass,
-                    ]
+                $bpProfile = collect(
+                    DB::connection($wordpressDb)
+                        ->select(
+                            "SELECT *
+                                FROM {$prefix}bp_xprofile_data
+                                WHERE user_id = ?",
+                                [$wpUser->ID]
+                        )
                 );
 
-                // Identify and transfer WordPress capabilities.
-                if ($userMeta->firstwhere('meta_key', 'wp_capabilities')->meta_value) {
-                    $capabilities = \unserialize($userMeta->firstwhere('meta_key', 'wp_capabilities')->meta_value);
-                    if (array_key_exists('administrator', $capabilities) && $capabilities['administrator'] === true) {
-                        $user->roles()->updateOrCreate(['role' => 'admin']);
-                    }
-                    if (array_key_exists('customer', $capabilities) && $capabilities['customer'] === true) {
-                        $wcOrders = DB::connection($wordpressDb)
-                            ->select(
-                                "SELECT p.* from {$prefix}posts p
-                                JOIN {$prefix}postmeta pm
-                                ON p.ID = pm.post_id
-                                WHERE post_type = 'shop_order'
-                                AND meta_key = '_customer_user'
-                                AND meta_value = '{$user->wp_id}'"
-                            );
+                // Create user.
+                User::withoutEvents( function() use ($wpUser, $userMeta, $bpProfile, $wordpressDb, $prefix) {
+                    $user = User::updateOrCreate(
+                        [
+                            'email' => $wpUser->user_email,
+                        ],
+                        [
+                            'name' => $bpProfile->firstWhere('field_id', 1) ? $bpProfile->firstWhere('field_id', 1)->value : $wpUser->display_name,
+                            //'email_verified_at' => null,
+                            'password' => Hash::make($wpUser->user_pass),
+                            //'two_factor_secret' => null,
+                            //'two_factor_secret_recovery_codes' => null,
+                            //'two_factor_confirmed_at' => null,
+                            //'remember_token' => null,
+                            'created_at' => Carbon::parse($wpUser->user_registered)
+                                ->setTimeZone(config('app.timezone'))
+                                ->toDateTimeString(),
+                            'updated_at' => Carbon::parse($wpUser->user_registered)
+                                ->setTimeZone(config('app.timezone'))
+                                ->toDateTimeString(),
+                            'first_name' => $userMeta->firstWhere('meta_key', 'first_name')->meta_value,
+                            'last_name' => $userMeta->firstWhere('meta_key', 'last_name')->meta_value,
+                            'description' => $userMeta->firstWhere('meta_key', 'description')->meta_value,
+                            'website' => $bpProfile->firstWhere('field_id', 5) ?  $bpProfile->firstWhere('field_id', 5)->value : null,
+                            'slug' => $wpUser->user_nicename ? Str::slug($wpUser->user_nicename) : Str::slug($wpUser->user_login),
+                            'wp_id' => $wpUser->ID,
+                            'wp_password' => $wpUser->user_pass,
+                            'place' => $bpProfile->firstWhere('field_id', 4) ? $bpProfile->firstWhere('field_id', 4)->value : null,
+                            'organisation' => $bpProfile->firstWhere('field_id', 2) ? $bpProfile->firstWhere('field_id', 2)->value : null,
+                            'job' => $bpProfile->firstWhere('field_id', 3) ? $bpProfile->firstWhere('field_id', 3)->value : null,
+                            'biography' => $bpProfile->firstWhere('field_id', 6) ? $bpProfile->firstWhere('field_id', 6)->value : null,
+                            'facebook' => $bpProfile->firstWhere('field_id', 7) ? $bpProfile->firstWhere('field_id', 7)->value : null,
+                            'twitter' => $bpProfile->firstWhere('field_id', 8) ? $bpProfile->firstWhere('field_id', 8)->value : null,
+                            'linkedin' => $bpProfile->firstWhere('field_id', 9) ? $bpProfile->firstWhere('field_id', 9)->value : null,
+                            //'photo' => null,
+                            //'billing_last_name' => null,
+                            //'billing_first_name' => null,
+                            //'billing_society' => null,
+                            //'billing_address_line_1' => null,
+                            //'billing_address_line_2' => null,
+                            //'billing_city' => null,
+                            //'billing_postal_code' => null,
+                            //'billing_country' => null,
+                            //'billing_state' => null,
+                            //'billing_phone' => null,
+                            //'billing_email' => null,
+                            'user_status' => 'ACTIVE',
+                            'last_connexion' => $userMeta->firstWhere('meta_key', 'last_activity') ?
+                                Carbon::parse($userMeta->firstWhere('meta_key', 'last_activity')->meta_value)
+                                    ->setTimeZone(config('app.timezone'))
+                                    ->toDateTimeString() :
+                                null,
+                            'username' => $wpUser->user_login,
+                            //'stripe_id' => null,
+                            //'pm_type' => null,
+                            //'pm_last_four' => null,
+                            //'trial_ends_at' => null,
+                            //'wp_application_password' => null, // FIXME Remove this
+                            'badgr_user_state' => $userMeta->firstWhere('meta_key', 'badgr_user_state') ? $userMeta->firstWhere('meta_key', 'badgr_user_state')->meta_value : null,
+                            'badgr_user_slug' => $userMeta->firstWhere('meta_key', 'badgr_user_slug') ? $userMeta->firstWhere('meta_key', 'badgr_user_slug')->meta_value : null,
+                            'badgr_password' => $userMeta->firstWhere('meta_key', 'badgr_password') ? $userMeta->firstWhere('meta_key', 'badgr_password')->meta_value : null,
+                        ]
+                    );
 
-                        foreach ($wcOrders as $wcOrder) {
-                            $wcOrderMeta = collect(
-                                DB::connection($wordpressDb)
-                                    ->select(
-                                        "SELECT *
-                                            FROM {$prefix}postmeta
-                                            WHERE post_id = ?",
-                                        [$wcOrder->ID]
-                                    )
-                            );
+                    // Identify and transfer WordPress capabilities.
+                    if ($userMeta->firstwhere('meta_key', 'wp_capabilities')->meta_value) {
+                        $capabilities = \unserialize($userMeta->firstwhere('meta_key', 'wp_capabilities')->meta_value);
+                        if (array_key_exists('administrator', $capabilities) && $capabilities['administrator'] === true) {
+                            $user->assignRole(User::ADMINISTRATOR);
+                        }
+                        if (array_key_exists('customer', $capabilities) && $capabilities['customer'] === true) {
+                            $wcOrders = DB::connection($wordpressDb)
+                                ->select(
+                                    "SELECT p.* from {$prefix}posts p
+                                    JOIN {$prefix}postmeta pm
+                                    ON p.ID = pm.post_id
+                                    WHERE post_type = 'shop_order'
+                                    AND meta_key = '_customer_user'
+                                    AND meta_value = '{$user->wp_id}'"
+                                );
 
-                            if (0 === intval($wcOrderMeta->firstWhere('meta_key', '_order_total')->meta_value)) {
-                                // Free access: give learner-free role.
-                                $user->roles()->updateOrCreate(['role' => 'learner-free']);
-                            } else {
-                                // Give access to specific courses.
+                            foreach ($wcOrders as $wcOrder) {
+                                $wcOrderMeta = collect(
+                                    DB::connection($wordpressDb)
+                                        ->select(
+                                            "SELECT *
+                                                FROM {$prefix}postmeta
+                                                WHERE post_id = ?",
+                                            [$wcOrder->ID]
+                                        )
+                                );
+
+                                if (0 === intval($wcOrderMeta->firstWhere('meta_key', '_order_total')->meta_value)) {
+                                    // Free access: give free-learner role.
+                                    $user->assignRole(User::FREE_LEARNER);
+                                    $user->assignRole(User::LEARNER);
+                                } else {
+                                    // Give access to specific courses.
+                                    $user->assignRole(User::LEARNER);
+                                    $user->assignRole(User::CLIENT);
+                                }
                             }
                         }
                     }
-                }
+                });
             }
         );
 

@@ -23,8 +23,8 @@ class BadgrProvider
                 $badgrConfig->client_id,
                 $badgrConfig->client_secret,
                 $badgrConfig->redirect_uri,
-                config('cadre21.badgr.server_url'),
-                config('cadre21.badgr.scopes')
+                config('badgefactor2.badgr.server_url'),
+                config('badgefactor2.badgr.admin_scopes')
             );
         }
     }
@@ -113,18 +113,6 @@ class BadgrProvider
 
     /**
      * @param string $issuerId
-     * @return bool|array
-     * @throws Exception
-     */
-    public function getAllBadgeClassesByIssuerSlug(string $issuerId): bool|array
-    {
-        $response = $this->getClient()->get('/v2/issuers/' . $issuerId . '/badgeclasses');
-
-        return $this->getResult($response);
-    }
-
-    /**
-     * @param string $issuerId
      * @return false|int
      * @throws Exception
      */
@@ -133,71 +121,6 @@ class BadgrProvider
         $response = $this->getClient()->put('/v2/badgeclasses_count/issuer/' . $issuerId);
 
         return $this->getCount($response);
-    }
-
-    /**
-     * @return false|int
-     * @throws Exception
-     */
-    public function getAllBadgeClassesCount(): bool|int
-    {
-        $response = $this->getClient()->get('/v2/badgeclasses_count');
-
-        return $this->getCount($response);
-    }
-
-    /**
-     * @param string $badgeClassId
-     * @return false|mixed
-     * @throws Exception
-     */
-    public function getBadgeClassByBadgeClassSlug(string $badgeClassId): mixed
-    {
-
-        $response = $this->getClient()->get('/v2/badgeclasses/' . $badgeClassId);
-
-        if (null !== $response && $response->status() === 200) {
-            $response = $response->json();
-            if (
-                isset($response['status']['success']) && true === $response['status']['success'] &&
-                isset($response['result']) && isset($response['result'][0])
-            ) {
-                return $response['result'][0];
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param string $badgeClassId
-     * @param string $name
-     * @param string|null $description
-     * @param string|null $image
-     * @return bool
-     * @throws Exception
-     */
-    public function updateBadgeClass(
-        string  $badgeClassId, string $name,
-        ?string $description = null, ?string $image = null
-    ): bool
-    {
-        $payload = [
-            'name' => $name,
-            'description' => $description,
-        ];
-
-        if (null !== $image) {
-            $payload['image'] = $image;
-        }
-
-        $response = $this->getClient()->put('/v2/badgeclasses/' . $badgeClassId, $payload);
-
-        if (null !== $response && $response->status() === 200) {
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -262,22 +185,6 @@ class BadgrProvider
 
         return $this->getEntityId($response);
     }
-
-    /**
-     * @param string $badgeClassId
-     * @param string $recipientIdentifier
-     * @param string $recipientType
-     * @param mixed|null $issuedOn
-     * @param string|null $evidenceUrl
-     * @param string|null $evidenceNarrative
-     * @return mixed
-     * @throws Exception
-     */
-    public function getAssertions(string  $email)
-    {
-        $response = $this->getClient()->get('/v2/issuers');
-    }
-
 
     /**
      * Prepares image to be sent to Badgr API.

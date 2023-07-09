@@ -16,6 +16,15 @@ class Badge extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
+    protected $schema = [
+        'entityId' => 'string',
+        'image' => 'string',
+        'issuer_id' => 'string',
+        'name' => 'string',
+        'description' => 'string',
+        'criteriaNarrative' => 'string',
+    ];
+
     protected static function booted(): void
     {
         static::creating(function (Badge $badge) {
@@ -51,16 +60,21 @@ class Badge extends Model
 
     public function getRows()
     {
-        $service = app(BadgrService::class);
+        $badges = app(BadgrBadge::class)->all();
+        if ($badges) {
+            $badges = collect(app(BadgrBadge::class)->all());
+            $badges = $badges->map(function($row) {
+                $row = collect($row);
+                $row['issuer_id'] = $row['issuer'];
+                unset($row['issuer']);
+                return $row->except(['alignments', 'tags', 'extensions', 'expires'])
+                    ->toArray();
+            });
 
-        $badges = collect(app(BadgrService::class)->getAllBadges())->map(function($row) {
-            $row['issuer_id'] = $row['issuer'];
-            unset($row['issuer']);
-            return collect($row)->except(['alignments', 'tags', 'extensions', 'expires'])
-                ->toArray();
-        });
+            return $badges->all();
+        }
+        return [];
 
-        return $badges->all();
     }
 
     public function issuer()

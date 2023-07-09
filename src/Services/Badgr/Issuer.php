@@ -21,8 +21,10 @@ class Issuer extends BadgrProvider
             return json_decode(Cache::get('issuers'));
         }
 
-        $response = $this->getClient()
-            ->get('/v2/issuers');
+        $client = $this->getClient();
+        if ( ! $client ) return false;
+
+        $response = $client->get('/v2/issuers');
 
         $response = $this->getResult($response);
 
@@ -43,8 +45,7 @@ class Issuer extends BadgrProvider
             return Cache::get('issuers_count');
         }
 
-        $response = $this->getClient()
-            ->get('/v2/issuers_count');
+        $response = $this->getClient()->get('/v2/issuers_count');
 
         $response = $this->getCount($response);
 
@@ -84,11 +85,10 @@ class Issuer extends BadgrProvider
     public function getBySlug(string $entityId): mixed
     {
         if (Cache::has('issuer_'.$entityId)) {
-            return json_decode(Cache::get('issuer_'.$entityId));
+            return json_decode(Cache::get('issuer_' . $entityId));
         }
 
-        $response = $this->getClient()
-            ->get('/v2/issuers/'.$entityId);
+        $response = $this->getClient()->get('/v2/issuers/' . $entityId);
 
         $response = $this->getFirstResult($response);
 
@@ -180,7 +180,11 @@ class Issuer extends BadgrProvider
      */
     public function delete(string $entityId): bool
     {
-        $response = $this->getClient()->delete('/v2/issuers/'.$entityId);
+
+        $client = $this->getClient();
+        if ( ! $client ) return false;
+
+        $response = $client->delete('/v2/issuers/' . $entityId);
 
         Cache::forget('issuers');
         Cache::forget('issuer_'.$entityId);

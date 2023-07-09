@@ -55,7 +55,6 @@ class Issuer extends Model
 
     public function getRows()
     {
-        $service = app(BadgrService::class);
         $issuers = collect(app(BadgrIssuer::class)->all())->map(function($row) {
             return collect($row)->except(['staff', 'extensions'])->toArray();
         });

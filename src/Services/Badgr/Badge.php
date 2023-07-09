@@ -22,8 +22,11 @@ class Badge extends BadgrProvider
             return json_decode(Cache::get('badges'));
         }
 
-        $response = $this->getClient()
-            ->get('/v2/badgeclasses');
+        $client = $this->getClient();
+
+        if ( ! $client ) return false;
+
+        $response = $this->getClient()->get('/v2/badgeclasses');
 
         $response = $this->getResult($response);
 
@@ -44,8 +47,7 @@ class Badge extends BadgrProvider
             return Cache::get('badges_count');
         }
 
-        $response = $this->getClient()
-            ->get('/v2/badgeclasses_count');
+        $response = $this->getClient()->get('/v2/badgeclasses_count');
 
         $response = $this->getCount($response);
 
@@ -88,8 +90,7 @@ class Badge extends BadgrProvider
             return json_decode(Cache::get('badge_'.$entityId));
         }
 
-        $response = $this->getClient()
-            ->get('/v2/badgeclasses/'.$entityId);
+        $response = $this->getClient()->get('/v2/badgeclasses/' . $entityId);
 
         $response = $this->getFirstResult($response);
 
@@ -186,7 +187,7 @@ class Badge extends BadgrProvider
      */
     public function delete(string $entityId): bool
     {
-        $response = $this->getClient()->delete('/v2/badgeclasses/'.$entityId);
+        $response = $this->getClient()->delete('/v2/badgeclasses/' . $entityId);
 
         Cache::forget('badges');
         Cache::forget('badge_'.$entityId);
