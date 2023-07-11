@@ -32,22 +32,6 @@ class BadgrService
         return $this->badgrClient;
     }
 
-    public function getAllBadgesByIssuer($issuer)
-    {
-        /*
-        if (Cache::has('badges-by-issuer-'.$issuer)) {
-            return Cache::get('badges-by-issuer-'.$issuer);
-        }
-
-        $response = $this->getBadgrClient()
-            ->getHttpClient(BadgrConfig::first()->getAccessTokenToArray())
-            ->get('/v2/issuers/' . $issuer . '/badgeclasses');
-        $response = $response->json('result');
-        Cache::put('badges-by-issuer-'.$issuer, $response, 60);
-        return collect($response);
-        */
-    }
-
     public function approveBadgeRequest(BadgeRequest $badgeRequest)
     {
         /*

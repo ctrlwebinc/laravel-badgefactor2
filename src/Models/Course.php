@@ -19,7 +19,7 @@ class Course extends Model
         'duration',
         'url',
         'autoevaluation_form_url',
-        'badge_id',
+        'badge_page_id',
     ];
 
     public function users()

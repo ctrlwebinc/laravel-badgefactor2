@@ -101,6 +101,24 @@ class Badge extends BadgrProvider
         return $response;
     }
 
+    public function getByIssuer(string $entityId): mixed
+    {
+        if (Cache::has('badges_by_issuer_'.$entityId)) {
+            return Cache::get('badges_by_issuer_'.$entityId);
+        }
+
+        $response = $this->getClient()
+            ->get('/v2/issuers/' . $entityId . '/badgeclasses');
+
+        $response = $this->getResult($response);
+
+        if ($response) {
+            Cache::put('badges_by_issuer_'.$issuer, $response, 60);
+        }
+
+        return $response;
+    }
+
 
     /**
      * @param string $image
