@@ -1,6 +1,6 @@
 <?php
 
-namespace Ctrlweb\BadgeFactor2\Http\Resources;
+namespace Ctrlweb\BadgeFactor2\Http\Resources\Courses;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 

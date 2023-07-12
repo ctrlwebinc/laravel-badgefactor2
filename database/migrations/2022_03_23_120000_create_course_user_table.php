@@ -1,6 +1,6 @@
 <?php
 
-use Ctrlweb\BadgeFactor2\Models\Course;
+use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 use Ctrlweb\BadgeFactor2\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;

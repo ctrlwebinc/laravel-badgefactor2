@@ -2,7 +2,6 @@
 
 namespace Ctrlweb\BadgeFactor2\Models\Courses;
 
-use App\Models\Product;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,16 +13,20 @@ class Course extends Model
 
     protected $translatable = [
         'title',
+        'description',
     ];
 
     protected $fillable = [
         'title',
+        'description',
         'type',
         'duration',
         'url',
         'autoevaluation_form_url',
         'badge_page_id',
         'course_category_id',
+        "regular_price",
+        "promo_price",
     ];
 
     protected $with = ['badgePage'];
@@ -46,7 +49,20 @@ class Course extends Model
         return $this->belongsTo(BadgePage::class);
     }
 
-    public function product() {
-        return $this->belongsTo(Product::class);
+    public function price(): Attribute
+    {
+        if (!is_null($this->promo_price)) {
+            $price = $this->promo_price;
+        } else {
+            $price = $this->regular_price;
+        }
+        return Attribute::make(
+            get: fn() => $price
+        );
+    }
+
+    public function carts(): BelongsToMany
+    {
+        return $this->belongsToMany(Cart::class, 'cart_product');
     }
 }

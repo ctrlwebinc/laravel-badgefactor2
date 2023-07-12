@@ -4,6 +4,7 @@ namespace Ctrlweb\BadgeFactor2;
 
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWooCommerceData;
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWordPressUsers;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -16,6 +17,9 @@ class CoreServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+
+        $this->configureRateLimiting();
+
         if ($this->app->runningInConsole()) {
             $this->registerPublishing();
             $this->commands([
@@ -98,25 +102,19 @@ class CoreServiceProvider extends ServiceProvider
      */
     protected function registerRoutes()
     {
+        $this->loadRoutesFrom(__DIR__.'/../routes/routes.php');
 
-        Route::group($this->routeConfiguration(), function () {
-            $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
-        });
     }
 
     /**
-     * Get the BadgeFactor2 route group configuration array.
+     * Configure the rate limiters for the application.
      *
-     * @return array
+     * @return void
      */
-    protected function routeConfiguration()
+    protected function configureRateLimiting()
     {
-        return [
-            'prefix' => 'api/{locale}',
-            'middleware' => 'locale',
-            'namespace' => 'Ctrlweb\BadgeFactor2\Http\Controllers\Api',
-            'domain' => config('badgefactor2.domain', null),
-            //'middleware' => 'bf2',
-        ];
+        RateLimiter::for('api', function (Request $request) {
+            return Limit::perMinute(60)->by(optional($request->user())->id ?: $request->ip());
+        });
     }
 }

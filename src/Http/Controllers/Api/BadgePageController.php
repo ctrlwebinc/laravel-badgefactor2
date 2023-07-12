@@ -3,7 +3,7 @@
 namespace Ctrlweb\BadgeFactor2\Http\Controllers\Api;
 
 use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
-use Ctrlweb\BadgeFactor2\Http\Resources\BadgePageResource;
+use Ctrlweb\BadgeFactor2\Http\Resources\Badges\BadgePageResource;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
 use Illuminate\Http\Request;

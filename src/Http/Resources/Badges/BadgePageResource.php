@@ -1,6 +1,6 @@
 <?php
 
-namespace Ctrlweb\BadgeFactor2\Http\Resources;
+namespace Ctrlweb\BadgeFactor2\Http\Resources\Badges;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Ctrlweb\BadgeFactor2\Http\Resources\Courses\BasicCourseGroupResource;
@@ -33,7 +33,6 @@ class BadgePageResource extends JsonResource
             "last_updated_at" => $this->resource->last_updated_at,
             "product_id" => $this->resource->course->product_id ?? null,
             "course" => CourseResource::make($this->resource->course ?? null),
-            "product" => ProductResource::make($this->resource->course->product ?? null),
             "course_group" => BasicCourseGroupResource::make($this->resource->course->courseGroup ?? null),
             "course_group_category" => CourseGroupCategoryResource::make(
                 $this->resource->course->courseGroup->courseGroupCategory ?? null

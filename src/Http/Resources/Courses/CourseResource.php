@@ -21,6 +21,8 @@ class CourseResource extends JsonResource
             "course_category_id" => $this->resource->course_category_id,
             "course_group_id" => $this->resource->course_group_id,
             "badge_page" => $this->resource->badgePage,
+            "regular_price" => $this->resource->regular_price,
+            "promo_price" => $this->resource->promo_price
         ];
     }
 }
