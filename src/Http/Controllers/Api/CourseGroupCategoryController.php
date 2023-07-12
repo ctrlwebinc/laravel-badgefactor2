@@ -3,9 +3,9 @@
 namespace Ctrlweb\BadgeFactor2\Http\Controllers\Api;
 
 use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
-use Ctrlweb\BadgeFactor2\Http\Resources\BasicCourseGroupCategoryResource;
-use Ctrlweb\BadgeFactor2\Http\Resources\CourseGroupCategoryResource;
-use Ctrlweb\BadgeFactor2\Models\CourseGroupCategory;
+use Ctrlweb\BadgeFactor2\Http\Resources\Courses\BasicCourseGroupCategoryResource;
+use Ctrlweb\BadgeFactor2\Http\Resources\Courses\CourseGroupCategoryResource;
+use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroupCategory;
 
 /**
  * @tags Catégories de groupes de cours

@@ -3,8 +3,8 @@
 namespace Ctrlweb\BadgeFactor2\Http\Controllers\Api;
 
 use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
-use Ctrlweb\BadgeFactor2\Http\Resources\CourseGroupResource;
-use Ctrlweb\BadgeFactor2\Models\CourseGroup;
+use Ctrlweb\BadgeFactor2\Http\Resources\Courses\CourseGroupResource;
+use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Pagination\LengthAwarePaginator;

@@ -141,8 +141,13 @@ class MigrateWordPressUsers extends Command
                     // Identify and transfer WordPress capabilities.
                     if ($userMeta->firstwhere('meta_key', 'wp_capabilities')->meta_value) {
                         $capabilities = \unserialize($userMeta->firstwhere('meta_key', 'wp_capabilities')->meta_value);
+
                         if (array_key_exists('administrator', $capabilities) && $capabilities['administrator'] === true) {
                             $user->assignRole(User::ADMINISTRATOR);
+                        } elseif (array_key_exists('approver', $capabilities) && $capabilities['approver'] === true) {
+                            $user->assignRole(User::APPROVER);
+                        } else {
+                            $user->assignRole(User::LEARNER);
                         }
                         if (array_key_exists('customer', $capabilities) && $capabilities['customer'] === true) {
                             $wcOrders = DB::connection($wordpressDb)
@@ -166,13 +171,8 @@ class MigrateWordPressUsers extends Command
                                         )
                                 );
 
-                                if (0 === intval($wcOrderMeta->firstWhere('meta_key', '_order_total')->meta_value)) {
-                                    // Free access: give free-learner role.
-                                    $user->assignRole(User::FREE_LEARNER);
-                                    $user->assignRole(User::LEARNER);
-                                } else {
+                                if (0 !== intval($wcOrderMeta->firstWhere('meta_key', '_order_total')->meta_value)) {
                                     // Give access to specific courses.
-                                    $user->assignRole(User::LEARNER);
                                     $user->assignRole(User::CLIENT);
                                 }
                             }

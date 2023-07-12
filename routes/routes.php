@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Route;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\BadgePageController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr\IssuerController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr\BadgeController;
+use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseCategoryController;
+use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseGroupCategoryController;
+use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseGroupController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\BadgeFactor2Controller;
 
 /*
@@ -35,6 +38,19 @@ Route::group([
     // Badge pages.
     Route::apiResource('badge-pages', BadgePageController::class)->only(['index', 'show']);
     Route::get('badge-pages-by-course-group/{courseGroup}', [BadgePageController::class, 'badgePageByCourseGroup']);
+
+    // Course Groups.
+    Route::apiResource('course-groups', CourseGroupController::class)
+    ->only(['index', 'show']);
+
+    // Course Group Categories.
+    Route::get('course-group-categories', [CourseGroupCategoryController::class, 'index']);
+    Route::get('course-group-categories/{courseGroupCategory}', [CourseGroupCategoryController::class, 'show']);
+
+    // Course Categories.
+    Route::apiResource('course-categories', CourseCategoryController::class)
+        ->only(['index', 'show']);
+
 });
 
 /*

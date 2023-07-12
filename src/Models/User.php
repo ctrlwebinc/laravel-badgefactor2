@@ -27,8 +27,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     const EDITOR = 'editor';
 
-    const FREE_LEARNER = 'free-learner';
-
     const LEARNER = 'learner';
 
     const CLIENT = 'client';
