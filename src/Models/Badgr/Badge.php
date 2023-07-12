@@ -2,8 +2,6 @@
 
 namespace Ctrlweb\BadgeFactor2\Models\Badgr;
 
-use App\Models\BadgrConfig;
-use Collator;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Badge as BadgrBadge;
 use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrService;
 use Illuminate\Database\Eloquent\Model;

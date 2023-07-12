@@ -2,7 +2,7 @@
 
 namespace Ctrlweb\BadgeFactor2\Services\Badgr;
 
-use App\Models\BadgrConfig;
+use Ctrlweb\BadgeFactor2\Models\BadgrConfig;
 use Carbon\CarbonInterface;
 use Exception;
 use GuzzleHttp\Promise\PromiseInterface;

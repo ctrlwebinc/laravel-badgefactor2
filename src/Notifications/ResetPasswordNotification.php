@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Notifications;
+namespace Ctrlweb\BadgeFactor2\Notifications;
 
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;

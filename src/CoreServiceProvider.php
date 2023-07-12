@@ -98,6 +98,7 @@ class CoreServiceProvider extends ServiceProvider
      */
     protected function registerRoutes()
     {
+
         Route::group($this->routeConfiguration(), function () {
             $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
         });
@@ -111,9 +112,10 @@ class CoreServiceProvider extends ServiceProvider
     protected function routeConfiguration()
     {
         return [
-            'namespace' => 'Ctrlweb\BadgeFactor2\Http\Controllers',
+            'prefix' => 'api/{locale}',
+            'middleware' => 'locale',
+            'namespace' => 'Ctrlweb\BadgeFactor2\Http\Controllers\Api',
             'domain' => config('badgefactor2.domain', null),
-            'prefix' => 'bf2-api',
             //'middleware' => 'bf2',
         ];
     }

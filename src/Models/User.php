@@ -5,7 +5,7 @@ namespace Ctrlweb\Badgefactor2\Models;
 
 use Ctrlweb\BadgeFactor2\Notifications\ResetPasswordNotification;
 use Ctrlweb\BadgeFactor2\Models\BillingInfo;
-use Ctrlweb\BadgeFactor2\Models\Course;
+use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 use Ctrlweb\BadgeFactor2\Models\UserRole;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
