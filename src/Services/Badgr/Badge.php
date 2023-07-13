@@ -113,7 +113,7 @@ class Badge extends BadgrProvider
         $response = $this->getResult($response);
 
         if ($response) {
-            Cache::put('badges_by_issuer_'.$issuer, $response, 60);
+            Cache::put('badges_by_issuer_'.$entityId, $response, 60);
         }
 
         return $response;

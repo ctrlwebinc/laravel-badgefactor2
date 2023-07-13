@@ -18,8 +18,21 @@ class BadgePage extends Model
     use HasTranslations;
 
     protected $casts = [
-        'last_updated_at' => 'datetime',
         'badgeclass_id' => 'string',
+    ];
+
+    protected $fillable = [
+        'type',
+        'badgeclass_id',
+        'title',
+        'slug',
+        'content',
+        'criteria',
+        'approval_type',
+        'request_type',
+        'request_form_url',
+        'badge_category_id',
+        'badge_group_id',
     ];
 
     public static function findBySlug($slug)

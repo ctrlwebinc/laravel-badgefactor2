@@ -26,7 +26,6 @@ class BadgePageResource extends JsonResource
             "content" => $this->resource->content,
             "criteria" => $this->resource->criteria,
             "approval_type" => $this->resource->approval_type,
-            "request_type" => $this->resource->request_type,
             "request_form_url" => $this->resource->request_form_url,
             "course_category_id" => $this->resource->course->course_category_id ?? null,
             "course_group_id" => $this->resource->course->course_group_id ?? null,
