@@ -4,6 +4,7 @@ namespace Ctrlweb\Badgefactor2\Models;
 
 
 use Ctrlweb\BadgeFactor2\Notifications\ResetPasswordNotification;
+use Ctrlweb\BadgeFactor2\Models\Badgr\Assertion;
 use Ctrlweb\BadgeFactor2\Models\BillingInfo;
 use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 use Ctrlweb\BadgeFactor2\Models\UserRole;
@@ -89,8 +90,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'badgr_user_slug',
         'badgr_password',
     ];
-
-    protected $guard_name = 'web';
 
     /**
      * The attributes that should be hidden for serialization.
@@ -189,5 +188,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function billingInfo()
     {
         return $this->hasOne(BillingInfo::class);
+    }
+
+    public function assertions()
+    {
+        return $this->hasMany(Assertion::class);
     }
 }

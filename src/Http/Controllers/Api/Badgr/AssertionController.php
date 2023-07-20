@@ -3,18 +3,22 @@
 namespace Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr;
 
 use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
-use Ctrlweb\BadgeFactor2\Services\Badgr\Badge;
+use Ctrlweb\BadgeFactor2\Models\Badgr\Assertion;
 
 /**
  * @tags Emetteurs
  */
-class BadgeController extends Controller
+class AssertionController extends Controller
 {
     public function index()
     {
-        $badges = app(Badge::class)->all();
+        $assertions = Assertion::all();
 
-        return response()->json($badges);
+        if (!$assertions) {
+            return response()->json([], 404);
+        }
+
+        return response()->json($assertions);
     }
 
     public function show(string $locale, string $entityId)

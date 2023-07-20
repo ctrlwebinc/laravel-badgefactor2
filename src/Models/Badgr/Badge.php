@@ -135,6 +135,11 @@ class Badge extends Model
 
     }
 
+    public function assertions()
+    {
+        return $this->hasMany(Assertion::class, 'badgeclass_id');
+    }
+
     public function issuer()
     {
         return $this->belongsTo(Issuer::class, 'issuer_id', 'entityId');

@@ -4,8 +4,9 @@ use Illuminate\Support\Facades\Route;
 
 
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\BadgePageController;
-use Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr\IssuerController;
+use Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr\AssertionController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr\BadgeController;
+use Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr\IssuerController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseCategoryController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseGroupCategoryController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseGroupController;
@@ -49,6 +50,10 @@ Route::group([
 
     // Course Categories.
     Route::apiResource('course-categories', CourseCategoryController::class)
+        ->only(['index', 'show']);
+
+    // Assertions.
+    Route::apiResource('assertions', AssertionController::class)
         ->only(['index', 'show']);
 
 });

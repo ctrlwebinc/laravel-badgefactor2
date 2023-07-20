@@ -14,6 +14,15 @@ class Issuer extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
+    protected $schema = [
+        'entityId' => 'string',
+        'name' => 'string',
+        'email' => 'string',
+        'url' => 'string',
+        'description' => 'string',
+        'image' => 'string',
+    ];
+
     protected static function booted(): void
     {
         static::creating(function (Issuer $issuer) {
@@ -60,6 +69,11 @@ class Issuer extends Model
         return $issuers->all();
 
 
+    }
+
+    public function assertions()
+    {
+        return $this->hasMany(Assertion::class, 'issuer_id');
     }
 
     public function badges()

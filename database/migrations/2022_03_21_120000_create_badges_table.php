@@ -1,7 +1,7 @@
 <?php
 
-use Ctrlweb\BadgeFactor2\Models\BadgeCategory;
-use Ctrlweb\BadgeFactor2\Models\BadgeGroup;
+use Ctrlweb\BadgeFactor2\Models\Badges\BadgeCategory;
+use Ctrlweb\BadgeFactor2\Models\Badges\BadgeGroup;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
