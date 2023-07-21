@@ -1,6 +1,6 @@
 <?php
 
-use Ctrlweb\BadgeFactor2\Models\Badgr\Badge;
+use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -20,7 +20,7 @@ class CreateCoursesTable extends Migration
             $table->decimal('duration');
             $table->string('url', 1024)->nullable();
             $table->string('autoevaluation_form_url', 1024)->nullable();
-            $table->foreignIdFor(Badge::class);
+            $table->foreignIdFor(BadgePage::class);
             $table->timestamps();
         });
     }
