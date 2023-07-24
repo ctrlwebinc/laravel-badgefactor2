@@ -14,8 +14,8 @@ jobs:
         fail-fast: true
         matrix:
             operating-system: ['ubuntu-latest']
-            php-versions: ['8.0', '8.1']
-            laravel-versions: ['8.0']
+            php-versions: ['8.1', '8.2']
+            laravel-versions: ['9.0']
             phpunit-versions: ['latest']
             dependency-version: [prefer-stable]
             include:
@@ -23,9 +23,9 @@ jobs:
                   testbench: 6.*
     steps:
         - name: Checkout code
-          uses: actions/checkout@v2
+          uses: ctrlwebinc/checkout@v2
         - name: Setup PHP
-          uses: shivammathur/setup-php@v2
+          uses: ctrlwebinc/setup-php@v2
           with:
             php-version: ${{ matrix.php-versions }}
             extensions: mbstring, intl
@@ -37,7 +37,7 @@ jobs:
               composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
               composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
         - name: Cache dependencies
-          uses: actions/cache@v2
+          uses: ctrlwebinc/cache@v2
           with:
               path: ~/.composer/cache/files
               key: dependencies-${{ matrix.dependency-version }}-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
