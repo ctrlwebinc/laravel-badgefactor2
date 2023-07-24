@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Cache;
 
 class Badge extends BadgrProvider
 {
-
     /**
      * @throws Exception
      *
@@ -119,7 +118,7 @@ class Badge extends BadgrProvider
         }
 
         $client = $this->getClient();
-        if (!$client ) {
+        if (!$client) {
             return [];
         }
 
@@ -133,7 +132,6 @@ class Badge extends BadgrProvider
 
         return $response;
     }
-
 
     /**
      * @param string      $image
@@ -181,14 +179,13 @@ class Badge extends BadgrProvider
      * @return bool
      */
     public function update(
-        string  $entityId,
+        string $entityId,
         string $name,
         string $issuer,
         ?string $description,
         ?string $criteriaNarrative,
         ?string $image
-    ): bool
-    {
+    ): bool {
         $issuer = json_decode($issuer)->entityId;
         $payload = [
             'name'              => $name,

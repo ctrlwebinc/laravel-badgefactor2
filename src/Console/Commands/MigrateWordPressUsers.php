@@ -71,7 +71,7 @@ class MigrateWordPressUsers extends Command
                             "SELECT *
                                 FROM {$prefix}bp_xprofile_data
                                 WHERE user_id = ?",
-                                [$wpUser->ID]
+                            [$wpUser->ID]
                         )
                 );
 
@@ -93,7 +93,7 @@ class MigrateWordPressUsers extends Command
                             'first_name'       => $userMeta->firstWhere('meta_key', 'first_name')->meta_value,
                             'last_name'        => $userMeta->firstWhere('meta_key', 'last_name')->meta_value,
                             'description'      => $userMeta->firstWhere('meta_key', 'description')->meta_value,
-                            'website'          => $bpProfile->firstWhere('field_id', 5) ?  $bpProfile->firstWhere('field_id', 5)->value : null,
+                            'website'          => $bpProfile->firstWhere('field_id', 5) ? $bpProfile->firstWhere('field_id', 5)->value : null,
                             'slug'             => $wpUser->user_nicename ? Str::slug($wpUser->user_nicename) : Str::slug($wpUser->user_login),
                             'wp_id'            => $wpUser->ID,
                             'wp_password'      => $wpUser->user_pass,

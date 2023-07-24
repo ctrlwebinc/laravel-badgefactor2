@@ -67,7 +67,7 @@ class Assertion extends BadgrProvider
         }
 
         $client = $this->getClient();
-        if (!$client ) {
+        if (!$client) {
             return [];
         }
 

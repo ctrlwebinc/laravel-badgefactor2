@@ -45,6 +45,7 @@ class Issuer extends Model
                 $issuer->description,
                 $issuer->image
             );
+
             return true;
         });
 

@@ -22,7 +22,7 @@ class ResponsibleResource extends JsonResource
             'slug'        => $this->resource->slug,
             'description' => $this->resource->description,
             'image'       => $this->resource->image,
-            'created_at'  => $this->resource->created_at
+            'created_at'  => $this->resource->created_at,
         ];
     }
 }

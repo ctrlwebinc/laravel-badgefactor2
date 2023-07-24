@@ -129,7 +129,7 @@ class User extends BadgrProvider
             'emails'    => [
                 [
                     'email'   => $email,
-                    'primary' => true
+                    'primary' => true,
                 ]
             ]
         ];

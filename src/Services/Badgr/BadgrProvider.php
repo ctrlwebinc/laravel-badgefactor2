@@ -157,9 +157,9 @@ class BadgrProvider
      * @return mixed
      */
     public function addAssertion(
-        string  $badgeClassId,
+        string $badgeClassId,
         string $recipientIdentifier,
-        string  $recipientType = 'email',
+        string $recipientType = 'email',
         mixed $issuedOn = null,
         ?string $evidenceUrl = null,
         ?string $evidenceNarrative = null
@@ -168,7 +168,7 @@ class BadgrProvider
             'recipient' => [
                 'identity' => $recipientIdentifier,
                 'type'     => $recipientType,
-            ]
+            ],
         ];
 
         if ($issuedOn instanceof CarbonInterface) {
@@ -208,15 +208,15 @@ class BadgrProvider
             $rawFile = Storage::disk(config('nova.storage_disk'))->get($image);
 
             if ('image/svg' === $mimeType) {
-				$mimeType .= '+xml';
-			} elseif ('image/jpeg' === $mimeType || 'image/gif' === $mimeType) {
-			    ob_start();
-				$gdImage = imagecreatefromstring( $rawFile );
-				$success = imagepng( $gdImage );
-				$rawFile = ob_get_contents();
-				$mimeType = 'image/png';
-			    ob_end_clean();
-			}
+                $mimeType .= '+xml';
+            } elseif ('image/jpeg' === $mimeType || 'image/gif' === $mimeType) {
+                ob_start();
+                $gdImage = imagecreatefromstring( $rawFile );
+                $success = imagepng( $gdImage );
+                $rawFile = ob_get_contents();
+                $mimeType = 'image/png';
+                ob_end_clean();
+            }
 
             $file = base64_encode($rawFile);
 

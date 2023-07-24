@@ -2,8 +2,8 @@
 
 namespace Ctrlweb\BadgeFactor2\Http\Controllers;
 
-use Ctrlweb\BadgeFactor2\Models\BadgrConfig;
 use App\Nova\BadgrConfig as NovaBadgrConfig;
+use Ctrlweb\BadgeFactor2\Models\BadgrConfig;
 use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrService;
 use Illuminate\Http\Request;
 

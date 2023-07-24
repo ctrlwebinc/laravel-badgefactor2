@@ -74,4 +74,3 @@ Route::group([
         ->middleware('auth')
         ->name('bf2.redirect');
 });
-

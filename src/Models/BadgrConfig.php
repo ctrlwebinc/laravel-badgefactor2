@@ -28,7 +28,7 @@ class BadgrConfig extends Model
         return [
             'access_token'  => $this->access_token,
             'refresh_token' => $this->refresh_token,
-            'expires_at'    => $this->expires_at->format('Y-m-d H:i:s')
+            'expires_at'    => $this->expires_at->format('Y-m-d H:i:s'),
         ];
     }
 }

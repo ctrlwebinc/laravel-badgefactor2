@@ -64,7 +64,6 @@ class BadgrClient
 
     protected $accessToken;
 
-
     /**
      * BadgrClient constructor.
      *
@@ -110,6 +109,7 @@ class BadgrClient
                 }
             } catch (\Exception $e) {
                 return null; // FIXME.
+
                 throw new \Exception('The Badgr access token does not exist. Please log in again');
             }
 
@@ -149,9 +149,9 @@ class BadgrClient
             'clientId'                => $this->clientId,
             'clientSecret'            => $this->clientSecret,
             'redirectUri'             => $this->redirectUri,
-            'urlAuthorize'            =>  $this->serverUrl . '/o/authorize',
-            'urlAccessToken'          => $this->serverUrl . '/o/token',
-            'urlResourceOwnerDetails' => $this->serverUrl . '/o/resource',
+            'urlAuthorize'            =>  $this->serverUrl.'/o/authorize',
+            'urlAccessToken'          => $this->serverUrl.'/o/token',
+            'urlResourceOwnerDetails' => $this->serverUrl.'/o/resource',
             'scopes'                  => $this->scopes ?? null,
         ]);
     }

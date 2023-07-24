@@ -152,14 +152,13 @@ class Issuer extends BadgrProvider
      * @return bool
      */
     public function update(
-        string  $entityId,
+        string $entityId,
         string $name,
         string $email,
         string $url,
         ?string $description = null,
         ?string $image = null
-    ): bool
-    {
+    ): bool {
         $payload = [
             'name'  => $name,
             'email' => $email,
@@ -180,7 +179,6 @@ class Issuer extends BadgrProvider
         Cache::forget('issuer_'.$entityId);
 
         if (null !== $response && $response->status() === 200) {
-
             return true;
         }
 
@@ -189,8 +187,10 @@ class Issuer extends BadgrProvider
 
     /**
      * @param string $entityId
-     * @return bool
+     *
      * @throws Exception
+     *
+     * @return bool
      */
     public function delete(string $entityId): bool
     {

@@ -59,6 +59,7 @@ class Course extends Model
         } else {
             $price = $this->regular_price;
         }
+
         return Attribute::make(
             get: fn () => $price
         );

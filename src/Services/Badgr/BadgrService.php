@@ -4,13 +4,10 @@ namespace Ctrlweb\BadgeFactor2\Services\Badgr;
 
 use App\Models\BadgeRequest;
 use Ctrlweb\BadgeFactor2\Models\BadgrConfig;
-use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrClient;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 
 class BadgrService
 {
-
     private $badgrClient;
 
     public function __construct()
@@ -44,5 +41,4 @@ class BadgrService
         return $response->json();
         */
     }
-
 }

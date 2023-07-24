@@ -2,7 +2,6 @@
 
 namespace Ctrlweb\Badgefactor2\Models;
 
-
 use Ctrlweb\BadgeFactor2\Models\Badgr\Assertion;
 use Ctrlweb\BadgeFactor2\Models\BillingInfo;
 use Ctrlweb\BadgeFactor2\Models\Courses\Course;
