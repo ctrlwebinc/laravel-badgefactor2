@@ -1,6 +1,6 @@
 <?php
 
-namespace Ctrlweb\BadgeFactor2;
+namespace Ctrlweb\BadgeFactor2\Providers;
 
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWooCommerceData;
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWordPressUsers;
@@ -27,6 +27,16 @@ class CoreServiceProvider extends ServiceProvider
         }
 
         $this->registerResources();
+    }
+
+    /**
+     * Register application services.
+     *
+     * @return void
+     */
+    public function register(): void
+    {
+        $this->app->register(EventServiceProvider::class);
     }
 
     /**

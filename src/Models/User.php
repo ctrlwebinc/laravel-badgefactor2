@@ -6,6 +6,7 @@ use Ctrlweb\BadgeFactor2\Models\Badgr\Assertion;
 use Ctrlweb\BadgeFactor2\Models\BillingInfo;
 use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 use Ctrlweb\BadgeFactor2\Notifications\ResetPasswordNotification;
+use Ctrlweb\BadgeFactor2\Services\Badgr\User as BadgrUser;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -41,7 +42,6 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<int, string>
      */
     protected $fillable = [
-
         'id',
         'email',
         'email_verified_at',
@@ -111,6 +111,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'created_at'        => 'datetime',
         'email_verified_at' => 'datetime',
+        'is_validated'      => 'boolean',
     ];
 
     protected $with = [
@@ -192,5 +193,15 @@ class User extends Authenticatable implements MustVerifyEmail
     public function assertions()
     {
         return $this->hasMany(Assertion::class);
+    }
+
+    public function isVerified(): Attribute
+    {
+        $isVerified = $this->badgr_user_slug ? app(BadgrUser::class)->checkVerified($this->badgr_user_slug) : false;
+
+        dd($isVerified);
+        return Attribute::make(
+            get: fn ($value) => $isVerified,
+        );
     }
 }
