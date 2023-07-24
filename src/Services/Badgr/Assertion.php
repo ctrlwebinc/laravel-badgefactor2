@@ -2,19 +2,17 @@
 
 namespace Ctrlweb\BadgeFactor2\Services\Badgr;
 
-use Carbon\CarbonInterface;
 use Exception;
-use GuzzleHttp\Promise\PromiseInterface;
-use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 
 class Assertion extends BadgrProvider
 {
     /**
      * @param string $entityId
-     * @return mixed
+     *
      * @throws Exception
+     *
+     * @return mixed
      */
     public function getBySlug(string $entityId): mixed
     {
@@ -23,9 +21,11 @@ class Assertion extends BadgrProvider
         }
 
         $client = $this->getClient();
-        if ( ! $client ) return [];
+        if (!$client) {
+            return [];
+        }
 
-        $response = $client->get('/v2/assertions/' . $entityId);
+        $response = $client->get('/v2/assertions/'.$entityId);
 
         $response = $this->getFirstResult($response);
 
@@ -43,19 +43,21 @@ class Assertion extends BadgrProvider
         }
 
         $client = $this->getClient();
-        if ( ! $client ) return [];
+        if (!$client) {
+            return [];
+        }
 
-        $response = $client->get('/v2/issuers/' . $entityId . '/assertions');
+        $response = $client->get('/v2/issuers/'.$entityId.'/assertions');
 
         $response = $this->getResult($response);
 
         if ($response) {
             Cache::put('assertions_by_issuer_'.$entityId, $response, 60);
+
             return $response;
         }
 
         return [];
-
     }
 
     public function getByBadgeClass(string $entityId): mixed
@@ -65,19 +67,20 @@ class Assertion extends BadgrProvider
         }
 
         $client = $this->getClient();
-        if ( ! $client ) return [];
+        if (!$client ) {
+            return [];
+        }
 
-        $response = $client->get('/v2/badgeclasses/' . $entityId . '/assertions');
+        $response = $client->get('/v2/badgeclasses/'.$entityId.'/assertions');
 
         $response = $this->getResult($response);
 
         if ($response) {
             Cache::put('assertions_by_badgeclass_'.$entityId, $response, 60);
+
             return $response;
         }
 
         return [];
     }
-
 }
-

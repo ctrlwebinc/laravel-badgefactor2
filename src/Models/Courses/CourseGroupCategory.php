@@ -17,7 +17,7 @@ class CourseGroupCategory extends Model
         'image',
         'description',
         'menu_title',
-        'is_featured'
+        'is_featured',
     ];
 
     protected $translatable = [
@@ -30,7 +30,7 @@ class CourseGroupCategory extends Model
     ];
 
     protected $casts = [
-        'is_featured' => 'boolean'
+        'is_featured' => 'boolean',
     ];
 
     public static function findBySlug($slug)

@@ -27,6 +27,7 @@ class CourseGroupCategoryController extends Controller
     public function featured(string $locale)
     {
         $categories = CourseGroupCategory::where('is_featured', true)->orderBy('title')->take(5)->get();
+
         return BasicCourseGroupCategoryResource::collection($categories);
     }
 }

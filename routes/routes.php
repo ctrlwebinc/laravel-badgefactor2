@@ -1,8 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
-
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\BadgePageController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr\AssertionController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr\BadgeController;
@@ -11,6 +8,7 @@ use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseCategoryController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseGroupCategoryController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseGroupController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\BadgeFactor2Controller;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,10 +22,10 @@ use Ctrlweb\BadgeFactor2\Http\Controllers\BadgeFactor2Controller;
 */
 
 Route::group([
-    'prefix' => 'api/{locale}',
+    'prefix'     => 'api/{locale}',
     'middleware' => ['api', 'locale'],
-    'namespace' => 'Ctrlweb\BadgeFactor2\Http\Controllers\Api',
-    'domain' => config('badgefactor2.domain', null),
+    'namespace'  => 'Ctrlweb\BadgeFactor2\Http\Controllers\Api',
+    'domain'     => config('badgefactor2.domain', null),
 ], function () {
     // Issuers.
     Route::apiResource('issuers', IssuerController::class)->only(['index', 'show']);
@@ -55,7 +53,6 @@ Route::group([
     // Assertions.
     Route::apiResource('assertions', AssertionController::class)
         ->only(['index', 'show']);
-
 });
 
 /*
@@ -71,7 +68,7 @@ Route::group([
 
 Route::group([
     'middleware' => 'web',
-    'namespace' => 'Ctrlweb\BadgeFactor2\Http\Controllers',
+    'namespace'  => 'Ctrlweb\BadgeFactor2\Http\Controllers',
 ], function () {
     Route::get('/bf2/redirect', [BadgeFactor2Controller::class, 'getAccessTokenFromAuthCode'])
         ->middleware('auth')

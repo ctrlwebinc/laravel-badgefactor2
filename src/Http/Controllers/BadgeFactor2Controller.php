@@ -18,18 +18,18 @@ class BadgeFactor2Controller extends Controller
 
             if ($badgrConfig) {
                 $badgrConfig->update([
-                    'access_token' => $accessToken->getToken(),
+                    'access_token'  => $accessToken->getToken(),
                     'refresh_token' => $accessToken->getRefreshToken(),
-                    'expires_at' => now()->setTimestamp($accessToken->getExpires()),
+                    'expires_at'    => now()->setTimestamp($accessToken->getExpires()),
                 ]);
 
                 return redirect()->route('nova.pages.detail', [
-                    'resource' => NovaBadgrConfig::uriKey(),
+                    'resource'   => NovaBadgrConfig::uriKey(),
                     'resourceId' => $badgrConfig->id,
                 ]);
             }
         } catch (\Exception $e) {
-            throw new \Exception('Connection exception: ' . $e->getMessage());
+            throw new \Exception('Connection exception: '.$e->getMessage());
         }
     }
 }

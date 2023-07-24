@@ -23,11 +23,12 @@ class BadgrConfig extends Model
         'expires_at' => 'datetime:Y-m-d H:i:s',
     ];
 
-    public function getAccessTokenToArray() {
+    public function getAccessTokenToArray()
+    {
         return [
-            'access_token' => $this->access_token,
+            'access_token'  => $this->access_token,
             'refresh_token' => $this->refresh_token,
-            'expires_at' => $this->expires_at->format('Y-m-d H:i:s')
+            'expires_at'    => $this->expires_at->format('Y-m-d H:i:s')
         ];
     }
 }

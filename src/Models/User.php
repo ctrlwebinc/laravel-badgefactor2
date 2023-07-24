@@ -3,11 +3,10 @@
 namespace Ctrlweb\Badgefactor2\Models;
 
 
-use Ctrlweb\BadgeFactor2\Notifications\ResetPasswordNotification;
 use Ctrlweb\BadgeFactor2\Models\Badgr\Assertion;
 use Ctrlweb\BadgeFactor2\Models\BillingInfo;
 use Ctrlweb\BadgeFactor2\Models\Courses\Course;
-use Ctrlweb\BadgeFactor2\Models\UserRole;
+use Ctrlweb\BadgeFactor2\Notifications\ResetPasswordNotification;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -22,7 +21,10 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, HasRoles, Notifiable;
+    use HasApiTokens;
+    use HasFactory;
+    use HasRoles;
+    use Notifiable;
 
     const ADMINISTRATOR = 'administrator';
 
@@ -108,7 +110,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<string, string>
      */
     protected $casts = [
-        'created_at' => 'datetime',
+        'created_at'        => 'datetime',
         'email_verified_at' => 'datetime',
     ];
 
@@ -121,7 +123,7 @@ class User extends Authenticatable implements MustVerifyEmail
         parent::boot();
 
         self::creating(function (User $user) {
-            $user->name = $user->first_name . ' ' . $user->first_name;
+            $user->name = $user->first_name.' '.$user->first_name;
             $user->password = Hash::make($user->password ?? Str::random(16));
             $user->slug = Str::slug($user->username);
         });
@@ -136,8 +138,8 @@ class User extends Authenticatable implements MustVerifyEmail
 
         self::addGlobalScope('query', function ($query) {
             if (request('q')) {
-                $query->whereRaw("concat(first_name, ' ', last_name) LIKE '%" . request('q') . "%'")
-                    ->orWhereRaw("concat(last_name, ' ', first_name) LIKE '%" . request('q') . "%'");
+                $query->whereRaw("concat(first_name, ' ', last_name) LIKE '%".request('q')."%'")
+                    ->orWhereRaw("concat(last_name, ' ', first_name) LIKE '%".request('q')."%'");
             }
         });
 
@@ -149,7 +151,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
         // Filter by dates (start and end)
         self::addGlobalScope('dates', function ($query) {
-
             if (request('start_date')) {
                 $query->where('created_at', '>=', request('start_date'));
             }
@@ -165,7 +166,6 @@ class User extends Authenticatable implements MustVerifyEmail
         $this->notify(new ResetPasswordNotification($token));
     }
 
-
     public function primaryRole(): Attribute
     {
         return Attribute::make(
@@ -176,7 +176,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function fullname(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->first_name . ' ' . $this->last_name
+            get: fn () => $this->first_name.' '.$this->last_name
         );
     }
 

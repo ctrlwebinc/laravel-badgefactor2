@@ -12,17 +12,18 @@ class ProductResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  Request  $request
+     * @param Request $request
+     *
      * @return array|Arrayable|JsonSerializable
      */
     public function toArray($request): array|JsonSerializable|Arrayable
     {
         return [
-            "id" => $this->resource->id,
-            "name" => $this->resource->name,
-            "description" => $this->resource->description,
+            "id"            => $this->resource->id,
+            "name"          => $this->resource->name,
+            "description"   => $this->resource->description,
             "regular_price" => $this->resource->regular_price,
-            "promo_price" => $this->resource->promo_price
+            "promo_price"   => $this->resource->promo_price
         ];
     }
 }

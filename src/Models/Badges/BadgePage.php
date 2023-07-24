@@ -2,16 +2,13 @@
 
 namespace Ctrlweb\BadgeFactor2\Models\Badges;
 
-use Ctrlweb\BadgeFactor2\Services\Badgr\Badge as BadgrBadge;
-use Ctrlweb\BadgeFactor2\Services\Badgr\Issuer as BadgrIssuer;
 use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
-use Collator;
-use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrProvider;
+use Ctrlweb\BadgeFactor2\Services\Badgr\Badge as BadgrBadge;
+use Ctrlweb\BadgeFactor2\Services\Badgr\Issuer as BadgrIssuer;
 use Illuminate\Database\Eloquent\Builder;
-use Ctrlweb\BadgeFactor2\Models\Badgr\Badge as BadgeFactor2Badge;
-use Spatie\Translatable\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Translatable\HasTranslations;
 
 class BadgePage extends Model
 {
@@ -138,11 +135,12 @@ class BadgePage extends Model
 
     public function getBadgeAttribute()
     {
-        if ($this->badgeclass_id)
-        {
+        if ($this->badgeclass_id) {
             $badge = app(BadgrBadge::class)->getBySlug($this->badgeclass_id);
+
             return $badge;
         }
+
         return null;
     }
 }

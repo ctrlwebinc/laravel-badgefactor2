@@ -53,7 +53,8 @@ class MigrateWordPressCourses extends Command
                 "SELECT DISTINCT u.*
                 FROM {$prefix}users u
                 WHERE u.user_status = 0"
-            ), function ($wpUser) use ($wordpressDb, $prefix) {
+            ),
+            function ($wpUser) use ($wordpressDb, $prefix) {
                 $userMeta = collect(
                     DB::connection($wordpressDb)
                         ->select(
@@ -70,17 +71,17 @@ class MigrateWordPressCourses extends Command
                         'email' => $wpUser->user_email,
                     ],
                     [
-                        'name' => $wpUser->display_name,
-                        'first_name' => $userMeta->firstWhere('meta_key', 'first_name')->meta_value,
-                        'last_name' => $userMeta->firstWhere('meta_key', 'last_name')->meta_value,
+                        'name'        => $wpUser->display_name,
+                        'first_name'  => $userMeta->firstWhere('meta_key', 'first_name')->meta_value,
+                        'last_name'   => $userMeta->firstWhere('meta_key', 'last_name')->meta_value,
                         'description' => $userMeta->firstWhere('meta_key', 'description')->meta_value,
-                        'website' => '',
-                        'slug' => $wpUser->user_nicename,
-                        'password' => Hash::make($wpUser->user_pass),
-                        'created_at' => Carbon::parse($wpUser->user_registered)
+                        'website'     => '',
+                        'slug'        => $wpUser->user_nicename,
+                        'password'    => Hash::make($wpUser->user_pass),
+                        'created_at'  => Carbon::parse($wpUser->user_registered)
                             ->setTimeZone(config('app.timezone'))
                             ->toDateTimeString(),
-                        'wp_id' => $wpUser->ID,
+                        'wp_id'       => $wpUser->ID,
                         'wp_password' => $wpUser->user_pass,
                     ]
                 );

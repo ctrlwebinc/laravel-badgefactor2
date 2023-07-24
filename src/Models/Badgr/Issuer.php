@@ -2,7 +2,6 @@
 
 namespace Ctrlweb\BadgeFactor2\Models\Badgr;
 
-use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrService;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Issuer as BadgrIssuer;
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,12 +14,12 @@ class Issuer extends Model
     public $incrementing = false;
 
     protected $schema = [
-        'entityId' => 'string',
-        'name' => 'string',
-        'email' => 'string',
-        'url' => 'string',
+        'entityId'    => 'string',
+        'name'        => 'string',
+        'email'       => 'string',
+        'url'         => 'string',
         'description' => 'string',
-        'image' => 'string',
+        'image'       => 'string',
     ];
 
     protected static function booted(): void
@@ -33,6 +32,7 @@ class Issuer extends Model
                 $issuer->description,
                 $issuer->image
             );
+
             return true;
         });
 
@@ -52,23 +52,22 @@ class Issuer extends Model
             app(BadgrIssuer::class)->delete(
                 $issuer->entityId
             );
+
             return true;
         });
 
-        static::saving(function(Issuer $issuer) {
+        static::saving(function (Issuer $issuer) {
             return true;
         });
     }
 
     public function getRows()
     {
-        $issuers = collect(app(BadgrIssuer::class)->all())->map(function($row) {
+        $issuers = collect(app(BadgrIssuer::class)->all())->map(function ($row) {
             return collect($row)->except(['staff', 'extensions'])->toArray();
         });
 
         return $issuers->all();
-
-
     }
 
     public function assertions()
@@ -80,5 +79,4 @@ class Issuer extends Model
     {
         return $this->hasMany(Badge::class, 'issuer', 'entityId');
     }
-
 }

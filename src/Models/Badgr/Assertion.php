@@ -4,9 +4,7 @@ namespace Ctrlweb\BadgeFactor2\Models\Badgr;
 
 use Ctrlweb\BadgeFactor2\Models\User;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Assertion as BadgrAssertion;
-use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrService;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Nova\FilterDecoder;
 
 class Assertion extends Model
 {
@@ -17,32 +15,29 @@ class Assertion extends Model
     public $incrementing = false;
 
     protected $schema = [
-        'entityId' => 'string',
-        'badgeclass_id' => 'string',
-        'issuer_id' => 'string',
-        'image' => 'string',
-        'recipient_email' => 'string',
-        'recipient_id' => 'integer',
-        'issuedOn' => 'string',
-        'narrative' => 'string',
-        'evidenceUrl' => 'string',
-        'revoked' => 'boolean',
+        'entityId'         => 'string',
+        'badgeclass_id'    => 'string',
+        'issuer_id'        => 'string',
+        'image'            => 'string',
+        'recipient_email'  => 'string',
+        'recipient_id'     => 'integer',
+        'issuedOn'         => 'string',
+        'narrative'        => 'string',
+        'evidenceUrl'      => 'string',
+        'revoked'          => 'boolean',
         'revocationReason' => 'string',
-        'expires' => 'datetime',
+        'expires'          => 'datetime',
     ];
 
     protected static function booted(): void
     {
         static::creating(function (Badge $badge) {
-
         });
 
         static::updating(function (Badge $badge) {
-
         });
 
         static::deleting(function (Badge $badge) {
-
         });
     }
 
@@ -56,7 +51,6 @@ class Assertion extends Model
                 $viaResource = 'issuers';
                 $arr = explode('/issuers/', request()->getPathInfo());
                 $viaResourceId = end($arr);
-
             } elseif (str_contains(request()->getPathInfo(), '/badges/')) {
                 $viaResource = 'badges';
                 $arr = explode('/badges/', request()->getPathInfo());
@@ -68,7 +62,6 @@ class Assertion extends Model
         $assertions = [];
 
         if ($viaResource && $viaResourceId) {
-
             switch ($viaResource) {
                 case 'issuers':
                     $isFiltered = true;
@@ -114,14 +107,12 @@ class Assertion extends Model
         }
 
         return $assertions;
-
     }
 
     public function issuer()
     {
         return $this->belongsTo(Issuer::class, 'issuer_id', 'entityId');
     }
-
 
     public function badgeclass()
     {
@@ -132,5 +123,4 @@ class Assertion extends Model
     {
         return $this->belongsTo(User::class, 'recipient_id', 'id');
     }
-
 }

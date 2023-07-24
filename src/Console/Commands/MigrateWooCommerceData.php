@@ -174,7 +174,8 @@ class MigrateWooCommerceData extends Command
                 AND post_status = 'wc-completed'
             GROUP BY
                 p.ID, p.post_date"
-            ), function ($wcOrder) use ($wordpressDb, $prefix) {
+            ),
+            function ($wcOrder) use ($wordpressDb, $prefix) {
                 if ($wcOrder->order_total == 0.00) {
                     // Order is not imported; give user role "client" instead.
                     $user = User::where('wp_id', '=', $wpOrder->customer_user_id);

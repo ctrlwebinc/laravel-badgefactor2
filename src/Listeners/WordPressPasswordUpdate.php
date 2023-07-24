@@ -14,7 +14,7 @@ class WordPressPasswordUpdate
     public function handle(Attempting $event)
     {
         $this->_user = User::where('email', $event->credentials['email'])->first();
-        if (! $this->_user) {
+        if (!$this->_user) {
             return;
         }
         $this->checkAndUpdate($event->credentials['password']);
@@ -25,7 +25,7 @@ class WordPressPasswordUpdate
         $passwordHash = new PasswordHash(8, true);
         // If the hash is md5 or phpass, verify and update if necessary.
         if ((32 >= strlen($this->_user->wp_password) && md5($value) === $this->_user->wp_password)
-            || ($passwordHash->CheckPassword($value, $this->_user->wp_password))
+            || $passwordHash->CheckPassword($value, $this->_user->wp_password)
         ) {
             $this->_user->password = Hash::make($value);
             $this->_user->save();

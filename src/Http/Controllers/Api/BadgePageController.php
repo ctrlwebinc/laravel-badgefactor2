@@ -5,7 +5,6 @@ namespace Ctrlweb\BadgeFactor2\Http\Controllers\Api;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
 use Ctrlweb\BadgeFactor2\Http\Resources\Badges\BadgePageResource;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
-use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
 use Illuminate\Http\Request;
 
 /**
@@ -14,7 +13,7 @@ use Illuminate\Http\Request;
 class BadgePageController extends Controller
 {
     /**
-     * Liste des badges
+     * Liste des badges.
      *
      * Les valeurs de `badge_category` sont :
      * - `reconnaissance` correspond à l'onglet "Badge événementiels"
@@ -28,16 +27,18 @@ class BadgePageController extends Controller
      * et par `q` (recherche dans le titre, le slug et la description).
      *
      * @param Request $request
+     *
      * @return void
      */
     public function index(Request $request)
     {
         $request->validate([
             'badge_category' => 'in:certification,reconnaissance,badges-lecture',
-            'course_group' => 'nullable|exists:course_groups,id',
-            'issuer' => 'nullable',
-            'q' => 'nullable',
+            'course_group'   => 'nullable|exists:course_groups,id',
+            'issuer'         => 'nullable',
+            'q'              => 'nullable',
         ]);
+
         return BadgePageResource::collection(BadgePage::paginate());
     }
 
@@ -51,6 +52,7 @@ class BadgePageController extends Controller
         $badgePages = BadgePage::whereHas('course', function ($query) use ($courseGroup) {
             $query->where('course_group_id', $courseGroup->id);
         })->get();
+
         return BadgePageResource::collection($badgePages);
     }
 }

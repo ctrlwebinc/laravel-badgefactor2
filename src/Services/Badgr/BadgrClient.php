@@ -14,49 +14,49 @@ use League\OAuth2\Client\Token\AccessTokenInterface;
 class BadgrClient
 {
     /**
-     * The client ID for authentication
+     * The client ID for authentication.
      *
      * @var string
      */
     protected string $clientId;
 
     /**
-     * The client secret for authentication
+     * The client secret for authentication.
      *
      * @var string
      */
     protected string $clientSecret;
 
     /**
-     * The redirect Uri
+     * The redirect Uri.
      *
      * @var string
      */
     protected string $redirectUri;
 
     /**
-     * The Badgr Server URL
+     * The Badgr Server URL.
      *
      * @var string
      */
     protected string $serverUrl;
 
     /**
-     * Scopes
+     * Scopes.
      *
      * @var string
      */
     private $scopes;
 
     /**
-     * The client instance
+     * The client instance.
      *
      * @var mixed
      */
     private $httpClient;
 
     /**
-     * The Auth Provider instance
+     * The Auth Provider instance.
      *
      * @var mixed
      */
@@ -66,13 +66,14 @@ class BadgrClient
 
 
     /**
-     * BadgrClient constructor
+     * BadgrClient constructor.
      *
-     * @param string $clientId The client ID for authentication
-     * @param string $clientSecret The client secret for authentication
+     * @param string $clientId     The client ID for authentication.
+     * @param string $clientSecret The client secret for authentication.
+     *
      * @return void
      */
-    public function __construct(string $clientId, string $clientSecret, string $redirectUri, string $serverUrl, string $scopes = "")
+    public function __construct(string $clientId, string $clientSecret, string $redirectUri, string $serverUrl, string $scopes = '')
     {
         $this->clientId = $clientId;
         $this->clientSecret = $clientSecret;
@@ -84,11 +85,13 @@ class BadgrClient
     }
 
     /**
-     * Get the HTTP client
+     * Get the HTTP client.
      *
      * @param array|null $accessToken
+     *
+     * @throws Exception If the base URL is not set in the config array.
+     *
      * @return PendingRequest|mixed
-     * @throws Exception If the base URL is not set in the config array
      */
     public function getHttpClient(?array $accessToken = null): mixed
     {
@@ -106,8 +109,8 @@ class BadgrClient
                     $this->accessToken = $this->fetchAccessTokenUsingRefreshToken($this->accessToken['refresh_token']);
                 }
             } catch (\Exception $e) {
-                return null;
-                throw new \Exception("The Badgr access token does not exist. Please log in again");
+                return null; // FIXME.
+                throw new \Exception('The Badgr access token does not exist. Please log in again');
             }
 
             if ($this->accessToken instanceof AccessTokenInterface) {
@@ -126,6 +129,7 @@ class BadgrClient
      * OAuth 2.0 service provider, using Bearer token authentication.
      *
      * @param array $config
+     *
      * @return GenericProvider
      */
     private function makeAuthProvider()
@@ -142,18 +146,18 @@ class BadgrClient
         }
 
         return new GenericProvider([
-            'clientId' => $this->clientId,
-            'clientSecret' => $this->clientSecret,
-            'redirectUri' => $this->redirectUri,
-            'urlAuthorize' =>  $this->serverUrl . '/o/authorize',
-            'urlAccessToken' => $this->serverUrl . '/o/token',
+            'clientId'                => $this->clientId,
+            'clientSecret'            => $this->clientSecret,
+            'redirectUri'             => $this->redirectUri,
+            'urlAuthorize'            =>  $this->serverUrl . '/o/authorize',
+            'urlAccessToken'          => $this->serverUrl . '/o/token',
             'urlResourceOwnerDetails' => $this->serverUrl . '/o/resource',
-            'scopes' => $this->scopes ?? null,
+            'scopes'                  => $this->scopes ?? null,
         ]);
     }
 
     /**
-     * Get Auth Provider
+     * Get Auth Provider.
      *
      * @return GenericProvider
      */
@@ -168,9 +172,10 @@ class BadgrClient
     }
 
     /**
-     * Get Access Token using authorization code
+     * Get Access Token using authorization code.
      *
-     * @param string $code The authorization code
+     * @param string $code The authorization code.
+     *
      * @return mixed access token object or array
      */
     public function getAccessTokenUsingAuthCode(string $code)
@@ -181,16 +186,17 @@ class BadgrClient
     }
 
     /**
-     * Fetch new Access Token object using refresh token
+     * Fetch new Access Token object using refresh token.
      *
      * @param string $refreshToken
+     *
      * @return mixed|AccessTokenInterface
      */
     public function fetchAccessTokenUsingRefreshToken(string $refreshToken)
     {
         $accessToken = $this->getAuthProvider()
             ->getAccessToken('refresh_token', [
-                'refresh_token' => $refreshToken
+                'refresh_token' => $refreshToken,
             ]);
 
         if ($accessToken instanceof AccessTokenInterface) {
@@ -203,14 +209,14 @@ class BadgrClient
     private function accessTokenHasExpired($accessToken)
     {
         if (!isset($accessToken['access_token']) && isset($accessToken['expires_at'])) {
-            throw new Exception("The provided access token is invalid");
+            throw new Exception('The provided access token is invalid');
         }
 
         if (!($accessToken['expires_at'] instanceof CarbonInterface)) {
             try {
                 $accessToken['expires_at'] = Carbon::parse($accessToken['expires_at']);
             } catch (Exception $e) {
-                throw new Exception("Token expiration date is not in a valid format.");
+                throw new Exception('Token expiration date is not in a valid format.');
             }
         }
 

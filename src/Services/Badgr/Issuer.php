@@ -2,18 +2,15 @@
 
 namespace Ctrlweb\BadgeFactor2\Services\Badgr;
 
-use Carbon\CarbonInterface;
 use Exception;
-use GuzzleHttp\Promise\PromiseInterface;
-use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 
 class Issuer extends BadgrProvider
 {
-
     /**
-     * @return array|bool
      * @throws Exception
+     *
+     * @return array|bool
      */
     public function all(): array|bool
     {
@@ -22,7 +19,9 @@ class Issuer extends BadgrProvider
         }
 
         $client = $this->getClient();
-        if ( ! $client ) return false;
+        if (!$client) {
+            return false;
+        }
 
         $response = $client->get('/v2/issuers');
 
@@ -36,8 +35,9 @@ class Issuer extends BadgrProvider
     }
 
     /**
-     * @return int|bool
      * @throws Exception
+     *
+     * @return int|bool
      */
     public function count(): int|bool
     {
@@ -58,18 +58,22 @@ class Issuer extends BadgrProvider
 
     /**
      * @param string $name
-     * @return array|bool
+     *
      * @throws Exception
+     *
+     * @return array|bool
      */
     public function getByName(string $name): array|bool
     {
         $issuers = $this->all();
         if ($issuers) {
             $issuers = collect($issuers);
+
             return $issuers->filter(function ($issuer) use ($name) {
                 if (strtolower($issuer['name']) === strtolower($name)) {
                     return $issuer;
                 }
+
                 return null;
             })->filter()->first();
         }
@@ -79,16 +83,18 @@ class Issuer extends BadgrProvider
 
     /**
      * @param string $entityId
-     * @return mixed
+     *
      * @throws Exception
+     *
+     * @return mixed
      */
     public function getBySlug(string $entityId): mixed
     {
         if (Cache::has('issuer_'.$entityId)) {
-            return json_decode(Cache::get('issuer_' . $entityId));
+            return json_decode(Cache::get('issuer_'.$entityId));
         }
 
-        $response = $this->getClient()->get('/v2/issuers/' . $entityId);
+        $response = $this->getClient()->get('/v2/issuers/'.$entityId);
 
         $response = $this->getFirstResult($response);
 
@@ -99,15 +105,16 @@ class Issuer extends BadgrProvider
         return $response;
     }
 
-
     /**
-     * @param string $name
-     * @param string $email
-     * @param string $url
+     * @param string      $name
+     * @param string      $email
+     * @param string      $url
      * @param string|null $description
      * @param string|null $image
-     * @return mixed
+     *
      * @throws Exception
+     *
+     * @return mixed
      */
     public function add(string $name, string $email, string $url, ?string $description, ?string $image = null): mixed
     {
@@ -133,23 +140,30 @@ class Issuer extends BadgrProvider
     }
 
     /**
-     * @param string $entityId
-     * @param string $name
-     * @param string $email
-     * @param string $url
+     * @param string      $entityId
+     * @param string      $name
+     * @param string      $email
+     * @param string      $url
      * @param string|null $description
      * @param string|null $image
-     * @return bool
+     *
      * @throws Exception
+     *
+     * @return bool
      */
     public function update(
-        string  $entityId, string $name, string $email, string $url,
-        ?string $description = null, ?string $image = null): bool
+        string  $entityId,
+        string $name,
+        string $email,
+        string $url,
+        ?string $description = null,
+        ?string $image = null
+    ): bool
     {
         $payload = [
-            'name' => $name,
+            'name'  => $name,
             'email' => $email,
-            'url' => $url,
+            'url'   => $url,
         ];
 
         if (null !== $description) {
@@ -160,14 +174,14 @@ class Issuer extends BadgrProvider
             $payload['image'] = $this->prepareImage($image);
         }
 
-        $response = $this->getClient()->put('/v2/issuers/' . $entityId, $payload);
+        $response = $this->getClient()->put('/v2/issuers/'.$entityId, $payload);
 
         Cache::forget('issuers');
         Cache::forget('issuer_'.$entityId);
 
         if (null !== $response && $response->status() === 200) {
-            return true;
 
+            return true;
         }
 
         return false;
@@ -182,9 +196,11 @@ class Issuer extends BadgrProvider
     {
 
         $client = $this->getClient();
-        if ( ! $client ) return false;
+        if (!$client) {
+            return false;
+        }
 
-        $response = $client->delete('/v2/issuers/' . $entityId);
+        $response = $client->delete('/v2/issuers/'.$entityId);
 
         Cache::forget('issuers');
         Cache::forget('issuer_'.$entityId);
@@ -196,4 +212,3 @@ class Issuer extends BadgrProvider
         return false;
     }
 }
-

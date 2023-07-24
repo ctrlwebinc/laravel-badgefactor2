@@ -20,6 +20,7 @@ class BadgeController extends Controller
     public function show(string $locale, string $entityId)
     {
         $badge = app(Badge::class)->getBySlug($entityId);
+
         return response()->json($badge);
     }
 

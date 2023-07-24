@@ -9,7 +9,8 @@ use Spatie\Translatable\HasTranslations;
 
 class Course extends Model
 {
-    use HasFactory, HasTranslations;
+    use HasFactory;
+    use HasTranslations;
 
     protected $translatable = [
         'title',
@@ -25,13 +26,14 @@ class Course extends Model
         'autoevaluation_form_url',
         'badge_page_id',
         'course_category_id',
-        "regular_price",
-        "promo_price",
+        'regular_price',
+        'promo_price',
     ];
 
     protected $with = ['badgePage'];
 
-    public function generateCourseLink() {
+    public function generateCourseLink()
+    {
         $url = $this->url;
     }
 
@@ -45,7 +47,8 @@ class Course extends Model
         return $this->belongsTo(CourseGroup::class);
     }
 
-    public function badgePage() {
+    public function badgePage()
+    {
         return $this->belongsTo(BadgePage::class);
     }
 
@@ -57,7 +60,7 @@ class Course extends Model
             $price = $this->regular_price;
         }
         return Attribute::make(
-            get: fn() => $price
+            get: fn () => $price
         );
     }
 

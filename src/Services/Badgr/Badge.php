@@ -2,19 +2,16 @@
 
 namespace Ctrlweb\BadgeFactor2\Services\Badgr;
 
-use Carbon\CarbonInterface;
 use Exception;
-use GuzzleHttp\Promise\PromiseInterface;
-use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 
 class Badge extends BadgrProvider
 {
 
     /**
-     * @return array|bool
      * @throws Exception
+     *
+     * @return array|bool
      */
     public function all(): array|bool
     {
@@ -24,7 +21,9 @@ class Badge extends BadgrProvider
 
         $client = $this->getClient();
 
-        if ( ! $client ) return false;
+        if (!$client) {
+            return false;
+        }
 
         $response = $this->getClient()->get('/v2/badgeclasses');
 
@@ -38,8 +37,9 @@ class Badge extends BadgrProvider
     }
 
     /**
-     * @return int|bool
      * @throws Exception
+     *
+     * @return int|bool
      */
     public function count(): int|bool
     {
@@ -60,18 +60,22 @@ class Badge extends BadgrProvider
 
     /**
      * @param string $name
-     * @return array|bool
+     *
      * @throws Exception
+     *
+     * @return array|bool
      */
     public function getByName(string $name): array|bool
     {
         $badges = $this->all();
         if ($badges) {
             $badges = collect($badges);
+
             return $badges->filter(function ($badge) use ($name) {
                 if (strtolower($badge['name']) === strtolower($name)) {
                     return $badge;
                 }
+
                 return null;
             })->filter()->first();
         }
@@ -81,8 +85,10 @@ class Badge extends BadgrProvider
 
     /**
      * @param string $entityId
-     * @return mixed
+     *
      * @throws Exception
+     *
+     * @return mixed
      */
     public function getBySlug(string $entityId): mixed
     {
@@ -91,9 +97,11 @@ class Badge extends BadgrProvider
         }
 
         $client = $this->getClient();
-        if ( ! $client ) return [];
+        if (!$client) {
+            return [];
+        }
 
-        $response = $client->get('/v2/badgeclasses/' . $entityId);
+        $response = $client->get('/v2/badgeclasses/'.$entityId);
 
         $response = $this->getFirstResult($response);
 
@@ -111,9 +119,11 @@ class Badge extends BadgrProvider
         }
 
         $client = $this->getClient();
-        if ( ! $client ) return [];
+        if (!$client ) {
+            return [];
+        }
 
-        $response = $client->get('/v2/issuers/' . $entityId . '/badgeclasses');
+        $response = $client->get('/v2/issuers/'.$entityId.'/badgeclasses');
 
         $response = $this->getResult($response);
 
@@ -126,11 +136,12 @@ class Badge extends BadgrProvider
 
 
     /**
-     * @param string $image
-     * @param string $name
-     * @param string $issuer
+     * @param string      $image
+     * @param string      $name
+     * @param string      $issuer
      * @param string|null $description
      * @param string|null $criteriaNarrative
+     *
      * @return mixed
      */
     public function add(string $image, string $name, string $issuer, ?string $description, ?string $criteriaNarrative): mixed
@@ -158,20 +169,26 @@ class Badge extends BadgrProvider
     }
 
     /**
-     * @param string $entityId
-     * @param string $name
-     * @param string $issuer
+     * @param string      $entityId
+     * @param string      $name
+     * @param string      $issuer
      * @param string|null $description
      * @param string|null $criteriaNarrative
      * @param string|null $image
-     * @return bool
+     *
      * @throws Exception
+     *
+     * @return bool
      */
     public function update(
-        string  $entityId, string $name, string $issuer,
-        ?string $description, ?string $criteriaNarrative, ?string $image ): bool
+        string  $entityId,
+        string $name,
+        string $issuer,
+        ?string $description,
+        ?string $criteriaNarrative,
+        ?string $image
+    ): bool
     {
-
         $issuer = json_decode($issuer)->entityId;
         $payload = [
             'name'              => $name,
@@ -190,14 +207,14 @@ class Badge extends BadgrProvider
             $payload['image'] = $this->prepareImage($image);
         }
 
-        $response = $this->getClient()->put('/v2/badgeclasses/' . $entityId, $payload);
+        $response = $this->getClient()->put('/v2/badgeclasses/'.$entityId, $payload);
 
         Cache::forget('badges');
         Cache::forget('badge_'.$entityId);
 
         if (null !== $response && $response->status() === 200) {
-            return true;
 
+            return true;
         }
 
         return false;
@@ -205,12 +222,14 @@ class Badge extends BadgrProvider
 
     /**
      * @param string $entityId
-     * @return bool
+     *
      * @throws Exception
+     *
+     * @return bool
      */
     public function delete(string $entityId): bool
     {
-        $response = $this->getClient()->delete('/v2/badgeclasses/' . $entityId);
+        $response = $this->getClient()->delete('/v2/badgeclasses/'.$entityId);
 
         Cache::forget('badges');
         Cache::forget('badge_'.$entityId);
@@ -222,4 +241,3 @@ class Badge extends BadgrProvider
         return false;
     }
 }
-

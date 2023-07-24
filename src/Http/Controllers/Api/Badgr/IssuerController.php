@@ -2,10 +2,9 @@
 
 namespace Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr;
 
+use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseCategory;
-use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
-use Ctrlweb\BadgeFactor2\Http\Resources\Badgr\IssuerResource;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Badge;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Issuer;
 
@@ -31,6 +30,7 @@ class IssuerController extends Controller
     public function show(string $locale, string $entityId)
     {
         $issuer = app(Issuer::class)->getBySlug($entityId);
+
         return response()->json($issuer);
     }
 

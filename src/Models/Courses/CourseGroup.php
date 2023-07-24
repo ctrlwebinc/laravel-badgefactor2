@@ -2,7 +2,6 @@
 
 namespace Ctrlweb\BadgeFactor2\Models\Courses;
 
-use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrService;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Badge as BadgrBadge;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -64,9 +63,9 @@ class CourseGroup extends Model
         self::addGlobalScope('q', function (Builder $query) {
             $locale = app()->getLocale();
             if (request('q')) {
-                $query->where(function( $q) {
-                    $q->where("title", 'LIKE', '%'.request('q').'%')
-                        ->orWhere("description", 'LIKE', '%'.request('q').'%');
+                $query->where(function ($q) {
+                    $q->where('title', 'LIKE', '%'.request('q').'%')
+                        ->orWhere('description', 'LIKE', '%'.request('q').'%');
                 });
             }
         });
@@ -79,11 +78,12 @@ class CourseGroup extends Model
 
         self::addGlobalScope('issuer', function ($query) {
             $locale = app()->getLocale();
-            $query->when(!empty(request()->input('issuer')), function ($q) use ($locale) {
+            $query->when(!empty(request()->input('issuer')), function ($q) {
                 $issuer = request()->input('issuer');
                 $badgeClassIds = collect(app(BadgrBadge::class)->getByIssuer($issuer))->pluck('entityId')->toArray();
                 $badgePageIds = BadgePage::withoutGlobalScope('issuer')->withoutGlobalScope('q')->whereIn('badgeclass_id', $badgeClassIds)->pluck('id');
                 $courseGroupIds = Course::whereIn('badge_page_id', $badgePageIds)->pluck('course_group_id');
+
                 return $q->whereIn('id', $courseGroupIds);
             });
         });

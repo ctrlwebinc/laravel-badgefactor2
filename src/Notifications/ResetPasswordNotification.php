@@ -32,7 +32,8 @@ class ResetPasswordNotification extends Notification
     /**
      * Create a notification instance.
      *
-     * @param  string  $token
+     * @param string $token
+     *
      * @return void
      */
     public function __construct($token)
@@ -43,7 +44,8 @@ class ResetPasswordNotification extends Notification
     /**
      * Get the notification's channels.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
+     *
      * @return array|string
      */
     public function via($notifiable)
@@ -54,7 +56,8 @@ class ResetPasswordNotification extends Notification
     /**
      * Build the mail representation of the notification.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
+     *
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
     public function toMail($notifiable)
@@ -69,23 +72,25 @@ class ResetPasswordNotification extends Notification
     /**
      * Get the reset password notification mail message for the given URL.
      *
-     * @param  string  $url
+     * @param string $url
+     *
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
     protected function buildMailMessage($url)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject(Lang::get('Réinitialisation de votre mot de passe'))
             ->line(Lang::get('Vous recevez cet email car nous avons reçu une demande de réinitialisation de votre mot de passe.'))
             ->action(Lang::get('Réinitialiser mon mot de passe'), $url)
-            ->line(Lang::get('Ce lien de réinitialisation de mot de passe expirera dans :count minutes.', ['count' => config('auth.passwords.' . config('auth.defaults.passwords') . '.expire')]))
+            ->line(Lang::get('Ce lien de réinitialisation de mot de passe expirera dans :count minutes.', ['count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')]))
             ->line(Lang::get('Si vous n\'avez pas demandé de réinitialisation de mot de passe, aucune autre action n\'est requise.'));
     }
 
     /**
      * Get the reset URL for the given notifiable.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
+     *
      * @return string
      */
     protected function resetUrl($notifiable)
@@ -103,7 +108,8 @@ class ResetPasswordNotification extends Notification
     /**
      * Set a callback that should be used when creating the reset password button URL.
      *
-     * @param  \Closure(mixed, string): string  $callback
+     * @param \Closure(mixed, string): string $callback
+     *
      * @return void
      */
     public static function createUrlUsing($callback)
