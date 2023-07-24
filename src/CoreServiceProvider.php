@@ -4,6 +4,7 @@ namespace Ctrlweb\BadgeFactor2;
 
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWooCommerceData;
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWordPressUsers;
+use Ctrlweb\BadgeFactor2\Providers\EventServiceProvider;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
