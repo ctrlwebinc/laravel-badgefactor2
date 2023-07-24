@@ -19,11 +19,11 @@ class ProductResource extends JsonResource
     public function toArray($request): array|JsonSerializable|Arrayable
     {
         return [
-            "id"            => $this->resource->id,
-            "name"          => $this->resource->name,
-            "description"   => $this->resource->description,
-            "regular_price" => $this->resource->regular_price,
-            "promo_price"   => $this->resource->promo_price,
+            'id'            => $this->resource->id,
+            'name'          => $this->resource->name,
+            'description'   => $this->resource->description,
+            'regular_price' => $this->resource->regular_price,
+            'promo_price'   => $this->resource->promo_price,
         ];
     }
 }

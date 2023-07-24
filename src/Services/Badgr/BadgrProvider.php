@@ -211,8 +211,8 @@ class BadgrProvider
                 $mimeType .= '+xml';
             } elseif ('image/jpeg' === $mimeType || 'image/gif' === $mimeType) {
                 ob_start();
-                $gdImage = imagecreatefromstring( $rawFile );
-                $success = imagepng( $gdImage );
+                $gdImage = imagecreatefromstring($rawFile);
+                $success = imagepng($gdImage);
                 $rawFile = ob_get_contents();
                 $mimeType = 'image/png';
                 ob_end_clean();

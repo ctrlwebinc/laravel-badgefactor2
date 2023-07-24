@@ -210,7 +210,6 @@ class Badge extends BadgrProvider
         Cache::forget('badge_'.$entityId);
 
         if (null !== $response && $response->status() === 200) {
-
             return true;
         }
 

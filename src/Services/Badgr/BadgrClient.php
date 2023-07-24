@@ -149,7 +149,7 @@ class BadgrClient
             'clientId'                => $this->clientId,
             'clientSecret'            => $this->clientSecret,
             'redirectUri'             => $this->redirectUri,
-            'urlAuthorize'            =>  $this->serverUrl.'/o/authorize',
+            'urlAuthorize'            => $this->serverUrl.'/o/authorize',
             'urlAccessToken'          => $this->serverUrl.'/o/token',
             'urlResourceOwnerDetails' => $this->serverUrl.'/o/resource',
             'scopes'                  => $this->scopes ?? null,

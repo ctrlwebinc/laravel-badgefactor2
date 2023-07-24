@@ -6,7 +6,6 @@ use Exception;
 
 class User extends BadgrProvider
 {
-
     /**
      * @param string $firstName
      * @param string $lastName
@@ -94,7 +93,6 @@ class User extends BadgrProvider
      */
     public function checkVerified(string $entityId): bool
     {
-
         $response = $this->getClient()->get('/v2/users/'.$entityId);
 
         if (null !== $response && $response->status() === 200) {
@@ -130,8 +128,8 @@ class User extends BadgrProvider
                 [
                     'email'   => $email,
                     'primary' => true,
-                ]
-            ]
+                ],
+            ],
         ];
 
         $response = $this->getClient()->put('/v2/users/'.$entityId, $payload);

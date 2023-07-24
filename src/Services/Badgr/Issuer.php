@@ -194,7 +194,6 @@ class Issuer extends BadgrProvider
      */
     public function delete(string $entityId): bool
     {
-
         $client = $this->getClient();
         if (!$client) {
             return false;

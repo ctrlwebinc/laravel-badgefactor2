@@ -26,7 +26,7 @@ return new class() extends Migration {
      */
     public function down()
     {
-         Schema::table('users', function (Blueprint $table) {
+        Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('badgr_user_state');
             $table->dropColumn('badgr_user_slug');
             $table->dropColumn('badgr_password');
