@@ -90,7 +90,10 @@ class Badge extends BadgrProvider
             return json_decode(Cache::get('badge_'.$entityId));
         }
 
-        $response = $this->getClient()->get('/v2/badgeclasses/' . $entityId);
+        $client = $this->getClient();
+        if ( ! $client ) return [];
+
+        $response = $client->get('/v2/badgeclasses/' . $entityId);
 
         $response = $this->getFirstResult($response);
 
@@ -107,8 +110,10 @@ class Badge extends BadgrProvider
             return Cache::get('badges_by_issuer_'.$entityId);
         }
 
-        $response = $this->getClient()
-            ->get('/v2/issuers/' . $entityId . '/badgeclasses');
+        $client = $this->getClient();
+        if ( ! $client ) return [];
+
+        $response = $client->get('/v2/issuers/' . $entityId . '/badgeclasses');
 
         $response = $this->getResult($response);
 

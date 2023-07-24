@@ -18,7 +18,7 @@ class User extends BadgrProvider
      * @return mixed
      * @throws Exception
      */
-    public function addUser(string $firstName, string $lastName, string $email, string $password): mixed
+    public function add(string $firstName, string $lastName, string $email, string $password): mixed
     {
         $payload = [
             'first_name' => $firstName,
@@ -50,7 +50,7 @@ class User extends BadgrProvider
      * @return bool
      * @throws Exception
      */
-    public function changeUserPassword(string $entityId, string $oldPassword, string $newPassword): bool
+    public function changePassword(string $entityId, string $oldPassword, string $newPassword): bool
     {
         $payload = [
             'password' => $newPassword,
@@ -75,7 +75,7 @@ class User extends BadgrProvider
      * @return mixed
      * @throws Exception
      */
-    public function getUser(string $entityId): mixed
+    public function get(string $entityId): mixed
     {
         $response = $this->getClient()->get('/v2/users/' . $entityId);
         return $this->getFirstResult($response);
@@ -86,7 +86,7 @@ class User extends BadgrProvider
      * @return bool
      * @throws Exception
      */
-    public function checkUserVerified(string $entityId): bool
+    public function checkVerified(string $entityId): bool
     {
 
         $response = $this->getClient()->get('/v2/users/' . $entityId);
@@ -113,7 +113,7 @@ class User extends BadgrProvider
      * @return bool
      * @throws Exception
      */
-    public function updateUser(string $entityId, string $firstName, string $lastName, string $email): bool
+    public function update(string $entityId, string $firstName, string $lastName, string $email): bool
     {
 
         $payload = [
