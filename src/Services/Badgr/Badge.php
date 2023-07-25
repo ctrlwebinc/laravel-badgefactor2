@@ -149,7 +149,6 @@ class Badge extends BadgrProvider
      */
     public function add(string $image, string $name, string $issuer, ?string $description, ?string $criteriaNarrative): mixed
     {
-
         $client = $this->getClient();
         if (!$client) {
             return false;
@@ -197,7 +196,6 @@ class Badge extends BadgrProvider
         ?string $criteriaNarrative,
         ?string $image
     ): bool {
-
         $client = $this->getClient();
         if (!$client) {
             return false;

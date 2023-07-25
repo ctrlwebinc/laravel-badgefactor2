@@ -6,6 +6,5 @@ class RegisterBadgrUser
 {
     public function handle(UserRegistered $event)
     {
-dd('yes');
     }
 }

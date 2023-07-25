@@ -199,7 +199,6 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $isVerified = $this->badgr_user_slug ? app(BadgrUser::class)->checkVerified($this->badgr_user_slug) : false;
 
-        dd($isVerified);
         return Attribute::make(
             get: fn ($value) => $isVerified,
         );
