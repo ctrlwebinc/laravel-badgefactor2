@@ -32,9 +32,12 @@ class BadgrProvider
      */
     public function getClient()
     {
-        return $this->client->getHttpClient(
-            BadgrConfig::first()->getAccessTokenToArray()
-        );
+        if (isset($this->client)) {
+            return $this->client->getHttpClient(
+                BadgrConfig::first()->getAccessTokenToArray()
+            );
+        }
+        return null;
     }
 
     /**
