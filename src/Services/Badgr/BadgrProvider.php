@@ -76,7 +76,7 @@ class BadgrProvider
             }
         }
 
-        return false;
+        return [];
     }
 
     /**
