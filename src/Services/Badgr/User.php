@@ -32,7 +32,12 @@ class User extends BadgrProvider
             'password'             => $password,
         ];
 
-        $response = $this->getClient()->post('/v1/user/profile', $payload);
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        $response = $client->post('/v1/user/profile', $payload);
 
         if (null !== $response && $response->status() === 201) {
             return $response->json('slug');
@@ -57,7 +62,12 @@ class User extends BadgrProvider
             'currentPassword' => $oldPassword,
         ];
 
-        $response = $this->getClient()->post('/v2/users/'.$entityId, $payload);
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        $response = $client->post('/v2/users/'.$entityId, $payload);
 
         if (null !== $response && $response->status() === 200) {
             $response = $response->json();
@@ -79,7 +89,12 @@ class User extends BadgrProvider
      */
     public function get(string $entityId): mixed
     {
-        $response = $this->getClient()->get('/v2/users/'.$entityId);
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        $response = $client->get('/v2/users/'.$entityId);
 
         return $this->getFirstResult($response);
     }
@@ -93,7 +108,12 @@ class User extends BadgrProvider
      */
     public function checkVerified(string $entityId): bool
     {
-        $response = $this->getClient()->get('/v2/users/'.$entityId);
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        $response = $client->get('/v2/users/'.$entityId);
 
         if (null !== $response && $response->status() === 200) {
             $response = $response->json();
@@ -132,7 +152,12 @@ class User extends BadgrProvider
             ],
         ];
 
-        $response = $this->getClient()->put('/v2/users/'.$entityId, $payload);
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        $response = $client->put('/v2/users/'.$entityId, $payload);
 
         if (null !== $response && $response->status() === 200) {
             return true;

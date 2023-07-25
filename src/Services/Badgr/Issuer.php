@@ -45,7 +45,12 @@ class Issuer extends BadgrProvider
             return Cache::get('issuers_count');
         }
 
-        $response = $this->getClient()->get('/v2/issuers_count');
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        $response = $client->get('/v2/issuers_count');
 
         $response = $this->getCount($response);
 
@@ -94,7 +99,12 @@ class Issuer extends BadgrProvider
             return json_decode(Cache::get('issuer_'.$entityId));
         }
 
-        $response = $this->getClient()->get('/v2/issuers/'.$entityId);
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        $response = $client->get('/v2/issuers/'.$entityId);
 
         $response = $this->getFirstResult($response);
 
@@ -118,6 +128,11 @@ class Issuer extends BadgrProvider
      */
     public function add(string $name, string $email, string $url, ?string $description, ?string $image = null): mixed
     {
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
         $payload = [
             'name'        => $name,
             'email'       => $email,
@@ -132,7 +147,7 @@ class Issuer extends BadgrProvider
             $payload['image'] = $this->prepareImage($image);
         }
 
-        $response = $this->getClient()->post('/v2/issuers', $payload);
+        $response = $client->post('/v2/issuers', $payload);
 
         Cache::forget('issuers');
 
@@ -159,6 +174,11 @@ class Issuer extends BadgrProvider
         ?string $description = null,
         ?string $image = null
     ): bool {
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
         $payload = [
             'name'  => $name,
             'email' => $email,
@@ -173,7 +193,7 @@ class Issuer extends BadgrProvider
             $payload['image'] = $this->prepareImage($image);
         }
 
-        $response = $this->getClient()->put('/v2/issuers/'.$entityId, $payload);
+        $response = $client->put('/v2/issuers/'.$entityId, $payload);
 
         Cache::forget('issuers');
         Cache::forget('issuer_'.$entityId);

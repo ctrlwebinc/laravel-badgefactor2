@@ -46,7 +46,12 @@ class Badge extends BadgrProvider
             return Cache::get('badges_count');
         }
 
-        $response = $this->getClient()->get('/v2/badgeclasses_count');
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        $response = $client->get('/v2/badgeclasses_count');
 
         $response = $this->getCount($response);
 
@@ -97,7 +102,7 @@ class Badge extends BadgrProvider
 
         $client = $this->getClient();
         if (!$client) {
-            return [];
+            return false;
         }
 
         $response = $client->get('/v2/badgeclasses/'.$entityId);
@@ -119,7 +124,7 @@ class Badge extends BadgrProvider
 
         $client = $this->getClient();
         if (!$client) {
-            return [];
+            return false;
         }
 
         $response = $client->get('/v2/issuers/'.$entityId.'/badgeclasses');
@@ -144,6 +149,12 @@ class Badge extends BadgrProvider
      */
     public function add(string $image, string $name, string $issuer, ?string $description, ?string $criteriaNarrative): mixed
     {
+
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
         $issuer = json_decode($issuer)->entityId;
         $payload = [
             'image'             => $this->prepareImage($image),
@@ -159,7 +170,7 @@ class Badge extends BadgrProvider
             $payload['criteriaNarrative'] = $criteriaNarrative;
         }
 
-        $response = $this->getClient()->post('/v2/badgeclasses', $payload);
+        $response = $client->post('/v2/badgeclasses', $payload);
 
         Cache::forget('badges');
 
@@ -186,6 +197,12 @@ class Badge extends BadgrProvider
         ?string $criteriaNarrative,
         ?string $image
     ): bool {
+
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
         $issuer = json_decode($issuer)->entityId;
         $payload = [
             'name'              => $name,
@@ -204,7 +221,7 @@ class Badge extends BadgrProvider
             $payload['image'] = $this->prepareImage($image);
         }
 
-        $response = $this->getClient()->put('/v2/badgeclasses/'.$entityId, $payload);
+        $response = $client->put('/v2/badgeclasses/'.$entityId, $payload);
 
         Cache::forget('badges');
         Cache::forget('badge_'.$entityId);
@@ -225,7 +242,12 @@ class Badge extends BadgrProvider
      */
     public function delete(string $entityId): bool
     {
-        $response = $this->getClient()->delete('/v2/badgeclasses/'.$entityId);
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        $response = $client->delete('/v2/badgeclasses/'.$entityId);
 
         Cache::forget('badges');
         Cache::forget('badge_'.$entityId);

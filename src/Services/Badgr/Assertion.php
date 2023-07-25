@@ -22,7 +22,7 @@ class Assertion extends BadgrProvider
 
         $client = $this->getClient();
         if (!$client) {
-            return [];
+            return false;
         }
 
         $response = $client->get('/v2/assertions/'.$entityId);
@@ -44,7 +44,7 @@ class Assertion extends BadgrProvider
 
         $client = $this->getClient();
         if (!$client) {
-            return [];
+            return false;
         }
 
         $response = $client->get('/v2/issuers/'.$entityId.'/assertions');
@@ -53,11 +53,9 @@ class Assertion extends BadgrProvider
 
         if ($response) {
             Cache::put('assertions_by_issuer_'.$entityId, $response, 60);
-
-            return $response;
         }
 
-        return [];
+        return $response;
     }
 
     public function getByBadgeClass(string $entityId): mixed
@@ -68,7 +66,7 @@ class Assertion extends BadgrProvider
 
         $client = $this->getClient();
         if (!$client) {
-            return [];
+            return false;
         }
 
         $response = $client->get('/v2/badgeclasses/'.$entityId.'/assertions');
@@ -77,10 +75,8 @@ class Assertion extends BadgrProvider
 
         if ($response) {
             Cache::put('assertions_by_badgeclass_'.$entityId, $response, 60);
-
-            return $response;
         }
 
-        return [];
+        return $response;
     }
 }
