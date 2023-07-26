@@ -3,12 +3,15 @@
 namespace Ctrlweb\BadgeFactor2\Models\Badgr;
 
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
+use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Badge as BadgrBadge;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Translatable\HasTranslations;
 
 class Badge extends Model
 {
     use \Sushi\Sushi;
+    use HasTranslations;
 
     protected $primaryKey = 'entityId';
     protected $keyType = 'string';
@@ -30,8 +33,17 @@ class Badge extends Model
         'request_form_url'  => 'json',
         'badge_category_id' => 'integer',
         'badge_group_id'    => 'integer',
+        'course_id'         => 'integer',
         'created_at'        => 'datetime',
         'updated_at'        => 'datetime',
+    ];
+
+    protected $translatable = [
+        'title',
+        'slug',
+        'content',
+        'criteria',
+        'request_form_url',
     ];
 
     protected static function booted(): void
@@ -45,6 +57,10 @@ class Badge extends Model
                 $badge->criteriaNarrative
             );
 
+            if (!$badgeclassId) {
+                return false;
+            }
+
             $badgePage = new BadgePage();
             $badgePage->badgeclass_id = $badgeclassId;
             $badgePage->type = $badge->type;
@@ -54,8 +70,7 @@ class Badge extends Model
             $badgePage->criteria = $badge->criteria;
             $badgePage->approval_type = $badge->approval_type;
             $badgePage->request_form_url = $badge->request_form_url;
-            $badgePage->badge_category_id = $badge->badge_category_id;
-            $badgePage->badge_group_id = $badge->badge_group_id;
+
             $badgePage->saveQuietly();
 
             return true;
@@ -113,15 +128,16 @@ class Badge extends Model
                 unset($row['issuer']);
 
                 $badgePage = $badgePages->where('badgeclass_id', $row['entityId'])->first();
-                $row['type'] = !empty($badgePage) ? $badgePage->type : null;
-                $row['title'] = !empty($badgePage) ? json_encode($badgePage->getTranslations('title')) : null;
-                $row['slug'] = !empty($badgePage) ? json_encode($badgePage->getTranslations('slug')) : null;
-                $row['content'] = !empty($badgePage) ? json_encode($badgePage->getTranslations('content')) : null;
-                $row['criteria'] = !empty($badgePage) ? json_encode($badgePage->getTranslations('criteria')) : null;
-                $row['approval_type'] = !empty($badgePage) ? $badgePage->approval_type : null;
-                $row['request_form_url'] = !empty($badgePage) ? json_encode($badgePage->getTranslations('request_form_url')) : null;
-                $row['badge_category_id'] = !empty($badgePage) ? $badgePage->badge_category_id : null;
-                $row['badge_group_id'] = !empty($badgePage) ? $badgePage->badge_group_id : null;
+                $row['type'] = !empty($badgePage) ? $badgePage->type : '';
+                $row['title'] = !empty($badgePage) ? json_encode($badgePage->getTranslations('title')) : '';
+                $row['slug'] = !empty($badgePage) ? json_encode($badgePage->getTranslations('slug')) : '';
+                $row['content'] = !empty($badgePage) ? json_encode($badgePage->getTranslations('content')) : '';
+                $row['criteria'] = !empty($badgePage) ? json_encode($badgePage->getTranslations('criteria')) : '';
+                $row['approval_type'] = !empty($badgePage) ? $badgePage->approval_type : '';
+                $row['request_form_url'] = !empty($badgePage) ? json_encode($badgePage->getTranslations('request_form_url')) : '';
+                $row['badge_category_id'] = !empty($badgePage) ? $badgePage->badge_category_id : '';
+                $row['badge_group_id'] = !empty($badgePage) ? $badgePage->badge_group_id : '';
+                $row['course_id'] = !empty($badgePage) && !empty($badgePage->course) ? $badgePage->course->id : '';
 
                 return $row->except(['alignments', 'tags', 'extensions', 'expires'])
                     ->toArray();
@@ -141,5 +157,10 @@ class Badge extends Model
     public function issuer()
     {
         return $this->belongsTo(Issuer::class, 'issuer_id', 'entityId');
+    }
+
+    public function course()
+    {
+        return $this->hasOne(Course::class, 'badge_page_id', '');
     }
 }

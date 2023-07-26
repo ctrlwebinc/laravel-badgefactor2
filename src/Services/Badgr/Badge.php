@@ -159,15 +159,9 @@ class Badge extends BadgrProvider
             'image'             => $this->prepareImage($image),
             'name'              => $name,
             'issuer'            => $issuer,
+            'description'       => $description,
+            'criteriaNarrative' => $criteriaNarrative,
         ];
-
-        if (null !== $description) {
-            $payload['description'] = $description;
-        }
-
-        if (null !== $criteriaNarrative) {
-            $payload['criteriaNarrative'] = $criteriaNarrative;
-        }
 
         $response = $client->post('/v2/badgeclasses', $payload);
 
@@ -205,15 +199,9 @@ class Badge extends BadgrProvider
         $payload = [
             'name'              => $name,
             'issuer'            => $issuer,
+            'description'       => $description,
+            'criteriaNarrative' => $criteriaNarrative,
         ];
-
-        if (null !== $description) {
-            $payload['description'] = $description;
-        }
-
-        if (null !== $criteriaNarrative) {
-            $payload['criteriaNarrative'] = $criteriaNarrative;
-        }
 
         if (null !== $image && $this->prepareImage($image)) {
             $payload['image'] = $this->prepareImage($image);

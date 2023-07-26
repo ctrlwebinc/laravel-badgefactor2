@@ -124,7 +124,9 @@ class User extends Authenticatable implements MustVerifyEmail
 
         self::creating(function (User $user) {
             $user->name = $user->first_name.' '.$user->first_name;
-            $user->password = Hash::make($user->password ?? Str::random(16));
+            if (60 !== strlen($user->password) && !preg_match('/^\$2y\$/', $user->password)) {
+                $user->password = Hash::make($user->password) ?? Str::random(16);
+            }
             $user->slug = Str::slug($user->username);
         });
 
