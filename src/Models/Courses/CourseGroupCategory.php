@@ -16,7 +16,6 @@ class CourseGroupCategory extends Model
         'subtitle',
         'image',
         'description',
-        'menu_title',
         'is_featured',
     ];
 
@@ -26,7 +25,6 @@ class CourseGroupCategory extends Model
         'excerpt',
         'subtitle',
         'description',
-        'menu_title',
     ];
 
     protected $casts = [

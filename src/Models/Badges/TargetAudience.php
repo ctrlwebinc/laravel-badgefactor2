@@ -1,30 +1,29 @@
 <?php
 
-namespace Ctrlweb\BadgeFactor2\Models\Courses;
+namespace Ctrlweb\BadgeFactor2\Models\Badges;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Translatable\HasTranslations;
 
-class Responsible extends Model
+class TargetAudience extends Model
 {
-    use HasFactory;
-    use HasTranslations;
+    use HasFactory, HasTranslations;
 
     protected $fillable = [
         'name',
         'slug',
         'description',
-        'image',
     ];
 
     protected $translatable = [
+        'name',
         'slug',
         'description',
     ];
 
-    public function courseGroups()
+    public function badgePages()
     {
-        return $this->belongsToMany(CourseGroup::class);
+        return $this->belongsToMany(BadgePage::class);
     }
 }

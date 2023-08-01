@@ -15,6 +15,14 @@ class CourseCategory extends Model
             ->orWhere('slug->en', $slug);
     }
 
+    protected $fillable = [
+        'title',
+        'slug',
+        'description',
+        'image',
+        'parent_id',
+    ];
+
     protected $translatable = [
         'title',
         'subtitle',

@@ -2,6 +2,7 @@
 
 namespace Ctrlweb\BadgeFactor2\Models\Courses;
 
+use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Badge as BadgrBadge;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -20,6 +21,7 @@ class CourseGroup extends Model
         'subtitle',
         'image',
         'description',
+        'course_group_category_id',
     ];
 
     protected $translatable = [

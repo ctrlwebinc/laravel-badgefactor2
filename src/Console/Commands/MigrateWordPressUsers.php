@@ -48,7 +48,7 @@ class MigrateWordPressUsers extends Command
         $this->info('Migrating users...');
 
         // Identify WP learners.
-        $users = $this->withProgressBar(
+        $this->withProgressBar(
             DB::connection($wordpressDb)
             ->select(
                 "SELECT DISTINCT u.*

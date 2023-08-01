@@ -20,7 +20,6 @@ class BasicCourseGroupCategoryResource extends JsonResource
             'title'       => $this->resource->title,
             'slug'        => $this->resource->slug,
             'is_featured' => $this->resource->is_featured,
-            'menu_title'  => $this->resource->menu_title,
             'excerpt'     => substr($this->resource->excerpt, 0, 140),
             'label'       => $this->resource->title,
             'subtitle'    => $this->resource->subtitle,

@@ -29,6 +29,10 @@ class BadgePage extends Model
         'request_form_url',
         'badge_category_id',
         'badge_group_id',
+        'duration',
+        'image',
+        'video_url',
+        'last_updated_at',
     ];
 
     public static function findBySlug($slug)
@@ -130,6 +134,11 @@ class BadgePage extends Model
     public function courseCategory()
     {
         return $this->belongsTo(CourseCategory::class);
+    }
+
+    public function targetAudiences()
+    {
+        return $this->belongsToMany(TargetAudience::class, 'badge_page_target_audience');
     }
 
     public function getBadgeAttribute()
