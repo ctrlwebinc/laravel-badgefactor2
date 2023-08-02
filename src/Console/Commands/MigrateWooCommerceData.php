@@ -197,7 +197,7 @@ class MigrateWooCommerceData extends Command
                             [$wcOrder->order_id]
                         )
                 );
-                dd($wcOrderItems);
+                //dd($wcOrderItems);
             }
         );
 
