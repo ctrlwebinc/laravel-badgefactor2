@@ -235,7 +235,7 @@ class MigrateWordPressCourses extends Command
                             'slug'        => $wpResponsible->post_name,
                             'name'        => $wpResponsible->post_title,
                             'description' => $wpDescription,
-                            'image'       => $novaGalleryMedia->path
+                            'image'       => $novaGalleryMedia->path,
                         ]
                     );
                     $this->ids['responsibles'][$wpResponsible->ID] = $responsible->id;
@@ -346,7 +346,7 @@ class MigrateWordPressCourses extends Command
                         [
                             'title'    => $wpCourse->post_title,
                             'duration' => $courseMeta->course_duration,
-                            'price'    => (int)$courseMeta->price,
+                            'price'    => (int) $courseMeta->price,
                         ]
                     );
                 }
