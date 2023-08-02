@@ -159,8 +159,8 @@ class Badge extends Model
         return $this->belongsTo(Issuer::class, 'issuer_id', 'entityId');
     }
 
-    public function course()
+    public function badgePage()
     {
-        return $this->hasOne(Course::class, 'badge_page_id', '');
+        return $this->hasOne(BadgePage::class, 'badgeclass_id');
     }
 }
