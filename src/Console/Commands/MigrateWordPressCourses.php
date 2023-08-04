@@ -2,6 +2,9 @@
 
 namespace Ctrlweb\BadgeFactor2\Console\Commands;
 
+use Ctrlweb\BadgeFactor2\Models\Badges\BadgeCategory;
+use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
+use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseCategory;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroupCategory;
@@ -50,6 +53,7 @@ class MigrateWordPressCourses extends Command
             'course-category'         => [],
             'course_group_categories' => [],
             'responsibles'            => [],
+            'badge-page'              => [],
         ];
     }
 
@@ -60,9 +64,9 @@ class MigrateWordPressCourses extends Command
      */
     public function handle()
     {
-        $this->importBadgePages();
 
         $categories = [
+            'badge-category'          => 'badge categories',
             'course-category'         => 'course categories',
             'course_group_categories' => 'course group categories',
         ];
@@ -71,59 +75,12 @@ class MigrateWordPressCourses extends Command
             $this->importCategory($slug, $category);
         }
 
+        $this->importBadgePages();
         $this->importResponsibles();
         $this->importCourseGroups();
         $this->importCourses();
 
-        $this->line('All done!');
-    }
-
-    /**
-     * Import Badge Pages from WordPress to Laravel.
-     *
-     * @return void
-     */
-    protected function importBadgePages()
-    {
-        $this->newLine();
-        $this->line('Importing badge pages...');
-
-        DB::transaction(function () {
-            $this->withProgressBar(
-                $this->wpdb
-                    ->table("{$this->prefix}posts")
-                    ->select('*')
-                    ->where('post_type', 'badge-page')
-                    ->get(),
-                function ($wpBadgePage) {
-                    $badgePageMeta = collect(
-                        $this->wpdb
-                            ->table("{$this->prefix}postmeta")
-                            ->select('*')
-                            ->where('post_id', $wpBadgePage->ID)
-                            ->get()
-                    );
-                    //dd($badgePageMeta);
-
-                    $course = BadgePage::updateOrCreate(
-                        [
-                            'badgeclass_id' => $badgePageMeta->badge,
-                        ],
-                        [
-                            'title'              => $wpBadgePage->post_title,
-                            'slug'               => $wpBadgePage->post_name,
-                            'content'            => $wpBadgePage->post_content,
-                            'criteria'           => $badgePageMeta->badge_criteria,
-                            'approval_type'      => $badgePageMeta->badge_approval_type,
-                            //'badge_category_id' => ,
-                            //'badge_group_id' => ,
-                            //'last_updated_at' => ,
-
-                        ]
-                    );
-                }
-            );
-        });
+        $this->line("\nAll done!");
     }
 
     /**
@@ -150,48 +107,104 @@ class MigrateWordPressCourses extends Command
                     ->groupBy("{$this->prefix}term_taxonomy.term_id")
                     ->orderBy("{$this->prefix}terms.name")
                     ->get(),
-                function ($wpCourseCategory) use ($slug) {
-                    $courseCategoryImage = $this->wpdb
+                function ($wpCategory) use ($slug) {
+                    $categoryImage = $this->wpdb
                         ->table("{$this->prefix}options")
                         ->select('option_value')
-                        ->where('option_name', '=', 'z_taxonomy_image'.$wpCourseCategory->term_id)
+                        ->where('option_name', '=', 'z_taxonomy_image'.$wpCategory->term_id)
                         ->first();
 
-                    $novaGalleryMedia = $courseCategoryImage ?
-                        $this->importImage($courseCategoryImage->option_value) :
+                    $novaGalleryMedia = $categoryImage ?
+                        $this->importImage($categoryImage->option_value) :
                         $this->importImage(null);
 
                     $locale = app()->currentLocale();
 
+                    $dataUpdate = ["slug->{$locale}" => $wpCategory->slug];
+                    $dataCreate = [
+                        'slug'        => $wpCategory->slug,
+                        'title'       => $wpCategory->name,
+                        'description' => $wpCategory->description,
+                        'image'       => substr($novaGalleryMedia->path, 8),
+                    ];
+
                     switch ($slug) {
+                        case 'badge-category':
+                            $category = BadgeCategory::updateOrCreate($dataUpdate, $dataCreate);
+                            $this->ids['badge-category'][$wpCategory->term_id] = $category->id;
+                            break;
                         case 'course-category':
-                            $category = CourseCategory::updateOrCreate(
-                                [
-                                    "slug->{$locale}" => $wpCourseCategory->slug,
-                                ],
-                                [
-                                    'slug'        => $wpCourseCategory->slug,
-                                    'title'       => $wpCourseCategory->name,
-                                    'description' => $wpCourseCategory->description,
-                                    'image'       => substr($novaGalleryMedia->path, 8),
-                                ]
-                            );
-                            $this->ids['course-category'][$wpCourseCategory->term_id] = $category->id;
+                            $category = CourseCategory::updateOrCreate($dataUpdate, $dataCreate);
+                            $this->ids['course-category'][$wpCategory->term_id] = $category->id;
                             break;
                         case 'course_group_categories':
-                            $category = CourseGroupCategory::updateOrCreate(
-                                [
-                                    "slug->{$locale}" => $wpCourseCategory->slug,
-                                ],
-                                [
-                                    'slug'        => $wpCourseCategory->slug,
-                                    'title'       => $wpCourseCategory->name,
-                                    'description' => $wpCourseCategory->description,
-                                    'image'       => substr($novaGalleryMedia->path, 8),
-                                ]
-                            );
-                            $this->ids['course_group_categories'][$wpCourseCategory->term_id] = $category->id;
+                            $category = CourseGroupCategory::updateOrCreate($dataUpdate, $dataCreate);
+                            $this->ids['course_group_categories'][$wpCategory->term_id] = $category->id;
                             break;
+                    }
+                }
+            );
+        });
+    }
+
+    /**
+     * Import Badge Pages from WordPress to Laravel.
+     *
+     * @return void
+     */
+    protected function importBadgePages()
+    {
+        $this->newLine();
+        $this->line('Importing badge pages...');
+
+        DB::transaction(function () {
+            $this->withProgressBar(
+                $this->wpdb
+                    ->table("{$this->prefix}posts")
+                    ->select('*')
+                    ->where('post_type', 'badge-page')
+                    ->where('post_status', 'publish')
+                    ->get(),
+                function ($wpBadgePage) {
+                    $badgePageMeta = collect(
+                        $this->wpdb
+                            ->table("{$this->prefix}postmeta")
+                            ->select('*')
+                            ->where('post_id', $wpBadgePage->ID)
+                            ->get()
+                    );
+
+                    $termRelationship = collect(
+                        $this->wpdb
+                            ->select(
+                                "SELECT *
+                                    FROM {$this->prefix}term_relationships
+                                    WHERE object_id = ?",
+                                [$wpBadgePage->ID]
+                            )
+                    )->first();
+
+                    $badgePageCategoryId = isset($termRelationship->term_taxonomy_id) && isset($this->ids['badge-category'][$termRelationship->term_taxonomy_id]) ?
+                        $this->ids['badge-category'][$termRelationship->term_taxonomy_id] :
+                        null;
+
+                    if (isset($badgePageMeta->firstWhere('meta_key', 'badge')->meta_value)) {
+                        $badgePage = BadgePage::updateOrCreate(
+                            [
+                                'badgeclass_id' => $badgePageMeta->firstWhere('meta_key', 'badge')->meta_value,
+                            ],
+                            [
+                                'title'             => $wpBadgePage->post_title,
+                                'slug'              => $wpBadgePage->post_name,
+                                'content'           => $wpBadgePage->post_content,
+                                'criteria'          => $badgePageMeta->firstWhere('meta_key', 'badge_criteria') ? $badgePageMeta->firstWhere('meta_key', 'badge_criteria')->meta_value : null,
+                                'approval_type'     => $badgePageMeta->firstWhere('meta_key', 'badge_approval_type') ? $badgePageMeta->firstWhere('meta_key', 'badge_approval_type')->meta_value : null,
+                                'badge_category_id' => $badgePageCategoryId,
+                                'last_updated_at'   => $badgePageMeta->firstWhere('meta_key', 'badgepage_latest_update_date') ? $badgePageMeta->firstWhere('meta_key', 'badgepage_latest_update_date')->meta_value : null,
+                            ]
+                        );
+
+                        $this->ids['badge-page'][$wpBadgePage->ID] = $badgePage->id;
                     }
                 }
             );
@@ -208,6 +221,7 @@ class MigrateWordPressCourses extends Command
                 $this->wpdb
                     ->table("{$this->prefix}posts")
                     ->where("{$this->prefix}posts.post_type", 'c21_responsable')
+                    ->where("{$this->prefix}posts.post_status", 'publish')
                     ->get(),
                 function ($wpResponsible) {
                     $wpResponsibleMeta = collect(
@@ -259,6 +273,7 @@ class MigrateWordPressCourses extends Command
                 $this->wpdb
                     ->table("{$this->prefix}posts")
                     ->where("{$this->prefix}posts.post_type", 'c21_course_group')
+                    ->where("{$this->prefix}posts.post_status", 'publish')
                     ->get(),
                 function ($wpCourseGroup) {
                     $wpCourseGroupMeta = collect(
@@ -322,14 +337,24 @@ class MigrateWordPressCourses extends Command
         $this->newLine();
         $this->line('Importing courses...');
 
-        DB::transaction(function () {
+        $wpBadgeFactor2Options = $this->wpdb
+            ->table("{$this->prefix}options")
+            ->select('*')
+            ->where('option_name', 'badgefactor2')
+            ->first();
+        $wpBadgeFactor2Options = unserialize($wpBadgeFactor2Options->option_value);
+        $wpFormSlug = $wpBadgeFactor2Options['bf2_form_slug'];
+        $wpAutoevaluationFormSlug = $wpBadgeFactor2Options['bf2_autoevaluation_form_slug'];
+
+        DB::transaction(function () use ($wpFormSlug, $wpAutoevaluationFormSlug) {
             $this->withProgressBar(
                 $this->wpdb
                     ->table("{$this->prefix}posts")
                     ->select('*')
-                    ->where('post_type', 'course')
+                    ->where("{$this->prefix}posts.post_type", 'course')
+                    ->where("{$this->prefix}posts.post_status", 'publish')
                     ->get(),
-                function ($wpCourse) {
+                function ($wpCourse) use ($wpFormSlug, $wpAutoevaluationFormSlug) {
                     $courseMeta = collect(
                         $this->wpdb
                             ->table("{$this->prefix}postmeta")
@@ -337,16 +362,62 @@ class MigrateWordPressCourses extends Command
                             ->where('post_id', $wpCourse->ID)
                             ->get()
                     );
-                    //dd($courseMeta);
+
+                    $wpBadgePageId = isset($courseMeta->firstWhere('meta_key', 'course_badge_page')->meta_value) ? $courseMeta->firstWhere('meta_key', 'course_badge_page')->meta_value : null;
+                    $wpBadgePage = $this->wpdb
+                        ->table("{$this->prefix}posts")
+                        ->select('*')
+                        ->where('post_type', 'badge-page')
+                        ->where('ID', $wpBadgePageId)
+                        ->first();
+
+                    $badgePageMeta = isset($wpBadgePage) ? collect(
+                        $this->wpdb
+                            ->table("{$this->prefix}postmeta")
+                            ->select('*')
+                            ->where('post_id', $wpBadgePage->ID)
+                            ->get()
+                    ) : null;
+
+                    $autoevaluationFormId = $badgePageMeta && $badgePageMeta->firstWhere('meta_key', 'autoevaluation_form_id') ? $badgePageMeta->firstWhere('meta_key', 'autoevaluation_form_id')->meta_value : null;
+
+                    $autoevaluationFormUrl = isset($autoevaluationFormId) && isset($wpBadgePage->guid) ? $wpBadgePage->guid . $wpAutoevaluationFormSlug : null;
+
+                    $wpCourseGroupCategory = $this->wpdb
+                        ->table("{$this->prefix}term_relationships")
+                        ->select("{$this->prefix}term_taxonomy.term_id", "{$this->prefix}terms.name", "{$this->prefix}terms.slug", "{$this->prefix}term_taxonomy.description")
+                        ->leftJoin("{$this->prefix}term_taxonomy", "{$this->prefix}term_relationships.term_taxonomy_id", '=', "{$this->prefix}term_taxonomy.term_taxonomy_id")
+                        ->leftJoin("{$this->prefix}terms", "{$this->prefix}terms.term_id", '=', "{$this->prefix}term_taxonomy.term_taxonomy_id")
+                        ->where("{$this->prefix}term_taxonomy.taxonomy", 'course-category')
+                        ->where("{$this->prefix}term_relationships.object_id", $wpCourse->ID)
+                        ->groupBy("{$this->prefix}term_taxonomy.term_id")
+                        ->orderBy("{$this->prefix}terms.name")
+                        ->first();
+
+                    $courseGroupCategoryId = isset($wpCourseGroupCategory->term_id) ? $this->ids['course-category'][$wpCourseGroupCategory->term_id] : null;
+
+                    $courseGroupId = $this->wpdb
+                        ->table("{$this->prefix}posts")
+                        ->select('ID')
+                        ->leftJoin("{$this->prefix}postmeta", "{$this->prefix}posts.ID", '=', "{$this->prefix}postmeta.post_id")
+                        ->where("{$this->prefix}postmeta.meta_key", 'group_courses')
+                        ->where("{$this->prefix}postmeta.meta_value", 'LIKE', "%\"{$wpCourse->ID}\"%")
+                        ->first();
 
                     $course = Course::updateOrCreate(
                         [
                             'url' => $wpCourse->guid,
                         ],
                         [
-                            'title'    => $wpCourse->post_title,
-                            'duration' => $courseMeta->course_duration,
-                            'price'    => (int) $courseMeta->price,
+                            'duration'                => isset($courseMeta->firstWhere('meta_key', 'course_duration')->meta_value) ? $courseMeta->firstWhere('meta_key', 'course_duration')->meta_value : 0,
+                            'url'                     => $wpCourse->guid,
+                            'autoevaluation_form_url' => $autoevaluationFormUrl,
+                            'badge_page_id'           => $wpBadgePageId && isset($this->ids['badge-page'][$wpBadgePageId]) ? $this->ids['badge-page'][$wpBadgePageId] : null,
+                            'course_category_id'      => $courseGroupCategoryId,
+                            'title'                   => $wpCourse->post_title,
+                            'decription'              => null,
+                            'course_group_id'         => $courseGroupId,
+                            'regular_price'           => isset($courseMeta->firstWhere('meta_key', 'price')->meta_value) ? (int) $courseMeta->firstWhere('meta_key', 'price')->meta_value : null,
                         ]
                     );
                 }

@@ -3,7 +3,6 @@
 namespace Ctrlweb\BadgeFactor2\Models\Badgr;
 
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
-use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Badge as BadgrBadge;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Translatable\HasTranslations;
