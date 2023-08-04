@@ -64,7 +64,6 @@ class MigrateWordPressCourses extends Command
      */
     public function handle()
     {
-
         $categories = [
             'badge-category'          => 'badge categories',
             'course-category'         => 'course categories',
@@ -346,7 +345,7 @@ class MigrateWordPressCourses extends Command
         $wpFormSlug = $wpBadgeFactor2Options['bf2_form_slug'];
         $wpAutoevaluationFormSlug = $wpBadgeFactor2Options['bf2_autoevaluation_form_slug'];
 
-        DB::transaction(function () use ($wpFormSlug, $wpAutoevaluationFormSlug) {
+        DB::transaction(function () use ($wpAutoevaluationFormSlug) {
             $this->withProgressBar(
                 $this->wpdb
                     ->table("{$this->prefix}posts")
@@ -354,7 +353,7 @@ class MigrateWordPressCourses extends Command
                     ->where("{$this->prefix}posts.post_type", 'course')
                     ->where("{$this->prefix}posts.post_status", 'publish')
                     ->get(),
-                function ($wpCourse) use ($wpFormSlug, $wpAutoevaluationFormSlug) {
+                function ($wpCourse) use ($wpAutoevaluationFormSlug) {
                     $courseMeta = collect(
                         $this->wpdb
                             ->table("{$this->prefix}postmeta")
@@ -381,7 +380,7 @@ class MigrateWordPressCourses extends Command
 
                     $autoevaluationFormId = $badgePageMeta && $badgePageMeta->firstWhere('meta_key', 'autoevaluation_form_id') ? $badgePageMeta->firstWhere('meta_key', 'autoevaluation_form_id')->meta_value : null;
 
-                    $autoevaluationFormUrl = isset($autoevaluationFormId) && isset($wpBadgePage->guid) ? $wpBadgePage->guid . $wpAutoevaluationFormSlug : null;
+                    $autoevaluationFormUrl = isset($autoevaluationFormId) && isset($wpBadgePage->guid) ? $wpBadgePage->guid.$wpAutoevaluationFormSlug : null;
 
                     $wpCourseGroupCategory = $this->wpdb
                         ->table("{$this->prefix}term_relationships")
