@@ -18,6 +18,9 @@ use Intervention\Image\ImageManagerStatic as Image;
 
 class MigrateWordPressCourses extends Command
 {
+    use CanImportWordPressCategories;
+    use CanImportWordPressImages;
+
     /**
      * The name and signature of the console command.
      *
@@ -36,8 +39,6 @@ class MigrateWordPressCourses extends Command
 
     private $prefix;
 
-    private $ids;
-
     /**
      * Create a new command instance.
      *
@@ -49,12 +50,6 @@ class MigrateWordPressCourses extends Command
         $wordpressDb = config('badgefactor2.wordpress.connection');
         $this->wpdb = DB::connection($wordpressDb);
         $this->prefix = config('badgefactor2.wordpress.db_prefix');
-        $this->ids = [
-            'course-category'         => [],
-            'course_group_categories' => [],
-            'responsibles'            => [],
-            'badge-page'              => [],
-        ];
     }
 
     /**
@@ -64,87 +59,19 @@ class MigrateWordPressCourses extends Command
      */
     public function handle()
     {
-        $categories = [
-            'badge-category'          => 'badge categories',
-            'course-category'         => 'course categories',
-            'course_group_categories' => 'course group categories',
-        ];
-
-        foreach ($categories as $slug => $category) {
-            $this->importCategory($slug, $category);
-        }
-
+        $this->importCategory(BadgeCategory::class, 'badge-category');
+        $this->importCategory(CourseCategory::class, 'course-category');
+        $this->importCategory(CourseGroupCategory::class, 'course_group_categories');
         $this->importBadgePages();
         $this->importResponsibles();
         $this->importCourseGroups();
         $this->importCourses();
 
-        $this->line("\nAll done!");
-    }
-
-    /**
-     * Import Categories (Taxonomies) from WordPress to Laravel.
-     *
-     * @param string $slug     Taxonomy.
-     * @param string $category Category.
-     *
-     * @return void
-     */
-    protected function importCategory($slug, $category)
-    {
         $this->newLine();
-        $this->line("Importing {$category}...");
-
-        DB::transaction(function () use ($slug) {
-            $this->withProgressBar(
-                $this->wpdb
-                    ->table("{$this->prefix}term_relationships")
-                    ->select("{$this->prefix}term_taxonomy.term_id", "{$this->prefix}terms.name", "{$this->prefix}terms.slug", "{$this->prefix}term_taxonomy.description")
-                    ->leftJoin("{$this->prefix}term_taxonomy", "{$this->prefix}term_relationships.term_taxonomy_id", '=', "{$this->prefix}term_taxonomy.term_taxonomy_id")
-                    ->leftJoin("{$this->prefix}terms", "{$this->prefix}terms.term_id", '=', "{$this->prefix}term_taxonomy.term_taxonomy_id")
-                    ->where("{$this->prefix}term_taxonomy.taxonomy", $slug)
-                    ->groupBy("{$this->prefix}term_taxonomy.term_id")
-                    ->orderBy("{$this->prefix}terms.name")
-                    ->get(),
-                function ($wpCategory) use ($slug) {
-                    $categoryImage = $this->wpdb
-                        ->table("{$this->prefix}options")
-                        ->select('option_value')
-                        ->where('option_name', '=', 'z_taxonomy_image'.$wpCategory->term_id)
-                        ->first();
-
-                    $novaGalleryMedia = $categoryImage ?
-                        $this->importImage($categoryImage->option_value) :
-                        $this->importImage(null);
-
-                    $locale = app()->currentLocale();
-
-                    $dataUpdate = ["slug->{$locale}" => $wpCategory->slug];
-                    $dataCreate = [
-                        'slug'        => $wpCategory->slug,
-                        'title'       => $wpCategory->name,
-                        'description' => $wpCategory->description,
-                        'image'       => substr($novaGalleryMedia->path, 8),
-                    ];
-
-                    switch ($slug) {
-                        case 'badge-category':
-                            $category = BadgeCategory::updateOrCreate($dataUpdate, $dataCreate);
-                            $this->ids['badge-category'][$wpCategory->term_id] = $category->id;
-                            break;
-                        case 'course-category':
-                            $category = CourseCategory::updateOrCreate($dataUpdate, $dataCreate);
-                            $this->ids['course-category'][$wpCategory->term_id] = $category->id;
-                            break;
-                        case 'course_group_categories':
-                            $category = CourseGroupCategory::updateOrCreate($dataUpdate, $dataCreate);
-                            $this->ids['course_group_categories'][$wpCategory->term_id] = $category->id;
-                            break;
-                    }
-                }
-            );
-        });
+        $this->line('All done!');
     }
+
+
 
     /**
      * Import Badge Pages from WordPress to Laravel.
@@ -422,42 +349,5 @@ class MigrateWordPressCourses extends Command
                 }
             );
         });
-    }
-
-    /**
-     * Import an image from an URL into a Nova Gallery Media object.
-     *
-     * @param string $imageUrl
-     *
-     * @return NovaGalleryMedia|null
-     */
-    private function importImage($imageUrl)
-    {
-        $fileName = null;
-        $imagePath = null;
-        $novaGalleryMedia = new NovaGalleryMedia();
-        if ($imageUrl) {
-            try {
-                $image = Image::make($imageUrl);
-                $fileName = md5(substr($imageUrl, strrpos($imageUrl, '/') + 1));
-                $fileName .= substr($imageUrl, strrpos($imageUrl, '.'));
-                $imagePath = 'uploads/'.$fileName;
-                Storage::disk('public')->put($imagePath, $image);
-
-                $novaGalleryMedia = NovaGalleryMedia::updateOrCreate(
-                    [
-                        'path' => 'storage/'.$imagePath,
-                    ],
-                    [
-                        'file_name' => $fileName,
-                        'mime_type' => $image->mime(),
-                    ]
-                );
-            } catch (NotReadableException $e) {
-                return new NovaGalleryMedia();
-            }
-        }
-
-        return $novaGalleryMedia;
     }
 }

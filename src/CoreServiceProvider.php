@@ -4,6 +4,7 @@ namespace Ctrlweb\BadgeFactor2;
 
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWooCommerceData;
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWordPressCourses;
+use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWordPressPosts;
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWordPressUsers;
 use Ctrlweb\BadgeFactor2\Providers\EventServiceProvider;
 use Illuminate\Support\Facades\RateLimiter;
@@ -25,6 +26,7 @@ class CoreServiceProvider extends ServiceProvider
             $this->commands([
                 MigrateWooCommerceData::class,
                 MigrateWordPressCourses::class,
+                MigrateWordPressPosts::class,
                 MigrateWordPressUsers::class,
             ]);
         }
