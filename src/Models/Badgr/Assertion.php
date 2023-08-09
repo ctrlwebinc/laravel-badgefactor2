@@ -14,6 +14,11 @@ class Assertion extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
+    protected $casts = [
+        'issedOn' => 'datetime',
+        'expires' => 'datetime',
+    ];
+
     protected $schema = [
         'entityId'         => 'string',
         'badgeclass_id'    => 'string',
@@ -21,23 +26,24 @@ class Assertion extends Model
         'image'            => 'string',
         'recipient_email'  => 'string',
         'recipient_id'     => 'integer',
-        'issuedOn'         => 'string',
+        'issuedOn'         => 'dateTime',
         'narrative'        => 'string',
         'evidenceUrl'      => 'string',
+        'evidenceNarrative'      => 'string',
         'revoked'          => 'boolean',
         'revocationReason' => 'string',
-        'expires'          => 'datetime',
+        'expires'          => 'dateTime',
     ];
 
     protected static function booted(): void
     {
-        static::creating(function (Badge $badge) {
+        static::creating(function (self $assertion) {
         });
 
-        static::updating(function (Badge $badge) {
+        static::updating(function (self $assertion) {
         });
 
-        static::deleting(function (Badge $badge) {
+        static::deleting(function (self $assertion) {
         });
     }
 
@@ -89,10 +95,11 @@ class Assertion extends Model
                 $recipient = User::where('email', '=', $assertions[$i]['recipient_email'])->first();
                 $assertions[$i]['recipient_id'] = $recipient->id ?? null;
 
-                if (!isset($assertion['evidence'][0])) {
-                    $assertions[$i]['evidenceUrl'] = null;
-                } else {
+                if (isset($assertion['evidence'][0]['url'])) {
                     $assertions[$i]['evidenceUrl'] = $assertions[$i]['evidence'][0]['url'];
+                }
+                if (isset($assertion['evidence'][0]['narrative'])) {
+                    $assertions[$i]['evidenceNarrative'] = $assertions[$i]['evidence'][0]['narrative'];
                 }
                 unset($assertions[$i]['evidence']);
                 unset($assertions[$i]['acceptance']);

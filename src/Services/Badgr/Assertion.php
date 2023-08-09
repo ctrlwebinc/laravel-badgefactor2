@@ -4,6 +4,8 @@ namespace Ctrlweb\BadgeFactor2\Services\Badgr;
 
 use Exception;
 use Illuminate\Support\Facades\Cache;
+use Carbon\Carbon;
+
 
 class Assertion extends BadgrProvider
 {
@@ -78,5 +80,53 @@ class Assertion extends BadgrProvider
         }
 
         return $response;
+    }
+
+    public function add(string $issuer, string $badge, string $recipient, string $recipientType='email', ?Carbon $issuedOn, ?string $evidenceUrl, ?string $evidenceNarrative)
+    {
+        // cache: add badge by slug, forget assertions by badge class, forget assertions by issuer
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        $issuerId = json_decode($issuer)->entityId;
+        $badgeId = json_decode($badge)->entityId;
+        $payload = [
+            'recipient' => [
+                'identity' => $recipient,
+                'type' => $recipientType
+            ],
+        ];
+
+        if (null !== $issuedOn )
+        {
+			$payload['issuedOn'] = $issuedOn->format( 'c' );
+		}
+
+        if (null !== $evidenceNarrative || null !== $evidenceUrl )
+        {
+			$evidence = [];
+			if (null !== $evidenceNarrative )
+            {
+				$evidence['narrative'] = $evidenceNarrative;
+			}
+			if ( null !== $evidenceUrl)
+            {
+				$evidence['url'] = $evidenceUrl;
+			}
+			$payload['evidence'] = [$evidence];
+		}
+
+        $response = $client->post('/v2/badgeclasses/'.$badgeId.'/assertions', $payload);
+
+        if ($response) {
+            Cache::put('assertion_'.$entityId, json_encode($response), 60);
+        }
+
+        Cache::forget('assertions_by_badgeclass_'.$badgeId);
+        Cache::forget('assertions_by_issuer_'.$issuerId);
+
+        return $this->getEntityId($response);
     }
 }
