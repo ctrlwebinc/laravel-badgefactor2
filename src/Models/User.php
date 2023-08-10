@@ -119,6 +119,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'roles', 'billingInfo',
     ];
 
+    protected $guard_name = 'web';
+
     public static function boot()
     {
         parent::boot();
