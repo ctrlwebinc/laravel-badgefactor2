@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\DB;
 
 trait CanImportWordPressCategories
 {
-
     protected $ids;
 
     /**

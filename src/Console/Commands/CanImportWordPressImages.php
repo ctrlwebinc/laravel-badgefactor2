@@ -46,5 +46,3 @@ trait CanImportWordPressImages
         return $novaGalleryMedia;
     }
 }
-
-

@@ -9,12 +9,8 @@ use Ctrlweb\BadgeFactor2\Models\Courses\CourseCategory;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroupCategory;
 use Ctrlweb\BadgeFactor2\Models\Courses\Responsible;
-use Ctrlweb\NovaGallery\Models\NovaGalleryMedia;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Exception\NotReadableException;
-use Intervention\Image\ImageManagerStatic as Image;
 
 class MigrateWordPressCourses extends Command
 {
@@ -70,8 +66,6 @@ class MigrateWordPressCourses extends Command
         $this->newLine();
         $this->line('All done!');
     }
-
-
 
     /**
      * Import Badge Pages from WordPress to Laravel.
