@@ -6,11 +6,8 @@ use App\Models\Article;
 use App\Models\ArticleCategory;
 use App\Models\ArticleTag;
 use App\Models\User;
-use App\Models\WP\Post;
-
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use PHPUnit\Framework\Constraint\Count;
 
 class MigrateWordPressPosts extends Command
 {
@@ -134,8 +131,7 @@ class MigrateWordPressPosts extends Command
                         ->orderBy("{$this->prefix}terms.name")
                         ->get();
 
-                    foreach($postTags as $postTag)
-                    {
+                    foreach ($postTags as $postTag) {
                         $article->articleTags()->syncWithoutDetaching($this->ids['post_tag'][$postTag->term_id]);
                     }
                 }
