@@ -82,9 +82,8 @@ class Assertion extends BadgrProvider
         return $response;
     }
 
-    public function add(string $issuer, string $badge, string $recipient, string $recipientType='email', ?Carbon $issuedOn, ?string $evidenceUrl, ?string $evidenceNarrative)
+    public function add(string $issuer, string $badge, string $recipient, string $recipientType='email', ?Carbon $issuedOn=null, ?string $evidenceUrl=null, ?string $evidenceNarrative=null)
     {
-        // cache: add badge by slug, forget assertions by badge class, forget assertions by issuer
         $client = $this->getClient();
         if (!$client) {
             return false;
@@ -120,13 +119,14 @@ class Assertion extends BadgrProvider
 
         $response = $client->post('/v2/badgeclasses/'.$badgeId.'/assertions', $payload);
 
-        if ($response) {
+        $entityId = $this->getEntityId($response);
+
+        if ($entityId ) {
             Cache::put('assertion_'.$entityId, json_encode($response), 60);
+            Cache::forget('assertions_by_badgeclass_'.$badgeId);
+            Cache::forget('assertions_by_issuer_'.$issuerId);
         }
 
-        Cache::forget('assertions_by_badgeclass_'.$badgeId);
-        Cache::forget('assertions_by_issuer_'.$issuerId);
-
-        return $this->getEntityId($response);
+        return $entityId;
     }
 }
