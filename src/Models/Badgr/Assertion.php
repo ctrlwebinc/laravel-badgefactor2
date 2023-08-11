@@ -108,12 +108,9 @@ class Assertion extends Model
                 $recipient = User::where('email', '=', $assertions[$i]['recipient_email'])->first();
                 $assertions[$i]['recipient_id'] = $recipient->id ?? null;
 
-                if (isset($assertion['evidence'][0]['url'])) {
-                    $assertions[$i]['evidenceUrl'] = $assertions[$i]['evidence'][0]['url'];
-                }
-                if (isset($assertion['evidence'][0]['narrative'])) {
-                    $assertions[$i]['evidenceNarrative'] = $assertions[$i]['evidence'][0]['narrative'];
-                }
+                $assertions[$i]['evidenceUrl'] = isset($assertion['evidence'][0]['url']) ? $assertions[$i]['evidence'][0]['url'] : null;
+                $assertions[$i]['evidenceNarrative'] = isset($assertion['evidence'][0]['narrative']) ? $assertions[$i]['evidence'][0]['narrative'] : null;
+
                 unset($assertions[$i]['evidence']);
                 unset($assertions[$i]['acceptance']);
                 unset($assertions[$i]['extensions']);
