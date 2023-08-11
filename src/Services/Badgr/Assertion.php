@@ -91,9 +91,11 @@ class Assertion extends BadgrProvider
 
         $issuerId = json_decode($issuer)->entityId;
         $badgeId = json_decode($badge)->entityId;
+        $recipientMail = json_decode($recipient)->email;
+        
         $payload = [
             'recipient' => [
-                'identity' => $recipient,
+                'identity' => $recipientMail,
                 'type' => $recipientType
             ],
         ];

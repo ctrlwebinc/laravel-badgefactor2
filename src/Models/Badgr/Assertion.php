@@ -38,6 +38,19 @@ class Assertion extends Model
     protected static function booted(): void
     {
         static::creating(function (self $assertion) {
+            $badgeclassId = app(BadgrAssertion::class)->add(
+                $assertion->issuer,
+                $assertion->badgeClass,
+                $assertion->recipient,
+                'email',
+                $assertion->issuedOn,
+                $assertion->evidenceUrl,
+                $assertion->evidenceNarrative
+            );
+
+            if (!$badgeclassId) {
+                return false;
+            }
         });
 
         static::updating(function (self $assertion) {
