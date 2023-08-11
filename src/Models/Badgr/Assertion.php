@@ -38,7 +38,7 @@ class Assertion extends Model
     protected static function booted(): void
     {
         static::creating(function (self $assertion) {
-            $badgeclassId = app(BadgrAssertion::class)->add(
+            $assertionId = app(BadgrAssertion::class)->add(
                 $assertion->issuer,
                 $assertion->badgeClass,
                 $assertion->recipient,
@@ -47,10 +47,8 @@ class Assertion extends Model
                 $assertion->evidenceUrl,
                 $assertion->evidenceNarrative
             );
-
-            if (!$badgeclassId) {
-                return false;
-            }
+            
+            return $assertionId;
         });
 
         static::updating(function (self $assertion) {
