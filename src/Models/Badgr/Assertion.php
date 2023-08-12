@@ -5,6 +5,7 @@ namespace Ctrlweb\BadgeFactor2\Models\Badgr;
 use Ctrlweb\BadgeFactor2\Models\User;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Assertion as BadgrAssertion;
 use Illuminate\Database\Eloquent\Model;
+use Ctrlweb\BadgeFactor2\Events\AssertionIssued;
 
 class Assertion extends Model
 {
@@ -40,7 +41,7 @@ class Assertion extends Model
         static::creating(function (self $assertion) {
             $assertionId = app(BadgrAssertion::class)->add(
                 $assertion->issuer,
-                $assertion->badgeClass,
+                $assertion->badgeclass,
                 $assertion->recipient,
                 'email',
                 $assertion->issuedOn,
@@ -57,6 +58,15 @@ class Assertion extends Model
         static::deleting(function (self $assertion) {
         });
     }
+ 
+    /**
+     * The event map for the model.
+     *
+     * @var array
+     */
+    protected $dispatchesEvents = [
+        'created' => AssertionIssued::class,
+    ];
 
     public function getRows()
     {
