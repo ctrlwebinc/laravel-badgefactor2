@@ -48,7 +48,7 @@ class Assertion extends Model
                 $assertion->evidenceUrl,
                 $assertion->evidenceNarrative
             );
-            
+
             return $assertionId;
         });
 
@@ -58,7 +58,7 @@ class Assertion extends Model
         static::deleting(function (self $assertion) {
         });
     }
- 
+
     /**
      * The event map for the model.
      *
@@ -70,8 +70,14 @@ class Assertion extends Model
 
     public function getRows()
     {
-        $viaResource = request()->get('viaResource');
-        $viaResourceId = request()->get('viaResourceId');
+        $resourceId = request()->get('resourceId');
+        if ($resourceId) {
+            $viaResource = 'direct';
+            $viaResourceId = $resourceId;
+        } else {
+            $viaResource = request()->get('viaResource');
+            $viaResourceId = request()->get('viaResourceId');
+        }
 
         if (!$viaResource) {
             if (str_contains(request()->getPathInfo(), '/issuers/')) {
@@ -81,6 +87,14 @@ class Assertion extends Model
             } elseif (str_contains(request()->getPathInfo(), '/badges/')) {
                 $viaResource = 'badges';
                 $arr = explode('/badges/', request()->getPathInfo());
+                $viaResourceId = end($arr);
+            } elseif (str_contains(request()->getPathInfo(), '/admin/resources/assertions/'))  {
+                $viaResource = 'direct';
+                $arr = explode('/admin/resources/assertions/', request()->getPathInfo());
+                $viaResourceId = end($arr);
+            } elseif (str_contains(request()->getPathInfo(), '/nova-api/assertions/')) {
+                $viaResource = 'direct';
+                $arr = explode('/nova-api/assertions/', request()->getPathInfo());
                 $viaResourceId = end($arr);
             }
         }
@@ -98,6 +112,9 @@ class Assertion extends Model
                     $isFiltered = true;
                     $assertions = app(BadgrAssertion::class)->getByBadgeClass($viaResourceId);
                     break;
+                case 'direct':
+                    $isFiltered = true;
+                    $assertions = [json_decode(json_encode(app(BadgrAssertion::class)->getBySlug($viaResourceId)), true)];
             }
         }
 
