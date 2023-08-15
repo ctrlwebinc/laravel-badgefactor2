@@ -1,6 +1,6 @@
 <?php
 
-namespace Ctrlweb\BadgeFactor2\Providers;
+namespace Ctrlweb\BadgeFactor2;
 
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWooCommerceData;
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWordPressCourses;

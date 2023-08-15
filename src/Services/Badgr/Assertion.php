@@ -2,10 +2,9 @@
 
 namespace Ctrlweb\BadgeFactor2\Services\Badgr;
 
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Cache;
-use Carbon\Carbon;
-
 
 class Assertion extends BadgrProvider
 {
@@ -82,7 +81,7 @@ class Assertion extends BadgrProvider
         return $response;
     }
 
-    public function add(string $issuer, string $badge, string $recipient, string $recipientType='email', ?Carbon $issuedOn=null, ?string $evidenceUrl=null, ?string $evidenceNarrative=null)
+    public function add(string $issuer, string $badge, string $recipient, string $recipientType = 'email', ?Carbon $issuedOn = null, ?string $evidenceUrl = null, ?string $evidenceNarrative = null)
     {
         $client = $this->getClient();
         if (!$client) {
@@ -96,34 +95,30 @@ class Assertion extends BadgrProvider
         $payload = [
             'recipient' => [
                 'identity' => $recipientMail,
-                'type' => $recipientType
+                'type'     => $recipientType
             ],
         ];
 
-        if (null !== $issuedOn )
-        {
-			$payload['issuedOn'] = $issuedOn->format( 'c' );
-		}
+        if (null !== $issuedOn) {
+            $payload['issuedOn'] = $issuedOn->format('c');
+        }
 
-        if (null !== $evidenceNarrative || null !== $evidenceUrl )
-        {
-			$evidence = [];
-			if (null !== $evidenceNarrative )
-            {
-				$evidence['narrative'] = $evidenceNarrative;
-			}
-			if ( null !== $evidenceUrl)
-            {
-				$evidence['url'] = $evidenceUrl;
-			}
-			$payload['evidence'] = [$evidence];
-		}
+        if (null !== $evidenceNarrative || null !== $evidenceUrl) {
+            $evidence = [];
+            if (null !== $evidenceNarrative) {
+                $evidence['narrative'] = $evidenceNarrative;
+            }
+            if (null !== $evidenceUrl) {
+                $evidence['url'] = $evidenceUrl;
+            }
+            $payload['evidence'] = [$evidence];
+        }
 
         $response = $client->post('/v2/badgeclasses/'.$badgeId.'/assertions', $payload);
 
         $entityId = $this->getEntityId($response);
 
-        if ($entityId ) {
+        if ($entityId) {
             Cache::put('assertion_'.$entityId, json_encode($response), 60);
             Cache::forget('assertions_by_badgeclass_'.$badgeId);
             Cache::forget('assertions_by_issuer_'.$issuerId);

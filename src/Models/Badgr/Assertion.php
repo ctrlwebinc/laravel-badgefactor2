@@ -2,10 +2,10 @@
 
 namespace Ctrlweb\BadgeFactor2\Models\Badgr;
 
+use Ctrlweb\BadgeFactor2\Events\AssertionIssued;
 use Ctrlweb\BadgeFactor2\Models\User;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Assertion as BadgrAssertion;
 use Illuminate\Database\Eloquent\Model;
-use Ctrlweb\BadgeFactor2\Events\AssertionIssued;
 
 class Assertion extends Model
 {
@@ -21,19 +21,19 @@ class Assertion extends Model
     ];
 
     protected $schema = [
-        'entityId'         => 'string',
-        'badgeclass_id'    => 'string',
-        'issuer_id'        => 'string',
-        'image'            => 'string',
-        'recipient_email'  => 'string',
-        'recipient_id'     => 'integer',
-        'issuedOn'         => 'dateTime',
-        'narrative'        => 'string',
-        'evidenceUrl'      => 'string',
+        'entityId'               => 'string',
+        'badgeclass_id'          => 'string',
+        'issuer_id'              => 'string',
+        'image'                  => 'string',
+        'recipient_email'        => 'string',
+        'recipient_id'           => 'integer',
+        'issuedOn'               => 'dateTime',
+        'narrative'              => 'string',
+        'evidenceUrl'            => 'string',
         'evidenceNarrative'      => 'string',
-        'revoked'          => 'boolean',
-        'revocationReason' => 'string',
-        'expires'          => 'dateTime',
+        'revoked'                => 'boolean',
+        'revocationReason'       => 'string',
+        'expires'                => 'dateTime',
     ];
 
     protected static function booted(): void
@@ -88,7 +88,7 @@ class Assertion extends Model
                 $viaResource = 'badges';
                 $arr = explode('/badges/', request()->getPathInfo());
                 $viaResourceId = end($arr);
-            } elseif (str_contains(request()->getPathInfo(), '/admin/resources/assertions/'))  {
+            } elseif (str_contains(request()->getPathInfo(), '/admin/resources/assertions/')) {
                 $viaResource = 'direct';
                 $arr = explode('/admin/resources/assertions/', request()->getPathInfo());
                 $viaResourceId = end($arr);
