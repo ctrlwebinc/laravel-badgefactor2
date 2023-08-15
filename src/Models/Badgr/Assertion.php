@@ -53,9 +53,17 @@ class Assertion extends Model
         });
 
         static::updating(function (self $assertion) {
+            return app(BadgrAssertion::class)->update(
+                $assertion->entityId, [
+                'recipient' => $assertion->recipient,
+                'issuedOn' => $assertion->issuedOn,
+                'evidenceNarrative' => $assertion->evidenceNarrative,
+                'evidenceUrl' => $assertion->evidenceUrl,
+            ]);
         });
 
         static::deleting(function (self $assertion) {
+            return app(BadgrAssertion::class)->revoke($assertion->entityId);
         });
     }
 

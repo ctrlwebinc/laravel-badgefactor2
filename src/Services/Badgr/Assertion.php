@@ -81,7 +81,7 @@ class Assertion extends BadgrProvider
         return $response;
     }
 
-    public function add(string $issuer, string $badge, string $recipient, string $recipientType = 'email', ?Carbon $issuedOn = null, ?string $evidenceUrl = null, ?string $evidenceNarrative = null)
+    public function add(string $issuer, string $badge, string $recipient, string $recipientType = 'email', ?Carbon $issuedOn = null, ?string $evidenceUrl = null, ?string $evidenceNarrative = null) : mixed
     {
         $client = $this->getClient();
         if (!$client) {
@@ -125,5 +125,94 @@ class Assertion extends BadgrProvider
         }
 
         return $entityId;
+    }
+
+    public function update(string $entityId, array $parameters=[]) : bool
+    {
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        // Setup payload.
+		$payload = [];
+
+		if ( isset( $parameters['issuedOn'] ) && 0 !== strlen( $parameters['issuedOn'] ) ) {
+			$payload['issuedOn'] = $parameters['issuedOn']->format('c');
+		}
+
+        $evidence = [];
+        if (isset( $parameters['evidenceNarrative'] ) && (null !== $parameters['evidenceNarrative']) && ( 0 !== strlen( $parameters['evidenceNarrative'] )))
+        {
+            $evidence['narrative'] = $parameters['evidenceNarrative'];
+        }
+        if (isset( $parameters['evidenceUrl'] ) && (null !== $parameters['evidenceUrl']) && ( 0 !== strlen( $parameters['evidenceUrl'] )))
+        {
+            $evidence['url'] = $parameters['evidenceUrl'];
+        }
+        if (!empty($evidence))
+        {
+            $payload['evidence'] = [$evidence];
+        }
+
+        if ( isset( $parameters['recipient'] ) ) {
+            $payload['recipient'] = [
+                'identity' => json_decode($parameters['recipient'])->email,
+                'type' => 'email'
+            ];
+		}
+
+		if ( empty( $payload ) ) {
+			// Nothing to change, update not possible.
+			return false;
+		}
+
+        $response = $client->put('/v2/assertions/'.$entityId, $payload);
+
+        $result = $this->getFirstResult($response);
+
+        if ($result) {
+            Cache::put('assertion_'.$entityId, json_encode($result), 60);
+            Cache::forget('assertions_by_badgeclass_'.$result['badgeclass']);
+            Cache::forget('assertions_by_issuer_'.$result['issuer']);
+        }
+
+        return true;
+    }
+
+    public function revoke(string $entityId, string $reason=null) : bool
+    {
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        // Get assertion first to determine issuer and badgeclass for the purpose of invalidating the cache
+        $response = $client->get('/v2/assertions/'.$entityId);
+
+        $result = $this->getFirstResult($response);
+
+        if (!$result || $result['revoked'] == true)
+        {
+            // No cache operation required
+            return true;
+        }
+
+        $issuerId = $result['issuer'];
+        $badgeId = $result['badgeclass'];
+
+        $response = $client->delete('/v2/assertions/'.$entityId,[
+            'revocation_reason' => $reason ?? 'No reason specified'
+        ]);
+
+        if (null !== $response && ($response->status() === 204 || $response->status() === 200 || $response->status() === 404 || $response->status() === 400)) {
+            Cache::forget('assertion_'.$entityId);
+            Cache::forget('assertions_by_badgeclass_'.$badgeId);
+            Cache::forget('assertions_by_issuer_'.$issuerId);
+
+            return true;
+        }
+
+        return false;
     }
 }
