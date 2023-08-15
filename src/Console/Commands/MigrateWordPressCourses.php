@@ -114,13 +114,18 @@ class MigrateWordPressCourses extends Command
                                 'badgeclass_id' => $badgePageMeta->firstWhere('meta_key', 'badge')->meta_value,
                             ],
                             [
+                                'type'              => 'certification', // FIXME
+                                'badgeclass_id'     => $badgePageMeta->firstWhere('meta_key', 'badge')->meta_value,
                                 'title'             => $wpBadgePage->post_title,
                                 'slug'              => $wpBadgePage->post_name,
                                 'content'           => $wpBadgePage->post_content,
                                 'criteria'          => $badgePageMeta->firstWhere('meta_key', 'badge_criteria') ? $badgePageMeta->firstWhere('meta_key', 'badge_criteria')->meta_value : null,
                                 'approval_type'     => $badgePageMeta->firstWhere('meta_key', 'badge_approval_type') ? $badgePageMeta->firstWhere('meta_key', 'badge_approval_type')->meta_value : null,
+                                'request_type'      => 'external',
+                                'request_form_url'  => null, // FIXME
                                 'badge_category_id' => $badgePageCategoryId,
                                 'last_updated_at'   => $badgePageMeta->firstWhere('meta_key', 'badgepage_latest_update_date') ? $badgePageMeta->firstWhere('meta_key', 'badgepage_latest_update_date')->meta_value : null,
+
                             ]
                         );
 
