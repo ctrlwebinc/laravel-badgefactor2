@@ -149,56 +149,6 @@ class BadgrProvider
     }
 
     /**
-     * @param string      $badgeClassId
-     * @param string      $recipientIdentifier
-     * @param string      $recipientType
-     * @param mixed|null  $issuedOn
-     * @param string|null $evidenceUrl
-     * @param string|null $evidenceNarrative
-     *
-     * @throws Exception
-     *
-     * @return mixed
-     */
-    public function addAssertion(
-        string $badgeClassId,
-        string $recipientIdentifier,
-        string $recipientType = 'email',
-        mixed $issuedOn = null,
-        ?string $evidenceUrl = null,
-        ?string $evidenceNarrative = null
-    ): mixed {
-        $payload = [
-            'recipient' => [
-                'identity' => $recipientIdentifier,
-                'type'     => $recipientType,
-            ],
-        ];
-
-        if ($issuedOn instanceof CarbonInterface) {
-            $payload['issuedOn'] = $issuedOn->format('c');
-        }
-
-        if (null !== $evidenceNarrative || null !== $evidenceUrl) {
-            $evidence = [];
-
-            if (null !== $evidenceNarrative) {
-                $evidence['narrative'] = $evidenceNarrative;
-            }
-
-            if (null !== $evidenceUrl) {
-                $evidence['url'] = $evidenceUrl;
-            }
-
-            $payload['evidence'] = $evidence;
-        }
-
-        $response = $this->getClient()->post('/v2/badgeclasses/'.$badgeClassId.'/assertions', $payload);
-
-        return $this->getEntityId($response);
-    }
-
-    /**
      * Prepares image to be sent to Badgr API.
      *
      * @param string $image
