@@ -95,7 +95,7 @@ class Assertion extends BadgrProvider
         $payload = [
             'recipient' => [
                 'identity' => $recipientMail,
-                'type'     => $recipientType
+                'type'     => $recipientType,
             ],
         ];
 
