@@ -31,7 +31,6 @@ class Badge extends Model
         'approval_type'     => 'string',
         'request_form_url'  => 'json',
         'badge_category_id' => 'integer',
-        'badge_group_id'    => 'integer',
         'course_id'         => 'integer',
         'created_at'        => 'datetime',
         'updated_at'        => 'datetime',
@@ -96,7 +95,6 @@ class Badge extends Model
                     'approval_type'     => $badge->approval_type,
                     'request_form_url'  => $badge->request_form_url,
                     'badge_category_id' => $badge->badge_category_id,
-                    'badge_group_id'    => $badge->badge_group_id,
                 ]
             );
 
@@ -135,7 +133,6 @@ class Badge extends Model
                 $row['approval_type'] = !empty($badgePage) ? $badgePage->approval_type : '';
                 $row['request_form_url'] = !empty($badgePage) ? json_encode($badgePage->getTranslations('request_form_url')) : '';
                 $row['badge_category_id'] = !empty($badgePage) ? $badgePage->badge_category_id : '';
-                $row['badge_group_id'] = !empty($badgePage) ? $badgePage->badge_group_id : '';
                 $row['course_id'] = !empty($badgePage) && !empty($badgePage->course) ? $badgePage->course->id : '';
 
                 return $row->except(['alignments', 'tags', 'extensions', 'expires'])

@@ -13,9 +13,9 @@ return new class() extends Migration {
     public function up()
     {
         Schema::table('badge_pages', function (Blueprint $table) {
-            $table->string('video_url')->after('badge_group_id')->nullable();
-            $table->string('image')->after('badge_group_id')->nullable();
-            $table->boolean('duration')->after('badge_group_id')->nullable();
+            $table->string('video_url')->after('badge_category_id')->nullable();
+            $table->string('image')->after('badge_category_id')->nullable();
+            $table->boolean('duration')->after('badge_category_id')->nullable();
         });
     }
 

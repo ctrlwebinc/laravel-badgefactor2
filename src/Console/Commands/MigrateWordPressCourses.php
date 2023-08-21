@@ -127,8 +127,10 @@ class MigrateWordPressCourses extends Command
                                 'request_type'      => 'external',
                                 'request_form_url'  => null, // FIXME
                                 'badge_category_id' => $badgePageCategoryId,
+                                'duration'          => null,
+                                'image'             => null,
+                                'video_url'         => null,
                                 'last_updated_at'   => $badgePageMeta->firstWhere('meta_key', 'badgepage_latest_update_date') ? $badgePageMeta->firstWhere('meta_key', 'badgepage_latest_update_date')->meta_value : null,
-
                             ]
                         );
 
@@ -381,9 +383,6 @@ class MigrateWordPressCourses extends Command
                     foreach ($wpTechnicalRequirements as $wpTechnicalRequirement) {
                         $course->technicalRequirements()->syncWithoutDetaching([$this->ids['exigence_technique_de_cours'][$wpTechnicalRequirement->term_id]]);
                     }
-
-
-
                 }
             );
         });

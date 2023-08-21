@@ -31,5 +31,4 @@ class TechnicalRequirement extends Model
     {
         return $this->belongsToMany(Course::class);
     }
-
 }

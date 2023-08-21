@@ -81,7 +81,7 @@ class Assertion extends BadgrProvider
         return $response;
     }
 
-    public function add(string $issuer, string $badge, string $recipient, string $recipientType = 'email', ?Carbon $issuedOn = null, ?string $evidenceUrl = null, ?string $evidenceNarrative = null) : mixed
+    public function add(string $issuer, string $badge, string $recipient, string $recipientType = 'email', ?Carbon $issuedOn = null, ?string $evidenceUrl = null, ?string $evidenceNarrative = null): mixed
     {
         $client = $this->getClient();
         if (!$client) {
@@ -127,7 +127,7 @@ class Assertion extends BadgrProvider
         return $entityId;
     }
 
-    public function update(string $entityId, array $parameters=[]) : bool
+    public function update(string $entityId, array $parameters = []): bool
     {
         $client = $this->getClient();
         if (!$client) {
@@ -135,37 +135,34 @@ class Assertion extends BadgrProvider
         }
 
         // Setup payload.
-		$payload = [];
+        $payload = [];
 
-		if ( isset( $parameters['issuedOn'] ) && 0 !== strlen( $parameters['issuedOn'] ) ) {
-			$payload['issuedOn'] = $parameters['issuedOn']->format('c');
-		}
+        if (isset($parameters['issuedOn']) && 0 !== strlen($parameters['issuedOn'])) {
+            $payload['issuedOn'] = $parameters['issuedOn']->format('c');
+        }
 
         $evidence = [];
-        if (isset( $parameters['evidenceNarrative'] ) && (null !== $parameters['evidenceNarrative']) && ( 0 !== strlen( $parameters['evidenceNarrative'] )))
-        {
+        if (isset($parameters['evidenceNarrative']) && (null !== $parameters['evidenceNarrative']) && (0 !== strlen($parameters['evidenceNarrative']))) {
             $evidence['narrative'] = $parameters['evidenceNarrative'];
         }
-        if (isset( $parameters['evidenceUrl'] ) && (null !== $parameters['evidenceUrl']) && ( 0 !== strlen( $parameters['evidenceUrl'] )))
-        {
+        if (isset($parameters['evidenceUrl']) && (null !== $parameters['evidenceUrl']) && (0 !== strlen($parameters['evidenceUrl']))) {
             $evidence['url'] = $parameters['evidenceUrl'];
         }
-        if (!empty($evidence))
-        {
+        if (!empty($evidence)) {
             $payload['evidence'] = [$evidence];
         }
 
-        if ( isset( $parameters['recipient'] ) ) {
+        if (isset($parameters['recipient'])) {
             $payload['recipient'] = [
                 'identity' => json_decode($parameters['recipient'])->email,
-                'type' => 'email'
+                'type'     => 'email'
             ];
-		}
+        }
 
-		if ( empty( $payload ) ) {
-			// Nothing to change, update not possible.
-			return false;
-		}
+		if (empty($payload)) {
+            // Nothing to change, update not possible.
+            return false;
+        }
 
         $response = $client->put('/v2/assertions/'.$entityId, $payload);
 
@@ -180,7 +177,7 @@ class Assertion extends BadgrProvider
         return true;
     }
 
-    public function revoke(string $entityId, string $reason=null) : bool
+    public function revoke(string $entityId, string $reason=null): bool
     {
         $client = $this->getClient();
         if (!$client) {
@@ -192,16 +189,15 @@ class Assertion extends BadgrProvider
 
         $result = $this->getFirstResult($response);
 
-        if (!$result || $result['revoked'] == true)
-        {
-            // No cache operation required
+        if (!$result || $result['revoked'] == true) {
+            // No cache operation required.
             return true;
         }
 
         $issuerId = $result['issuer'];
         $badgeId = $result['badgeclass'];
 
-        $response = $client->delete('/v2/assertions/'.$entityId,[
+        $response = $client->delete('/v2/assertions/'.$entityId, [
             'revocation_reason' => $reason ?? 'No reason specified'
         ]);
 

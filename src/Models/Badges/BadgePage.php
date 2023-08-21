@@ -28,7 +28,6 @@ class BadgePage extends Model
         'request_type',
         'request_form_url',
         'badge_category_id',
-        'badge_group_id',
         'duration',
         'image',
         'video_url',
