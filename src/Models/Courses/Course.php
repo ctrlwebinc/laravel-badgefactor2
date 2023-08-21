@@ -28,7 +28,6 @@ class Course extends Model
         'course_category_id',
         'course_group_id',
         'regular_price',
-        'promo_price',
     ];
 
     protected $with = ['badgePage'];
@@ -65,14 +64,8 @@ class Course extends Model
 
     public function price(): Attribute
     {
-        if (!is_null($this->promo_price)) {
-            $price = $this->promo_price;
-        } else {
-            $price = $this->regular_price;
-        }
-
         return Attribute::make(
-            get: fn () => $price
+            get: fn () => $this->regular_price
         );
     }
 
