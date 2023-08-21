@@ -2,7 +2,7 @@
 
 namespace Ctrlweb\BadgeFactor2\Tests;
 
-use Ctrlweb\BadgeFactor2\CoreServiceProvider;
+use Ctrlweb\BadgeFactor2\Providers\CoreServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {

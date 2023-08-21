@@ -1,6 +1,6 @@
 <?php
 
-namespace Ctrlweb\BadgeFactor2;
+namespace Ctrlweb\BadgeFactor2\Providers;
 
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWooCommerceData;
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWordPressCourses;
@@ -115,7 +115,7 @@ class CoreServiceProvider extends ServiceProvider
      */
     protected function registerRoutes()
     {
-        $this->loadRoutesFrom(__DIR__.'/../routes/routes.php');
+        $this->loadRoutesFrom(__DIR__.'/../../routes/routes.php');
     }
 
     /**
