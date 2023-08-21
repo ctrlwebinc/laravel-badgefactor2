@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class() extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -12,9 +13,9 @@ return new class() extends Migration {
      */
     public function up()
     {
-        Schema::create('badge_page_target_audience', function (Blueprint $table) {
-            $table->foreignId('target_audience_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('badge_page_id')->constrained()->cascadeOnDelete();
+        Schema::create('course_technical_requirement', function (Blueprint $table) {
+            $table->foreignId('course_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('technical_requirement_id')->constrained()->cascadeOnDelete();
         });
     }
 
@@ -25,6 +26,6 @@ return new class() extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('badge_page_target_audience');
+        Schema::dropIfExists('course_technical_requirement');
     }
 };

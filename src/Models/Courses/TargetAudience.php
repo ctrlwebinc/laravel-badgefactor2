@@ -1,6 +1,6 @@
 <?php
 
-namespace Ctrlweb\BadgeFactor2\Models\Badges;
+namespace Ctrlweb\BadgeFactor2\Models\Courses;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,19 +12,23 @@ class TargetAudience extends Model
     use HasTranslations;
 
     protected $fillable = [
-        'name',
         'slug',
-        'description',
+        'title',
     ];
 
     protected $translatable = [
-        'name',
         'slug',
-        'description',
+        'title',
     ];
 
-    public function badgePages()
+    public static function findBySlug($slug)
     {
-        return $this->belongsToMany(BadgePage::class);
+        return self::where('slug->fr', $slug)
+            ->orWhere('slug->en', $slug);
+    }
+
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class);
     }
 }

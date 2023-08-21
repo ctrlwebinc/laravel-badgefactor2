@@ -136,11 +136,6 @@ class BadgePage extends Model
         return $this->belongsTo(CourseCategory::class);
     }
 
-    public function targetAudiences()
-    {
-        return $this->belongsToMany(TargetAudience::class, 'badge_page_target_audience');
-    }
-
     public function getBadgeAttribute()
     {
         if ($this->badgeclass_id) {

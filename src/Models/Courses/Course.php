@@ -26,6 +26,7 @@ class Course extends Model
         'autoevaluation_form_url',
         'badge_page_id',
         'course_category_id',
+        'course_group_id',
         'regular_price',
         'promo_price',
     ];
@@ -50,6 +51,16 @@ class Course extends Model
     public function badgePage()
     {
         return $this->belongsTo(BadgePage::class);
+    }
+
+    public function targetAudiences()
+    {
+        return $this->belongsToMany(TargetAudience::class);
+    }
+
+    public function technicalRequirements()
+    {
+        return $this->belongsToMany(TechnicalRequirement::class);
     }
 
     public function price(): Attribute

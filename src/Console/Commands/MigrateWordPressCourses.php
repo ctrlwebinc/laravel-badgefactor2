@@ -9,6 +9,8 @@ use Ctrlweb\BadgeFactor2\Models\Courses\CourseCategory;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroupCategory;
 use Ctrlweb\BadgeFactor2\Models\Courses\Responsible;
+use Ctrlweb\BadgeFactor2\Models\Courses\TargetAudience;
+use Ctrlweb\BadgeFactor2\Models\Courses\TechnicalRequirement;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -58,6 +60,8 @@ class MigrateWordPressCourses extends Command
         $this->importCategory(BadgeCategory::class, 'badge-category');
         $this->importCategory(CourseCategory::class, 'course-category');
         $this->importCategory(CourseGroupCategory::class, 'course_group_categories');
+        $this->importCategory(TargetAudience::class, 'public-cible');
+        $this->importCategory(TechnicalRequirement::class, 'exigence_technique_de_cours');
         $this->importBadgePages();
         $this->importResponsibles();
         $this->importCourseGroups();
@@ -94,19 +98,18 @@ class MigrateWordPressCourses extends Command
                             ->get()
                     );
 
-                    $termRelationship = collect(
-                        $this->wpdb
-                            ->select(
-                                "SELECT *
-                                    FROM {$this->prefix}term_relationships
-                                    WHERE object_id = ?",
-                                [$wpBadgePage->ID]
-                            )
-                    )->first();
+                    $wpBadgePageCategory = $this->wpdb
+                        ->table("{$this->prefix}term_relationships")
+                        ->select("{$this->prefix}term_taxonomy.term_id", "{$this->prefix}terms.name", "{$this->prefix}terms.slug", "{$this->prefix}term_taxonomy.description")
+                        ->leftJoin("{$this->prefix}term_taxonomy", "{$this->prefix}term_relationships.term_taxonomy_id", '=', "{$this->prefix}term_taxonomy.term_taxonomy_id")
+                        ->leftJoin("{$this->prefix}terms", "{$this->prefix}terms.term_id", '=', "{$this->prefix}term_taxonomy.term_taxonomy_id")
+                        ->where("{$this->prefix}term_taxonomy.taxonomy", 'badge-category')
+                        ->where("{$this->prefix}term_relationships.object_id", $wpBadgePage->ID)
+                        ->groupBy("{$this->prefix}term_taxonomy.term_id")
+                        ->orderBy("{$this->prefix}terms.name")
+                        ->first();
 
-                    $badgePageCategoryId = isset($termRelationship->term_taxonomy_id) && isset($this->ids['badge-category'][$termRelationship->term_taxonomy_id]) ?
-                        $this->ids['badge-category'][$termRelationship->term_taxonomy_id] :
-                        null;
+                    $badgePageCategoryId = isset($wpBadgePageCategory->term_id) ? $this->ids['badge-category'][$wpBadgePageCategory->term_id] : null;
 
                     if (isset($badgePageMeta->firstWhere('meta_key', 'badge')->meta_value)) {
                         $badgePage = BadgePage::updateOrCreate(
@@ -240,6 +243,8 @@ class MigrateWordPressCourses extends Command
                         ]
                     );
 
+                    $this->ids['course_groups'][$wpCourseGroup->ID] = $courseGroup->id;
+
                     foreach (unserialize($wpCourseGroupMeta->firstWhere('meta_key', 'badge_page_in_charge_of_feedback')->meta_value) as $wpResponsibleId) {
                         $courseGroup->retroactionResponsibles()->syncWithoutDetaching($this->ids['responsibles'][$wpResponsibleId]);
                     }
@@ -289,6 +294,7 @@ class MigrateWordPressCourses extends Command
                     );
 
                     $wpBadgePageId = isset($courseMeta->firstWhere('meta_key', 'course_badge_page')->meta_value) ? $courseMeta->firstWhere('meta_key', 'course_badge_page')->meta_value : null;
+
                     $wpBadgePage = $this->wpdb
                         ->table("{$this->prefix}posts")
                         ->select('*')
@@ -341,10 +347,43 @@ class MigrateWordPressCourses extends Command
                             'course_category_id'      => $courseGroupCategoryId,
                             'title'                   => $wpCourse->post_title,
                             'decription'              => null,
-                            'course_group_id'         => $courseGroupId,
+                            'course_group_id'         => isset($courseGroupId->ID) ? $this->ids['course_groups'][$courseGroupId->ID] : null,
                             'regular_price'           => isset($courseMeta->firstWhere('meta_key', 'price')->meta_value) ? (int) $courseMeta->firstWhere('meta_key', 'price')->meta_value : null,
                         ]
                     );
+
+                    $wpTargetAudiences = $this->wpdb
+                        ->table("{$this->prefix}term_relationships")
+                        ->select("{$this->prefix}term_taxonomy.term_id", "{$this->prefix}terms.name", "{$this->prefix}terms.slug", "{$this->prefix}term_taxonomy.description")
+                        ->leftJoin("{$this->prefix}term_taxonomy", "{$this->prefix}term_relationships.term_taxonomy_id", '=', "{$this->prefix}term_taxonomy.term_taxonomy_id")
+                        ->leftJoin("{$this->prefix}terms", "{$this->prefix}terms.term_id", '=', "{$this->prefix}term_taxonomy.term_taxonomy_id")
+                        ->where("{$this->prefix}term_taxonomy.taxonomy", 'public-cible')
+                        ->where("{$this->prefix}term_relationships.object_id", $wpBadgePageId)
+                        ->groupBy("{$this->prefix}term_taxonomy.term_id")
+                        ->orderBy("{$this->prefix}terms.name")
+                        ->get();
+
+                    foreach ($wpTargetAudiences as $wpTargetAudience) {
+                        $course->targetAudiences()->syncWithoutDetaching([$this->ids['public-cible'][$wpTargetAudience->term_id]]);
+                    }
+
+                    $wpTechnicalRequirements = $this->wpdb
+                        ->table("{$this->prefix}term_relationships")
+                        ->select("{$this->prefix}term_taxonomy.term_id", "{$this->prefix}terms.name", "{$this->prefix}terms.slug", "{$this->prefix}term_taxonomy.description")
+                        ->leftJoin("{$this->prefix}term_taxonomy", "{$this->prefix}term_relationships.term_taxonomy_id", '=', "{$this->prefix}term_taxonomy.term_taxonomy_id")
+                        ->leftJoin("{$this->prefix}terms", "{$this->prefix}terms.term_id", '=', "{$this->prefix}term_taxonomy.term_taxonomy_id")
+                        ->where("{$this->prefix}term_taxonomy.taxonomy", 'exigence_technique_de_cours')
+                        ->where("{$this->prefix}term_relationships.object_id", $wpBadgePageId)
+                        ->groupBy("{$this->prefix}term_taxonomy.term_id")
+                        ->orderBy("{$this->prefix}terms.name")
+                        ->get();
+
+                    foreach ($wpTechnicalRequirements as $wpTechnicalRequirement) {
+                        $course->technicalRequirements()->syncWithoutDetaching([$this->ids['exigence_technique_de_cours'][$wpTechnicalRequirement->term_id]]);
+                    }
+
+
+
                 }
             );
         });
