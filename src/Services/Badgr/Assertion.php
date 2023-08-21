@@ -155,11 +155,11 @@ class Assertion extends BadgrProvider
         if (isset($parameters['recipient'])) {
             $payload['recipient'] = [
                 'identity' => json_decode($parameters['recipient'])->email,
-                'type'     => 'email'
+                'type'     => 'email',
             ];
         }
 
-		if (empty($payload)) {
+        if (empty($payload)) {
             // Nothing to change, update not possible.
             return false;
         }
@@ -177,7 +177,7 @@ class Assertion extends BadgrProvider
         return true;
     }
 
-    public function revoke(string $entityId, string $reason=null): bool
+    public function revoke(string $entityId, string $reason = null): bool
     {
         $client = $this->getClient();
         if (!$client) {
@@ -198,7 +198,7 @@ class Assertion extends BadgrProvider
         $badgeId = $result['badgeclass'];
 
         $response = $client->delete('/v2/assertions/'.$entityId, [
-            'revocation_reason' => $reason ?? 'No reason specified'
+            'revocation_reason' => $reason ?? 'No reason specified',
         ]);
 
         if (null !== $response && ($response->status() === 204 || $response->status() === 200 || $response->status() === 404 || $response->status() === 400)) {
