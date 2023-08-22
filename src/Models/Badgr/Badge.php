@@ -117,7 +117,7 @@ class Badge extends Model
         if ($badges) {
             $badges = collect(app(BadgrBadge::class)->all());
 
-            $badgePages = BadgePage::all();
+            $badgePages = BadgePage::with('course')->get();
 
             $badges = $badges->map(function ($row) use ($badgePages) {
                 $row = collect($row);
