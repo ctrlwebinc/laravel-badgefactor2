@@ -12,13 +12,16 @@ class TechnicalRequirement extends Model
     use HasTranslations;
 
     protected $fillable = [
-        'slug',
         'title',
+        'slug',
+        'description',
+        'image',
     ];
 
     protected $translatable = [
-        'slug',
         'title',
+        'slug',
+        'description',
     ];
 
     public static function findBySlug($slug)
