@@ -110,7 +110,6 @@ class MigrateWordPressPosts extends Command
                         [
                             'title'               => $wpPost->post_title,
                             'slug'                => $wpPost->post_name,
-                            'excerpt'             => $wpPost->post_excerpt,
                             'featured_image'      => $novaGalleryMedia ? $novaGalleryMedia->path : null,
                             'content'             => $wpPost->post_content,
                             'status'              => 'PUBLISHED',

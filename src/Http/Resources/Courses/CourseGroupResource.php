@@ -21,9 +21,9 @@ class CourseGroupResource extends JsonResource
         return [
             'id'                       => $this->resource->id,
             'slug'                     => $this->resource->slug,
-            'excerpt'                  => substr($this->resource->excerpt, 0, 140),
             'title'                    => $this->resource->title,
             'description'              => $this->resource->description,
+            'excerpt'                  => mb_substr(strip_tags($this->resource->description), 0, 134, 'UTF-8').' [...]',
             'image'                    => $this->resource->image,
             'content_specialists'      => ResponsibleResource::collection($this->resource->contentSpecialists ?? null),
             'retroaction_responsibles' => ResponsibleResource::collection($this->resource->retroactionResponsibles ?? null),

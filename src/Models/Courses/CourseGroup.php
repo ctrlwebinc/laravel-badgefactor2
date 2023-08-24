@@ -17,7 +17,6 @@ class CourseGroup extends Model
     protected $fillable = [
         'slug',
         'title',
-        'excerpt',
         'subtitle',
         'image',
         'description',
@@ -26,7 +25,6 @@ class CourseGroup extends Model
 
     protected $translatable = [
         'slug',
-        'excerpt',
         'title',
         'subtitle',
         'description',

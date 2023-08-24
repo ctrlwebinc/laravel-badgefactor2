@@ -29,7 +29,7 @@ class Badge extends BadgrProvider
         $response = $this->getResult($response);
 
         if ($response) {
-            Cache::put('badges', json_encode($response), 60);
+            Cache::put('badges', json_encode($response), 86400);
         }
 
         return $response;
@@ -56,7 +56,7 @@ class Badge extends BadgrProvider
         $response = $this->getCount($response);
 
         if ($response) {
-            Cache::put('badges_count', $response, 60);
+            Cache::put('badges_count', $response, 86400);
         }
 
         return $response;
@@ -110,7 +110,7 @@ class Badge extends BadgrProvider
         $response = $this->getFirstResult($response);
 
         if ($response) {
-            Cache::put('badge_'.$entityId, json_encode($response), 60);
+            Cache::put('badge_'.$entityId, json_encode($response), 86400);
         }
 
         return $response;
@@ -132,7 +132,7 @@ class Badge extends BadgrProvider
         $response = $this->getResult($response);
 
         if ($response) {
-            Cache::put('badges_by_issuer_'.$entityId, $response, 60);
+            Cache::put('badges_by_issuer_'.$entityId, $response, 86400);
         }
 
         return $response;

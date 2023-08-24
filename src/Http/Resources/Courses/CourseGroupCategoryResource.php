@@ -21,7 +21,7 @@ class CourseGroupCategoryResource extends JsonResource
             'slug'           => $this->resource->slug,
             'is_featured'    => $this->resource->is_featured,
             'menu_title'     => $this->resource->menu_title,
-            'excerpt'        => substr($this->resource->excerpt, 0, 140),
+            'excerpt'        => mb_substr(strip_tags($this->resource->description), 0, 134, 'UTF-8').' [...]',
             'label'          => $this->resource->title,
             'subtitle'       => $this->resource->subtitle,
             'description'    => $this->resource->description,

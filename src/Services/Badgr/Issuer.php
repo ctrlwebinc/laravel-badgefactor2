@@ -28,7 +28,7 @@ class Issuer extends BadgrProvider
         $response = $this->getResult($response);
 
         if ($response) {
-            Cache::put('issuers', json_encode($response), 60);
+            Cache::put('issuers', json_encode($response), 86400);
         }
 
         return $response;
@@ -55,7 +55,7 @@ class Issuer extends BadgrProvider
         $response = $this->getCount($response);
 
         if ($response) {
-            Cache::put('issuers_count', $response, 60);
+            Cache::put('issuers_count', $response, 86400);
         }
 
         return $response;
@@ -109,7 +109,7 @@ class Issuer extends BadgrProvider
         $response = $this->getFirstResult($response);
 
         if ($response) {
-            Cache::put('issuer_'.$entityId, json_encode($response), 60);
+            Cache::put('issuer_'.$entityId, json_encode($response), 86400);
         }
 
         return $response;

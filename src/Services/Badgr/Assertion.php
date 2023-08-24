@@ -31,7 +31,7 @@ class Assertion extends BadgrProvider
         $response = $this->getFirstResult($response);
 
         if ($response) {
-            Cache::put('assertion_'.$entityId, json_encode($response), 60);
+            Cache::put('assertion_'.$entityId, json_encode($response), 86400);
         }
 
         return $response;
@@ -53,7 +53,7 @@ class Assertion extends BadgrProvider
         $response = $this->getResult($response);
 
         if ($response) {
-            Cache::put('assertions_by_issuer_'.$entityId, $response, 60);
+            Cache::put('assertions_by_issuer_'.$entityId, $response, 86400);
         }
 
         return $response;
@@ -75,7 +75,7 @@ class Assertion extends BadgrProvider
         $response = $this->getResult($response);
 
         if ($response) {
-            Cache::put('assertions_by_badgeclass_'.$entityId, $response, 60);
+            Cache::put('assertions_by_badgeclass_'.$entityId, $response, 86400);
         }
 
         return $response;
@@ -119,7 +119,7 @@ class Assertion extends BadgrProvider
         $entityId = $this->getEntityId($response);
 
         if ($entityId) {
-            Cache::put('assertion_'.$entityId, json_encode($response), 60);
+            Cache::put('assertion_'.$entityId, json_encode($response), 86400);
             Cache::forget('assertions_by_badgeclass_'.$badgeId);
             Cache::forget('assertions_by_issuer_'.$issuerId);
         }
@@ -169,7 +169,7 @@ class Assertion extends BadgrProvider
         $result = $this->getFirstResult($response);
 
         if ($result) {
-            Cache::put('assertion_'.$entityId, json_encode($result), 60);
+            Cache::put('assertion_'.$entityId, json_encode($result), 86400);
             Cache::forget('assertions_by_badgeclass_'.$result['badgeclass']);
             Cache::forget('assertions_by_issuer_'.$result['issuer']);
         }

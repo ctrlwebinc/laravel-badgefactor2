@@ -12,7 +12,6 @@ class CourseGroupCategory extends Model
     protected $fillable = [
         'slug',
         'title',
-        'excerpt',
         'subtitle',
         'image',
         'description',
