@@ -33,7 +33,7 @@ class BadgrProvider
     {
         if (isset($this->client)) {
             return $this->client->getHttpClient(
-                BadgrConfig::first()->getAccessTokenToArray()
+                BadgrConfig::first()->tokens
             );
         }
 

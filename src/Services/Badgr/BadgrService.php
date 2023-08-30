@@ -34,7 +34,7 @@ class BadgrService
         /*
         $approver = Auth::user();
         $response = $this->getBadgrClient()
-            ->getHttpClient(BadgrConfig::first()->getAccessTokenToArray())
+            ->getHttpClient(BadgrConfig::first()->tokens)
             ->baseUrl(config('cadre21.wordpress_base_url'))
             ->withBasicAuth($approver->email, $approver->wp_application_password)
             ->post('/wp-json/bf2-laravel/v1/approve-badge-request');

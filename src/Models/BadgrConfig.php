@@ -4,6 +4,8 @@ namespace Ctrlweb\BadgeFactor2\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+
 
 class BadgrConfig extends Model
 {
@@ -23,12 +25,14 @@ class BadgrConfig extends Model
         'expires_at' => 'datetime:Y-m-d H:i:s',
     ];
 
-    public function getAccessTokenToArray()
+    protected function tokens(): Attribute
     {
-        return [
-            'access_token'  => $this->access_token,
-            'refresh_token' => $this->refresh_token,
-            'expires_at'    => $this->expires_at->format('Y-m-d H:i:s'),
-        ];
+        return Attribute::make(
+            get: fn (mixed $value, array $attributes) => [
+                'access_token'  => $attributes['access_token'],
+                'refresh_token' => $attributes['refresh_token'],
+                'expires_at'    => $attributes['expires_at'],
+            ],
+        );
     }
 }
