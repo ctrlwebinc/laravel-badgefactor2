@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 
-class Assertion extends BadgrProvider
+class Assertion extends BadgrAdminProvider
 {
     /**
      * @param string $entityId

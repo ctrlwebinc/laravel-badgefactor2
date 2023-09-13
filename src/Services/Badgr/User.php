@@ -4,7 +4,7 @@ namespace Ctrlweb\BadgeFactor2\Services\Badgr;
 
 use Exception;
 
-class User extends BadgrProvider
+class User extends BadgrAdminProvider
 {
     /**
      * @param string $firstName

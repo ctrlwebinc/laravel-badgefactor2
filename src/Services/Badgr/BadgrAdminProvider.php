@@ -2,99 +2,50 @@
 
 namespace Ctrlweb\BadgeFactor2\Services\Badgr;
 
-use BadgeFactor2\Exceptions\ConfigurationException;
-use Calotes\Component\Response as ComponentResponse;
 use Ctrlweb\BadgeFactor2\Models\BadgrConfig;
 use Exception;
+use GuzzleHttp\Promise\PromiseInterface;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Storage;
-use League\OAuth2\Client\Provider\GenericProvider;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Client;
-use League\OAuth2\Client\Token\AccessTokenInterface;
 
-abstract class BadgrProvider
+class BadgrAdminProvider extends BadgrProvider
 {
-    protected $provider;
-    protected $config;
-    protected $providerConfiguration = [];
+    private BadgrClient $client;
 
-    protected function makeRequest($method, $url, array $options = [])
+    /**
+     * @throws Exception
+     */
+    public function getClient()
     {
-        return $this->getProvider()->getAuthenticatedRequest($method, $url, $this->getToken(), $options);
-    }
-
-    protected function getToken() : AccessTokenInterface
-    {
-        return $this->getConfig()->getTokenSet();
-    }
-
-    protected function sendRequest(Request $request) : Response
-    {
-        return $this->getProvider()->getHttpClient()->send($request);
-    }
-
-    protected function getConfig() : BadgrConfig
-    {
-        if (null===$this->config)
+        if (!isset($this->client))
         {
-            $this->config = BadgrConfig::first();
+            $badgrConfig = BadgrConfig::first();
+            if ($badgrConfig) {
+                $this->client = new BadgrClient(
+                    $badgrConfig->client_id,
+                    $badgrConfig->client_secret,
+                    $badgrConfig->redirect_uri,
+                    config('badgefactor2.badgr.server_url'),
+                    config('badgefactor2.badgr.admin_scopes')
+                );
+            }
         }
-        if (null===$this->config)
-        {
-            throw new ConfigurationException('No Badgr Config.');
+        if (isset($this->client)) {
+            return $this->client->getHttpClient(
+                BadgrConfig::first()->tokens
+            );
         }
 
-        return $this->config;
+        return null;
     }
-
-    protected function makeProvider() : void
-    {
-        $config = $this->getConfig();
-        $this->providerConfiguration['redirectUri'] = route('bf2.auth');
-        $this->providerConfiguration['urlAuthorize'] = $config->badgr_server_base_url.'/o/authorize';
-        $this->providerConfiguration['urlAccessToken'] = $config->badgr_server_base_url.'/o/token';
-        $this->providerConfiguration['urlResourceOwnerDetails'] = $config->badgr_server_base_url.'/o/resource';
-
-        $this->addClientInfo();
-        $this->addScopes();
-        $this->provider = new GenericProvider($this->providerConfiguration);
-    }
-
-    protected function getProvider() : GenericProvider
-    {
-        if (null === $this->provider)
-        {
-            $this->provider = $this->makeProvider();
-        }
-        return $this->provider;
-    }
-
-    protected function addClientInfo()
-    {
-        $config = $this->getConfig();
-        $this->providerConfiguration['clientId'] = $config->client_id;
-        $this->providerConfiguration['clientSecret'] = $config->client_secret;
-    }
-
-    protected function addScopes()
-    {
-        $config = $this->getConfig();
-        $this->providerConfiguration['scopes'] = 'rw:profile rw:backpack rw:issuer rw:serverAdmin';
-    }
-
-
 
     /**
      * @param PromiseInterface|Response $response
      *
      * @return false|mixed
      */
-    protected function getEntityId(string $method, string $endpoint, array $payload = []): mixed
+    protected function getEntityId(PromiseInterface|Response $response): mixed
     {
-        // try
-        // make the request
-        // process the respoonse
         if ($response->status() === 201) {
             $response = $response->json();
             if (isset($response['status']['success']) && true === $response['status']['success'] &&
@@ -102,7 +53,7 @@ abstract class BadgrProvider
                 return $response['result'][0]['entityId'];
             }
         }
-        // catch
+
         return false;
     }
 

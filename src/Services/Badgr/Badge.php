@@ -5,7 +5,7 @@ namespace Ctrlweb\BadgeFactor2\Services\Badgr;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 
-class Badge extends BadgrProvider
+class Badge extends BadgrAdminProvider
 {
     /**
      * @throws Exception

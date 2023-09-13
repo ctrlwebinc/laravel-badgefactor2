@@ -70,7 +70,7 @@ Route::group([
     'middleware' => 'web',
     'namespace'  => 'Ctrlweb\BadgeFactor2\Http\Controllers',
 ], function () {
-    Route::get('/bf2/redirect', [BadgeFactor2Controller::class, 'getAccessTokenFromAuthCode'])
+    Route::get('/bf2/auth', [BadgeFactor2Controller::class, 'getAccessTokenFromAuthCode'])
         ->middleware('auth')
-        ->name('bf2.redirect');
+        ->name('bf2.auth');
 });

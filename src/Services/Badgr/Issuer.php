@@ -5,7 +5,7 @@ namespace Ctrlweb\BadgeFactor2\Services\Badgr;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 
-class Issuer extends BadgrProvider
+class Issuer extends BadgrAdminProvider
 {
     /**
      * @throws Exception
@@ -128,11 +128,6 @@ class Issuer extends BadgrProvider
      */
     public function add(string $name, string $email, string $url, ?string $description, ?string $image = null): mixed
     {
-        $client = $this->getClient();
-        if (!$client) {
-            return false;
-        }
-
         $payload = [
             'name'        => $name,
             'email'       => $email,
@@ -151,7 +146,7 @@ class Issuer extends BadgrProvider
 
         Cache::forget('issuers');
 
-        return $this->getEntityId($response);
+        return $this->getEntityId('post', '/v2/issuers', $payload);
     }
 
     /**
