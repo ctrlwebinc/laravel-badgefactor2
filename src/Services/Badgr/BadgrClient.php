@@ -108,13 +108,10 @@ class BadgrClient
                     $this->accessToken = $this->fetchAccessTokenUsingRefreshToken($this->accessToken['refresh_token']);
                 }
             } catch (\Exception $e) {
-                return null; // FIXME.
-
                 throw new \Exception('The Badgr access token does not exist. Please log in again');
             }
 
             if ($this->accessToken instanceof AccessTokenInterface) {
-                return null;
                 $this->httpClient = $this->httpClient->withToken($this->$accessToken->getToken());
             } else {
                 $this->httpClient = $this->httpClient->withToken($this->accessToken['access_token']);

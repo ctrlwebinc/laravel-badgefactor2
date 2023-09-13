@@ -12,25 +12,24 @@ class BadgrProvider
 {
     private BadgrClient $client;
 
-    public function __construct()
-    {
-        $badgrConfig = BadgrConfig::first();
-        if ($badgrConfig) {
-            $this->client = new BadgrClient(
-                $badgrConfig->client_id,
-                $badgrConfig->client_secret,
-                $badgrConfig->redirect_uri,
-                config('badgefactor2.badgr.server_url'),
-                config('badgefactor2.badgr.admin_scopes')
-            );
-        }
-    }
-
     /**
      * @throws Exception
      */
     public function getClient()
     {
+        if (!isset($this->client))
+        {
+            $badgrConfig = BadgrConfig::first();
+            if ($badgrConfig) {
+                $this->client = new BadgrClient(
+                    $badgrConfig->client_id,
+                    $badgrConfig->client_secret,
+                    $badgrConfig->redirect_uri,
+                    config('badgefactor2.badgr.server_url'),
+                    config('badgefactor2.badgr.admin_scopes')
+                );
+            }
+        }
         if (isset($this->client)) {
             return $this->client->getHttpClient(
                 BadgrConfig::first()->tokens

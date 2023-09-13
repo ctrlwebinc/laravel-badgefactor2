@@ -18,8 +18,10 @@ use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
+use Ctrlweb\BadgeFactor2\Interfaces\TokenRepositoryInterface;
+use League\OAuth2\Client\Token\AccessTokenInterface;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail, TokenRepositoryInterface
 {
     use HasApiTokens;
     use HasFactory;
@@ -91,6 +93,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'badgr_user_state',
         'badgr_user_slug',
         'badgr_password',
+        'badgr_token_set',
     ];
 
     /**
@@ -102,6 +105,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'remember_token',
         'wp_password',
+        'badgr_token_set'
     ];
 
     /**
@@ -207,5 +211,17 @@ class User extends Authenticatable implements MustVerifyEmail
         return Attribute::make(
             get: fn ($value) => $isVerified,
         );
+    }
+
+    public function getTokenSet() : AccessTokenInterface
+    {
+        return unserialize($this->badgr_token_set);
+    }
+
+    public function saveTokenSet(AccessTokenInterface $tokenSet)
+    {
+        $this->refresh();
+        $this->badgr_token_set = serialize($tokenSet);
+        $this->save();
     }
 }

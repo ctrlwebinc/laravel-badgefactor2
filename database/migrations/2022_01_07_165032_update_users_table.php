@@ -45,6 +45,7 @@ class UpdateUsersTable extends Migration
             $table->string('billing_email')->nullable();
             $table->string('user_status')->default('ACTIVE')->nullable();
             $table->string('wp_application_password')->nullable();
+            $table->string('badgr_token_set',1024)->nullable();
             $table->timestamp('last_connexion')->nullable();
         });
     }
