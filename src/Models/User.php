@@ -217,7 +217,12 @@ class User extends Authenticatable implements MustVerifyEmail, TokenRepositoryIn
 
     public function getTokenSet() : AccessTokenInterface
     {
-        return unserialize($this->badgr_token_set);
+        $tokenSet = unserialize($this->badgr_token_set);
+        if (!$tokenSet)
+        {
+            return null;
+        }
+        return $tokenSet;
     }
 
     public function saveTokenSet(AccessTokenInterface $tokenSet)

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Ctrlweb\BadgeFactor2\Interfaces\TokenRepositoryInterface;
 use League\OAuth2\Client\Token\AccessTokenInterface;
-
+use PHP_CodeSniffer\Util\Tokens;
 
 class BadgrConfig extends Model implements TokenRepositoryInterface
 {
@@ -22,9 +22,14 @@ class BadgrConfig extends Model implements TokenRepositoryInterface
     protected $casts = [
     ];
 
-    public function getTokenSet() : AccessTokenInterface
+    public function getTokenSet() : ?AccessTokenInterface
     {
-        return unserialize($this->token_set);
+        $tokenSet = unserialize($this->token_set);
+        if (!$tokenSet)
+        {
+            return null;
+        }
+        return $tokenSet;
     }
 
     public function saveTokenSet(AccessTokenInterface $tokenSet)

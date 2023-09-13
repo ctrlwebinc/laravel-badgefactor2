@@ -71,21 +71,23 @@ abstract class BadgrProvider
     protected function makeProvider() : void
     {
         $config = $this->getConfig();
+        $httpClient = new Client(['base_uri' => $config->badgr_server_base_url]);
+
         $this->providerConfiguration['redirectUri'] = route('bf2.auth');
-        $this->providerConfiguration['urlAuthorize'] = $config->badgr_server_base_url.'/o/authorize';
-        $this->providerConfiguration['urlAccessToken'] = $config->badgr_server_base_url.'/o/token';
-        $this->providerConfiguration['urlResourceOwnerDetails'] = $config->badgr_server_base_url.'/o/resource';
+        $this->providerConfiguration['urlAuthorize'] = '/o/authorize';
+        $this->providerConfiguration['urlAccessToken'] = '/o/token';
+        $this->providerConfiguration['urlResourceOwnerDetails'] = '/o/resource';
 
         $this->addClientInfo();
         $this->addScopes();
-        $this->provider = new GenericProvider($this->providerConfiguration);
+        $this->provider = new GenericProvider($this->providerConfiguration, ['httpClient' => $httpClient]);
     }
 
     protected function getProvider() : GenericProvider
     {
         if (null === $this->provider)
         {
-            $this->provider = $this->makeProvider();
+            $this->makeProvider();
         }
         return $this->provider;
     }
@@ -181,8 +183,8 @@ abstract class BadgrProvider
         try
         {
             $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
-            if ($response->status() === 201) {
-                $response = $response->json();
+            if ($response->getStatusCode() === 201) {
+                $response = json_decode($response->getBody(),true);
                 if (isset($response['status']['success']) && true === $response['status']['success'] &&
                     isset($response['result'][0]['entityId'])) {
                     return $response['result'][0]['entityId'];
@@ -206,8 +208,8 @@ abstract class BadgrProvider
         try
         {
             $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
-            if ($response->status() === 200) {
-                $response = $response->json();
+            if ($response->getStatusCode() === 200) {
+                $response = json_decode($response->getBody(),true);
                 if (
                     isset($response['status']['success']) && true === $response['status']['success'] &&
                     isset($response['result']) && is_array($response['result'])
@@ -234,8 +236,8 @@ abstract class BadgrProvider
         try
         {
             $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
-            if ($response->status() === 200) {
-                $response = $response->json();
+            if ($response->getStatusCode() === 200) {
+                $response = json_decode($response->getBody(),true);
                 if (
                     isset($response['count']) && is_numeric($response['count'])
                 ) {
@@ -261,8 +263,8 @@ abstract class BadgrProvider
         try
         {
             $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
-            if ($response->status() === 200) {
-                $response = $response->json();
+            if ($response->getStatusCode() === 200) {
+                $response = json_decode($response->getBody(),true);
     
                 if (isset($response['status']['success']) && true === $response['status']['success'] && isset($response['result'][0])) {
                     return $response['result'][0];
@@ -271,7 +273,7 @@ abstract class BadgrProvider
         }
         catch (Exception $e)
         {
-
+            dd($e);
         }
 
         return false;
@@ -289,12 +291,12 @@ abstract class BadgrProvider
         return $this->getCount('PUT', '/v2/badgeclasses_count/issuer/'.$issuerId);
     }
 
-    protected function confirmDeletion(string $method, string $endpoint, array $payload = []) : boolean
+    protected function confirmDeletion(string $method, string $endpoint, array $payload = []) : bool
     {
         try
         {
             $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
-            if (null !== $response && ($response->status() === 204 || $response->status() === 404)) {
+            if (null !== $response && ($response->getStatusCode() === 204 || $response->getStatusCode() === 404)) {
                 return true;
             }
         }

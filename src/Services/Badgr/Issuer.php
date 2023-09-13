@@ -99,16 +99,9 @@ class Issuer extends BadgrAdminProvider
             return json_decode(Cache::get('issuer_'.$entityId));
         }
 
-        $client = $this->getClient();
-        if (!$client) {
-            return false;
-        }
+        $response = $this->getFirstResult('GET','/v2/issuers/'.$entityId);
 
-        $response = $client->get('/v2/issuers/'.$entityId);
-
-        $response = $this->getFirstResult($response);
-
-        if ($response) {
+        if ($result) {
             Cache::put('issuer_'.$entityId, json_encode($response), 86400);
         }
 
