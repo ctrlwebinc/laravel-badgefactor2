@@ -146,7 +146,7 @@ class Issuer extends BadgrAdminProvider
 
         Cache::forget('issuers');
 
-        return $this->getEntityId('post', '/v2/issuers', $payload);
+        return $this->getEntityId('POST', '/v2/issuers', $payload);
     }
 
     /**

@@ -105,7 +105,8 @@ class User extends Authenticatable implements MustVerifyEmail, TokenRepositoryIn
         'password',
         'remember_token',
         'wp_password',
-        'badgr_token_set'
+        'badgr_token_set',
+        'badgr_password',
     ];
 
     /**
@@ -117,6 +118,7 @@ class User extends Authenticatable implements MustVerifyEmail, TokenRepositoryIn
         'created_at'        => 'datetime',
         'email_verified_at' => 'datetime',
         'is_validated'      => 'boolean',
+        'badgr_password'    => 'encrypted',
     ];
 
     protected $with = [

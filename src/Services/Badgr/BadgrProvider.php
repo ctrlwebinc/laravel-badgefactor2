@@ -4,6 +4,8 @@ namespace Ctrlweb\BadgeFactor2\Services\Badgr;
 
 use BadgeFactor2\Exceptions\ConfigurationException;
 use Calotes\Component\Response as ComponentResponse;
+use Ctrlweb\BadgeFactor2\Exceptions\ExpiredTokenException;
+use Ctrlweb\BadgeFactor2\Exceptions\MissingTokenException;
 use Ctrlweb\BadgeFactor2\Models\BadgrConfig;
 use Exception;
 use Illuminate\Support\Facades\Storage;
@@ -12,6 +14,7 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Client;
 use League\OAuth2\Client\Token\AccessTokenInterface;
+use GuzzleHttp\Exception\ClientException;
 
 abstract class BadgrProvider
 {
@@ -19,14 +22,31 @@ abstract class BadgrProvider
     protected $config;
     protected $providerConfiguration = [];
 
-    protected function makeRequest($method, $url, array $options = [])
+    protected function buildRequest($method, $url, array $options = [], array $payload = [])
     {
-        return $this->getProvider()->getAuthenticatedRequest($method, $url, $this->getToken(), $options);
+        $defaultOptions = ['headers' => [
+            'Accept' => 'application/json',
+            ],
+        ];
+
+        $mergedOptions = array_merge_recursive($defaultOptions, $options);
+        if (!empty($payload))
+        {
+            $mergedOptions = array_merge_recursive($mergedOptions, ['body' => $payload]);
+        }
+        return $this->getProvider()->getAuthenticatedRequest($method, $url, $this->getVerifiedToken(), $mergedOptions);
     }
 
-    protected function getToken() : AccessTokenInterface
+    protected function getToken() : mixed
     {
         return $this->getConfig()->getTokenSet();
+    }
+
+    protected function getVerifiedToken() : AccessTokenInterface
+    {
+        $token = $this->getToken();
+        $this->checkToken($token);
+        return $token;
     }
 
     protected function sendRequest(Request $request) : Response
@@ -83,14 +103,80 @@ abstract class BadgrProvider
         $this->providerConfiguration['scopes'] = 'rw:profile rw:backpack rw:issuer rw:serverAdmin';
     }
 
+    protected function checkToken($token) : void
+    {
+        if (null === $token)
+        {
+            throw new MissingTokenException('No token retreived from token repository');
+        }
+        if ($token->hasExpired())
+        {
+            throw new ExpiredTokenException('Token has expired.');
+        }
+    }
 
+    protected function makeRecoverableRequest(string $method, string $endpoint, array $payload = []) : Response
+    {
+        try
+        {
+            $request = $this->buildRequest($method, $endpoint, [], $payload);
+            $response = $this->getProvider()->getHttpClient()->send($request);
+            return $response;
+        }
+        catch (MissingTokenException $e)
+        {
+            // No need to try refresh on a missing token
+            // Try a new auth cycle
+            // Let exceptions bubble up since they are not recoverable at this point.
+            $this->tryNewAuthCycle();
+            $request = $this->buildRequest($method, $endpoint, [], $payload);
+            $response = $this->getProvider()->getHttpClient()->send($request);
+            return $response;
+
+        } catch( ExpiredTokenException $e)
+        {
+            // Let processing continue for these exceptions since rest of precessing is to try refresh
+        } catch (ClientException $e)
+        {
+            // Check for 401 exception, rethrow anything else
+            if ($e->getCode() != 401)
+            {
+                throw $e;
+            }
+        }
+
+        // Try a refresh, let all exceptions bubble up
+        $this->refreshToken();
+        $request = $this->buildRequest($method, $endpoint, [], $payload);
+        $response = $this->getProvider()->getHttpClient()->send($request);
+        return $response;
+    }
+
+    protected function tryNewAuthCycle()
+    {
+        throw new Exception('Code auth cycle cannot be initiated in background.');
+    }
+
+    protected function refreshToken()
+    {
+        $newAccessToken = $this->getProvider()->getAccessToken('refresh_token', [
+            'refresh_token' => $this->getToken()->getRefreshToken()
+        ]);
+
+        $this->saveToken($newAccessToken);
+    }
+
+    protected function saveToken(AccessTokenInterface $token)
+    {
+        $this->getConfig()->saveTokenSet($token);
+    }
 
     /**
      * @param PromiseInterface|Response $response
      *
      * @return false|mixed
      */
-    protected function getEntityId(string $method, string $endpoint, array $payload = []): mixed
+    protected function getEntityId(string $method, string $endpoint, array $payload = []) : mixed
     {
         // try
         // make the request
