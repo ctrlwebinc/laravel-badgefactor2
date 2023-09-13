@@ -37,7 +37,7 @@ abstract class BadgrProvider
         return $this->getProvider()->getAuthenticatedRequest($method, $url, $this->getVerifiedToken(), $mergedOptions);
     }
 
-    protected function getToken() : mixed
+    protected function getToken() : ?AccessTokenInterface
     {
         return $this->getConfig()->getTokenSet();
     }
@@ -176,19 +176,23 @@ abstract class BadgrProvider
      *
      * @return false|mixed
      */
-    protected function getEntityId(string $method, string $endpoint, array $payload = []) : mixed
+    protected function getEntityId(string $method, string $endpoint, array $payload = []) : string|false
     {
-        // try
-        // make the request
-        // process the respoonse
-        if ($response->status() === 201) {
-            $response = $response->json();
-            if (isset($response['status']['success']) && true === $response['status']['success'] &&
-                isset($response['result'][0]['entityId'])) {
-                return $response['result'][0]['entityId'];
+        try
+        {
+            $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
+            if ($response->status() === 201) {
+                $response = $response->json();
+                if (isset($response['status']['success']) && true === $response['status']['success'] &&
+                    isset($response['result'][0]['entityId'])) {
+                    return $response['result'][0]['entityId'];
+                }
             }
         }
-        // catch
+        catch (Exception $e)
+        {
+
+        }
         return false;
     }
 
@@ -197,16 +201,24 @@ abstract class BadgrProvider
      *
      * @return array|false
      */
-    public function getResult(PromiseInterface|Response $response): array|false
+    public function getResult(string $method, string $endpoint, array $payload = []) : array|false
     {
-        if ($response->status() === 200) {
-            $response = $response->json();
-            if (
-                isset($response['status']['success']) && true === $response['status']['success'] &&
-                isset($response['result']) && is_array($response['result'])
-            ) {
-                return $response['result'];
+        try
+        {
+            $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
+            if ($response->status() === 200) {
+                $response = $response->json();
+                if (
+                    isset($response['status']['success']) && true === $response['status']['success'] &&
+                    isset($response['result']) && is_array($response['result'])
+                ) {
+                    return $response['result'];
+                }
             }
+        }
+        catch (Exception $e)
+        {
+
         }
 
         return [];
@@ -217,15 +229,23 @@ abstract class BadgrProvider
      *
      * @return false|int
      */
-    public function getCount(PromiseInterface|Response $response): int|false
+    public function getCount(string $method, string $endpoint, array $payload = []): int|false
     {
-        if ($response->status() === 200) {
-            $response = $response->json();
-            if (
-                isset($response['count']) && is_numeric($response['count'])
-            ) {
-                return intval($response['count']);
+        try
+        {
+            $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
+            if ($response->status() === 200) {
+                $response = $response->json();
+                if (
+                    isset($response['count']) && is_numeric($response['count'])
+                ) {
+                    return intval($response['count']);
+                }
             }
+        }
+        catch (Exception $e)
+        {
+
         }
 
         return false;
@@ -236,14 +256,22 @@ abstract class BadgrProvider
      *
      * @return false|mixed
      */
-    protected function getFirstResult(PromiseInterface|Response $response): mixed
+    protected function getFirstResult(string $method, string $endpoint, array $payload = []): mixed
     {
-        if ($response->status() === 200) {
-            $response = $response->json();
-
-            if (isset($response['status']['success']) && true === $response['status']['success'] && isset($response['result'][0])) {
-                return $response['result'][0];
+        try
+        {
+            $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
+            if ($response->status() === 200) {
+                $response = $response->json();
+    
+                if (isset($response['status']['success']) && true === $response['status']['success'] && isset($response['result'][0])) {
+                    return $response['result'][0];
+                }
             }
+        }
+        catch (Exception $e)
+        {
+
         }
 
         return false;
@@ -258,9 +286,24 @@ abstract class BadgrProvider
      */
     public function getAllBadgeClassesByIssuerSlugCount(string $issuerId): bool|int
     {
-        $response = $this->getClient()->put('/v2/badgeclasses_count/issuer/'.$issuerId);
+        return $this->getCount('PUT', '/v2/badgeclasses_count/issuer/'.$issuerId);
+    }
 
-        return $this->getCount($response);
+    protected function confirmDeletion(string $method, string $endpoint, array $payload = []) : boolean
+    {
+        try
+        {
+            $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
+            if (null !== $response && ($response->status() === 204 || $response->status() === 404)) {
+                return true;
+            }
+        }
+        catch (Exception $e)
+        {
+
+        }
+
+        return false;
     }
 
     /**
@@ -272,13 +315,7 @@ abstract class BadgrProvider
      */
     public function deleteBadgeClass(string $badgeClassId): bool
     {
-        $response = $this->getClient()->delete('/v2/badgeclasses/'.$badgeClassId);
-
-        if (null !== $response && ($response->status() === 204 || $response->status() === 404)) {
-            return true;
-        }
-
-        return false;
+        return $this->makeRecoverableRequest('DELETE','/v2/badgeclasses/'.$badgeClassId);
     }
 
     /**
