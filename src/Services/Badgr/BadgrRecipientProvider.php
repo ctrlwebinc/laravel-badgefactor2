@@ -17,11 +17,9 @@ class BadgrRecipientProvider extends BadgrProvider
 {
     protected $recipient;
 
-    function __construct(User $recipient) : void
+    function __construct(User $recipient)
     {
         $this->recipient = $recipient;
-
-        parent::__construct();
     }
 
     protected function addClientInfo()
@@ -37,7 +35,7 @@ class BadgrRecipientProvider extends BadgrProvider
         $this->providerConfiguration['scopes'] = 'rw:profile rw:backpack';
     }
 
-    protected function getToken() : mixed
+    protected function getToken() : ?AccessTokenInterface
     {
         return $this->recipient->getTokenSet();
     }
@@ -49,7 +47,7 @@ class BadgrRecipientProvider extends BadgrProvider
         // Save token if succeeds
         $newToken = $this->getProvider()->getAccessToken('password',[
             'username' => $this->recipient->email,
-            'password' => $this->recipient->badgr_password
+            'password' => $this->recipient->badgr_password,
         ]);
         $this->saveToken($newToken);
     }

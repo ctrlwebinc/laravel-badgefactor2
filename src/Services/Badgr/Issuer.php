@@ -101,7 +101,7 @@ class Issuer extends BadgrAdminProvider
 
         $response = $this->getFirstResult('GET','/v2/issuers/'.$entityId);
 
-        if ($result) {
+        if ($response) {
             Cache::put('issuer_'.$entityId, json_encode($response), 86400);
         }
 
