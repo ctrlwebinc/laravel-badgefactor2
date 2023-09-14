@@ -222,9 +222,10 @@ abstract class BadgrProvider
         {
 
         }
-
         return [];
     }
+
+
 
     /**
      * @param PromiseInterface|Response $response
@@ -273,7 +274,7 @@ abstract class BadgrProvider
         }
         catch (Exception $e)
         {
-            dd($e);
+
         }
 
         return false;
