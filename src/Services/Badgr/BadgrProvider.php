@@ -309,6 +309,23 @@ abstract class BadgrProvider
         return false;
     }
 
+    protected function confirmUpdate(string $method, string $endpoint, array $payload = []) : bool
+    {
+        try
+        {
+            $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
+            if (null !== $response && $response->getStatusCode() === 200) {
+                return true;
+            }
+        }
+        catch (Exception $e)
+        {
+
+        }
+
+        return false;
+    }
+
     /**
      * @param string $badgeClassId
      *

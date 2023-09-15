@@ -18,15 +18,7 @@ class Badge extends BadgrAdminProvider
             return json_decode(Cache::get('badges'));
         }
 
-        $client = $this->getClient();
-
-        if (!$client) {
-            return false;
-        }
-
-        $response = $this->getClient()->get('/v2/badgeclasses');
-
-        $response = $this->getResult($response);
+        $response = $this->getResult('GET','/v2/badgeclasses');
 
         if ($response) {
             Cache::put('badges', json_encode($response), 86400);
@@ -46,14 +38,7 @@ class Badge extends BadgrAdminProvider
             return Cache::get('badges_count');
         }
 
-        $client = $this->getClient();
-        if (!$client) {
-            return false;
-        }
-
-        $response = $client->get('/v2/badgeclasses_count');
-
-        $response = $this->getCount($response);
+        $response = $this->getCount('GET','/v2/badgeclasses_count');
 
         if ($response) {
             Cache::put('badges_count', $response, 86400);
@@ -100,17 +85,10 @@ class Badge extends BadgrAdminProvider
             return json_decode(Cache::get('badge_'.$entityId));
         }
 
-        $client = $this->getClient();
-        if (!$client) {
-            return false;
-        }
-
-        $response = $client->get('/v2/badgeclasses/'.$entityId);
-
-        $response = $this->getFirstResult($response);
+        $response = $this->getFirstResult('GET','/v2/badgeclasses/'.$entityId);
 
         if ($response) {
-            Cache::put('badge_'.$entityId, json_encode($response), 86400);
+            Cache::put('badge_'.$response['entityId'], json_encode($response), 86400);
         }
 
         return $response;
@@ -122,14 +100,7 @@ class Badge extends BadgrAdminProvider
             return Cache::get('badges_by_issuer_'.$entityId);
         }
 
-        $client = $this->getClient();
-        if (!$client) {
-            return false;
-        }
-
-        $response = $client->get('/v2/issuers/'.$entityId.'/badgeclasses');
-
-        $response = $this->getResult($response);
+        $response = $this->getResult('GET','/v2/issuers/'.$entityId.'/badgeclasses');
 
         if ($response) {
             Cache::put('badges_by_issuer_'.$entityId, $response, 86400);
@@ -149,11 +120,6 @@ class Badge extends BadgrAdminProvider
      */
     public function add(string $image, string $name, string $issuer, ?string $description, ?string $criteriaNarrative): mixed
     {
-        $client = $this->getClient();
-        if (!$client) {
-            return false;
-        }
-
         $issuer = json_decode($issuer)->entityId;
         $payload = [
             'image'             => $this->prepareImage($image),
@@ -163,11 +129,9 @@ class Badge extends BadgrAdminProvider
             'criteriaNarrative' => $criteriaNarrative,
         ];
 
-        $response = $client->post('/v2/badgeclasses', $payload);
-
         Cache::forget('badges');
 
-        return $this->getEntityId($response);
+        return $this->getEntityId('POST','/v2/badgeclasses', $payload);
     }
 
     /**
@@ -189,12 +153,8 @@ class Badge extends BadgrAdminProvider
         ?string $description,
         ?string $criteriaNarrative,
         ?string $image
-    ): bool {
-        $client = $this->getClient();
-        if (!$client) {
-            return false;
-        }
-
+    ): bool
+    {
         $issuer = json_decode($issuer)->entityId;
         $payload = [
             'name'              => $name,
@@ -207,16 +167,10 @@ class Badge extends BadgrAdminProvider
             $payload['image'] = $this->prepareImage($image);
         }
 
-        $response = $client->put('/v2/badgeclasses/'.$entityId, $payload);
-
         Cache::forget('badges');
         Cache::forget('badge_'.$entityId);
 
-        if (null !== $response && $response->status() === 200) {
-            return true;
-        }
-
-        return false;
+        return $this->confirmUpdate('PUT','/v2/badgeclasses/'.$entityId, $payload);
     }
 
     /**
@@ -228,20 +182,9 @@ class Badge extends BadgrAdminProvider
      */
     public function delete(string $entityId): bool
     {
-        $client = $this->getClient();
-        if (!$client) {
-            return false;
-        }
-
-        $response = $client->delete('/v2/badgeclasses/'.$entityId);
-
         Cache::forget('badges');
         Cache::forget('badge_'.$entityId);
 
-        if (null !== $response && ($response->status() === 204 || $response->status() === 404)) {
-            return true;
-        }
-
-        return false;
+        return $this->confirmDeletion('DELETE','/v2/badgeclasses/'.$entityId);
     }
 }
