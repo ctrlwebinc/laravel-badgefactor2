@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Ctrlweb\BadgeFactor2\Interfaces\TokenRepositoryInterface;
 use League\OAuth2\Client\Token\AccessTokenInterface;
 use PHP_CodeSniffer\Util\Tokens;
+use Carbon\Carbon;
 
 class BadgrConfig extends Model implements TokenRepositoryInterface
 {
@@ -37,5 +38,19 @@ class BadgrConfig extends Model implements TokenRepositoryInterface
         $this->refresh();
         $this->token_set = serialize($tokenSet);
         $this->save();
+    }
+
+    public function getTokenExpiryAttribute()
+    {
+        $tokenSet = $this->getTokenSet();
+        if (null!==$tokenSet)
+        {
+            $expiryTimestamp = $tokenSet->getExpires();
+            if(null!==$expiryTimestamp)
+            {
+                return Carbon::createFromTimestamp($expiryTimestamp);
+            }
+        }
+        return null;
     }
 }
