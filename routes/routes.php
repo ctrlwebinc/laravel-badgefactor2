@@ -70,6 +70,9 @@ Route::group([
     'middleware' => 'web',
     'namespace'  => 'Ctrlweb\BadgeFactor2\Http\Controllers',
 ], function () {
+    Route::get('/bf2/init',[BadgeFactor2Controller::class, 'initiateAuthCodeRetrieval'])
+        ->middleware('auth')
+        ->name('bf2.initAuth');
     Route::get('/bf2/auth', [BadgeFactor2Controller::class, 'getAccessTokenFromAuthCode'])
         ->middleware('auth')
         ->name('bf2.auth');

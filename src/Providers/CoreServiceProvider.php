@@ -6,6 +6,7 @@ use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWooCommerceData;
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWordPressCourses;
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWordPressPosts;
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWordPressUsers;
+use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrAdminProvider;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
@@ -41,6 +42,9 @@ class CoreServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->register(EventServiceProvider::class);
+        $this->app->singleton(BadgrAdminProvider::class, function () {
+            return new BadgrAdminProvider;
+        });
     }
 
     /**
