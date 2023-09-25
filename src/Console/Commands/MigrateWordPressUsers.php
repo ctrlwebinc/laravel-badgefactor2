@@ -35,6 +35,22 @@ class MigrateWordPressUsers extends Command
         parent::__construct();
     }
 
+    private function decryptWPEncryptedUserBadgrPassword(string $password) : string
+    {
+		$encrypt_method = env('BF2_ENCRYPTION_ALGORITHM');
+		$secret_key = env('BF2_SECRET_KEY');
+		$secret_iv = env('BF2_SECRET_IV');
+	
+		// hash
+		$key = hash('sha256', $secret_key);
+		
+		// iv - encrypt method AES-256-CBC expects 16 bytes - else you will get a warning
+		$iv = substr(hash('sha256', $secret_iv), 0, 16);
+	
+		return openssl_decrypt($password, $encrypt_method, $key, 0, $iv);
+
+    }
+
     /**
      * Execute the console command.
      *
@@ -113,7 +129,7 @@ class MigrateWordPressUsers extends Command
                             'username'         => $wpUser->user_login,
                             'badgr_user_state' => $userMeta->firstWhere('meta_key', 'badgr_user_state') ? $userMeta->firstWhere('meta_key', 'badgr_user_state')->meta_value : null,
                             'badgr_user_slug'  => $userMeta->firstWhere('meta_key', 'badgr_user_slug') ? $userMeta->firstWhere('meta_key', 'badgr_user_slug')->meta_value : null,
-                            'badgr_password'   => $userMeta->firstWhere('meta_key', 'badgr_password') ? $userMeta->firstWhere('meta_key', 'badgr_password')->meta_value : null,
+                            'badgr_password'   => $userMeta->firstWhere('meta_key', 'badgr_password') ? $this->decryptWPEncryptedUserBadgrPassword($userMeta->firstWhere('meta_key', 'badgr_password')->meta_value) : null,
                         ]
                     );
 
