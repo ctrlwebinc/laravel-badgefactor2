@@ -129,9 +129,11 @@ class MigrateWordPressUsers extends Command
                             'username'         => $wpUser->user_login,
                             'badgr_user_state' => $userMeta->firstWhere('meta_key', 'badgr_user_state') ? $userMeta->firstWhere('meta_key', 'badgr_user_state')->meta_value : null,
                             'badgr_user_slug'  => $userMeta->firstWhere('meta_key', 'badgr_user_slug') ? $userMeta->firstWhere('meta_key', 'badgr_user_slug')->meta_value : null,
-                            'badgr_password'   => $userMeta->firstWhere('meta_key', 'badgr_password') ? $this->decryptWPEncryptedUserBadgrPassword($userMeta->firstWhere('meta_key', 'badgr_password')->meta_value) : null,
                         ]
                     );
+
+                    $user->badgr_encrypted_password = $userMeta->firstWhere('meta_key', 'badgr_password') ? $this->decryptWPEncryptedUserBadgrPassword($userMeta->firstWhere('meta_key', 'badgr_password')->meta_value) : null;
+                    $user->save();
 
                     // Identify and transfer WordPress capabilities.
                     if ($userMeta->firstwhere('meta_key', 'wp_capabilities')->meta_value) {

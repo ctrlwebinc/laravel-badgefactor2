@@ -19,7 +19,7 @@ return new class() extends Migration {
             $table->string('client_secret');
             $table->string('password_client_id');
             $table->string('password_client_secret');
-            $table->string('token_set', 1024)->nullable();
+            $table->string('token_set', 1024)->default('N;');
             $table->timestamps();
         });
     }

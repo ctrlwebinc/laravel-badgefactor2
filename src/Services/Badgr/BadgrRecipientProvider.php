@@ -47,7 +47,7 @@ class BadgrRecipientProvider extends BadgrProvider
         // Save token if succeeds
         $newToken = $this->getProvider()->getAccessToken('password',[
             'username' => $this->recipient->email,
-            'password' => $this->recipient->badgr_password,
+            'password' => $this->recipient->badgr_encrypted_password,
         ]);
         $this->saveToken($newToken);
     }
