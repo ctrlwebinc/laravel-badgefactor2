@@ -2,7 +2,9 @@
 
 namespace Ctrlweb\BadgeFactor2\Console\Commands;
 
-use Ctrlweb\NovaGallery\Models\NovaGalleryMedia;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Exception\NotReadableException;
 use Intervention\Image\ImageManagerStatic as Image;
@@ -14,35 +16,75 @@ trait CanImportWordPressImages
      *
      * @param string $imageUrl
      *
-     * @return NovaGalleryMedia|null
+     * @return bool
      */
-    private function importImage($imageUrl)
+    private function importImage(string $modelType, int $modelId, ?int $imageId): bool
     {
-        $fileName = null;
-        $imagePath = null;
-        $novaGalleryMedia = new NovaGalleryMedia();
-        if ($imageUrl) {
-            try {
-                $image = Image::make($imageUrl);
-                $fileName = md5(substr($imageUrl, strrpos($imageUrl, '/') + 1));
-                $fileName .= substr($imageUrl, strrpos($imageUrl, '.'));
-                $imagePath = 'uploads/'.$fileName;
-                Storage::disk('public')->put($imagePath, $image);
+        if (!$imageId) {
+            return false;
+        }
 
-                $novaGalleryMedia = NovaGalleryMedia::updateOrCreate(
-                    [
-                        'path' => 'storage/'.$imagePath,
-                    ],
-                    [
-                        'file_name' => $fileName,
-                        'mime_type' => $image->mime(),
-                    ]
-                );
-            } catch (NotReadableException $e) {
-                return new NovaGalleryMedia();
+        $wordpressDb = config('badgefactor2.wordpress.connection');
+        $wpdb = DB::connection($wordpressDb);
+        $media = [];
+
+        $siteUrl = $wpdb
+            ->table("{$this->prefix}options")
+            ->select('option_value')
+            ->where('option_name', '=', 'siteurl')
+            ->first()->option_value;
+
+        $basePath = $siteUrl.'/wp-content/uploads/';
+
+        $image = $wpdb
+            ->table("{$this->prefix}posts")
+            ->select('*')
+            ->where('ID', '=', $imageId)
+            ->first();
+
+        if ($image) {
+
+            $imageMeta = $wpdb
+                ->table("{$this->prefix}postmeta")
+                ->select('*')
+                ->where('post_id', '=', $imageId)
+                ->get();
+
+            $wpImageUrl = $basePath.$imageMeta->where('meta_key', '_wp_attached_file')->pluck('meta_value')->first();
+            $wpImageAlt = $imageMeta->where('meta_key', '_wp_attachment_image_alt')->pluck('meta_value')->first();
+
+            if (config('cadre21.htaccess.user')) {
+                $wpImageFile = Http::withBasicAuth(config('cadre21.htaccess.user'), config('cadre21.htaccess.password'))
+                    ->get($wpImageUrl);
+            } else {
+                $wpImageFile = Http::get($wpImageUrl);
+            }
+
+            if ($wpImageFile->successful()) {
+                try {
+                    $image = Image::make($wpImageFile->body());
+                    $fileName = substr($wpImageUrl, strrpos($wpImageUrl, '/') + 1);
+                    $imagePath = 'uploads/'.$fileName;
+                    if (Storage::disk('public')->put($imagePath, $image)) {
+
+                        $modelInstance = (new $modelType())->find($modelId);
+
+                        $exists = $modelInstance->getFirstMedia();
+                        if (!$exists) {
+                            $modelInstance->addMediaFromDisk($imagePath, 'public')
+                            ->withCustomProperties([
+                                'alt' => $wpImageAlt,
+                            ])
+                            ->toMediaCollection();
+                        }
+                    }
+
+                } catch (NotReadableException $e) {
+                    return false;
+                }
             }
         }
 
-        return $novaGalleryMedia;
+        return true;
     }
 }

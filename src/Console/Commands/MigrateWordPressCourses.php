@@ -166,9 +166,6 @@ class MigrateWordPressCourses extends Command
 
                     $locale = app()->currentLocale();
 
-                    $wpImage = $wpResponsibleMeta->firstWhere('meta_key', 'image') ? $wpResponsibleMeta->firstWhere('meta_key', 'image')->meta_value : null;
-                    $novaGalleryMedia = $this->importImage($wpImage);
-
                     $wpDescription = $wpResponsibleMeta->firstWhere('meta_key', 'description') ? $wpResponsibleMeta->firstWhere('meta_key', 'description')->meta_value : null;
 
                     $responsible = Responsible::updateOrCreate(
@@ -179,9 +176,13 @@ class MigrateWordPressCourses extends Command
                             'slug'        => $wpResponsible->post_name,
                             'name'        => $wpResponsible->post_title,
                             'description' => $wpDescription,
-                            'image'       => $novaGalleryMedia->path,
                         ]
                     );
+
+                    $wpImage = $wpResponsibleMeta->firstWhere('meta_key', 'image') ? $wpResponsibleMeta->firstWhere('meta_key', 'image')->meta_value : null;
+                    $wpImageId = $wpResponsibleMeta->firstWhere('meta_key', 'image_id') ? $wpResponsibleMeta->firstWhere('meta_key', 'image_id')->meta_value : null;
+                    $this->importImage(Responsible::class, $responsible->id, $wpImageId);
+
                     $this->ids['responsibles'][$wpResponsible->ID] = $responsible->id;
                 }
             );
@@ -215,8 +216,6 @@ class MigrateWordPressCourses extends Command
                                 [$wpCourseGroup->ID]
                             )
                     );
-                    $image = $wpCourseGroupMeta->firstWhere('meta_key', 'image')->meta_value;
-                    $novaGalleryMedia = $this->importImage($image);
 
                     $locale = app()->currentLocale();
 
@@ -240,10 +239,12 @@ class MigrateWordPressCourses extends Command
                             'title'                    => $wpCourseGroup->post_title,
                             'subtitle'                 => $wpCourseGroupMeta->firstWhere('meta_key', 'subtitle')->meta_value,
                             'description'              => $wpCourseGroupMeta->firstWhere('meta_key', 'description')->meta_value,
-                            'image'                    => substr($novaGalleryMedia->path, 8),
                             'course_group_category_id' => $courseGroupCategoryId,
                         ]
                     );
+
+                    $imageId = $wpCourseGroupMeta->firstWhere('meta_key', 'image_id') ? $wpCourseGroupMeta->firstWhere('meta_key', 'image_id')->meta_value : null;
+                    $this->importImage(CourseGroup::class, $courseGroup->id, $imageId);
 
                     $this->ids['course_groups'][$wpCourseGroup->ID] = $courseGroup->id;
 

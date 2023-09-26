@@ -79,17 +79,6 @@ class MigrateWordPressPosts extends Command
 
                     $postUser = User::where('wp_id', $wpPost->post_author)->first();
 
-                    $thumbnailId = $postMeta->firstWhere('meta_key', '_thumbnail_id') ? $postMeta->firstWhere('meta_key', '_thumbnail_id')->meta_value : null;
-                    $novaGalleryMedia = null;
-                    if ($thumbnailId) {
-                        $thumbnail = $this->wpdb
-                            ->table("{$this->prefix}posts")
-                            ->select('*')
-                            ->where('ID', $thumbnailId)
-                            ->first();
-                        $novaGalleryMedia = $this->importImage($thumbnail->guid);
-                    }
-
                     $category = $this->wpdb
                         ->table("{$this->prefix}term_relationships")
                         ->select("{$this->prefix}term_taxonomy.term_id", "{$this->prefix}terms.name", "{$this->prefix}terms.slug", "{$this->prefix}term_taxonomy.description")
@@ -110,7 +99,6 @@ class MigrateWordPressPosts extends Command
                         [
                             'title'               => $wpPost->post_title,
                             'slug'                => $wpPost->post_name,
-                            'featured_image'      => $novaGalleryMedia ? $novaGalleryMedia->path : null,
                             'content'             => $wpPost->post_content,
                             'status'              => 'PUBLISHED',
                             'user_id'             => $postUser ? $postUser->id : null,
@@ -118,6 +106,9 @@ class MigrateWordPressPosts extends Command
                             'publication_date'    => $wpPost->post_date,
                         ]
                     );
+
+                    $thumbnailId = $postMeta->firstWhere('meta_key', '_thumbnail_id') ? $postMeta->firstWhere('meta_key', '_thumbnail_id')->meta_value : null;
+                    $this->importImage(Article::class, $article->id, $thumbnailId);
 
                     $postTags = $this->wpdb
                         ->table("{$this->prefix}term_relationships")

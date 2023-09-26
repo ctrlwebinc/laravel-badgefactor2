@@ -3,11 +3,14 @@
 namespace Ctrlweb\BadgeFactor2\Models\Courses;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Translatable\HasTranslations;
 
-class CourseCategory extends Model
+class CourseCategory extends Model implements HasMedia
 {
     use HasTranslations;
+    use InteractsWithMedia;
 
     public static function findBySlug($slug)
     {

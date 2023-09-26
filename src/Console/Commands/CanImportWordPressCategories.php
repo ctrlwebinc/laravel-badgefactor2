@@ -40,16 +40,6 @@ trait CanImportWordPressCategories
                     ->orderBy("{$this->prefix}terms.name")
                     ->get(),
                 function ($wpCategory) use ($categoryClass, $slug) {
-                    $categoryImage = $this->wpdb
-                        ->table("{$this->prefix}options")
-                        ->select('option_value')
-                        ->where('option_name', '=', 'z_taxonomy_image'.$wpCategory->term_id)
-                        ->first();
-
-                    $novaGalleryMedia = $categoryImage ?
-                        $this->importImage($categoryImage->option_value) :
-                        $this->importImage(null);
-
                     $locale = app()->currentLocale();
 
                     $dataUpdate = ["slug->{$locale}" => $wpCategory->slug];
@@ -57,10 +47,32 @@ trait CanImportWordPressCategories
                         'slug'        => $wpCategory->slug,
                         'title'       => $wpCategory->name,
                         'description' => $wpCategory->description,
-                        'image'       => substr($novaGalleryMedia->path, 8),
                     ];
 
                     $category = $categoryClass::updateOrCreate($dataUpdate, $dataCreate);
+
+                    $categoryImageUrl = $this->wpdb
+                        ->table("{$this->prefix}options")
+                        ->select('option_value')
+                        ->where('option_name', '=', 'z_taxonomy_image'.$wpCategory->term_id)
+                        ->first();
+
+                    $categoryImageUrl = isset($categoryImageUrl->option_value) ? parse_url($categoryImageUrl->option_value) : null;
+
+                    if (! empty($categoryImageUrl['path'])) {
+                        $wpAttachedFile = str_replace('/wp-content/uploads/', '', $categoryImageUrl['path']);
+                        $attachment = $this->wpdb
+                            ->table("{$this->prefix}posts")
+                            ->join("{$this->prefix}postmeta", "{$this->prefix}posts.ID", '=', "{$this->prefix}postmeta.post_id")
+                            ->select("{$this->prefix}posts.*")
+                            ->where('meta_key', '=', '_wp_attached_file')
+                            ->where('meta_value', '=', $wpAttachedFile)
+                            ->first();
+                        if ($attachment) {
+                            $media = $this->importImage($categoryClass, $category->id, $attachment->ID);
+                        }
+                    }
+
                     $this->ids[$slug][$wpCategory->term_id] = $category->id;
                 }
             );
