@@ -209,7 +209,7 @@ class User extends Authenticatable implements MustVerifyEmail, TokenRepositoryIn
 
     public function isVerified(): Attribute
     {
-        $isVerified = $this->badgr_user_slug ? app(BadgrUser::class)->checkVerified($this->badgr_user_slug) : false;
+        $isVerified = $this->badgr_user_slug ? app(BadgrUser::class)->hasVerifiedEmail($this->badgr_user_slug) : false;
 
         return Attribute::make(
             get: fn ($value) => $isVerified,
