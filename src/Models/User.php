@@ -204,7 +204,7 @@ class User extends Authenticatable implements MustVerifyEmail, TokenRepositoryIn
 
     public function assertions()
     {
-        return $this->hasMany(Assertion::class);
+        return $this->hasMany(Assertion::class,'recipient_id');
     }
 
     public function isVerified(): Attribute
