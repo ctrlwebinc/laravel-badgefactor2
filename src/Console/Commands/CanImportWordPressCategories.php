@@ -59,7 +59,7 @@ trait CanImportWordPressCategories
 
                     $categoryImageUrl = isset($categoryImageUrl->option_value) ? parse_url($categoryImageUrl->option_value) : null;
 
-                    if (! empty($categoryImageUrl['path'])) {
+                    if (!empty($categoryImageUrl['path'])) {
                         $wpAttachedFile = str_replace('/wp-content/uploads/', '', $categoryImageUrl['path']);
                         $attachment = $this->wpdb
                             ->table("{$this->prefix}posts")
@@ -69,7 +69,7 @@ trait CanImportWordPressCategories
                             ->where('meta_value', '=', $wpAttachedFile)
                             ->first();
                         if ($attachment) {
-                            $media = $this->importImage($categoryClass, $category->id, $attachment->ID);
+                            $this->importImage($categoryClass, $category->id, $attachment->ID);
                         }
                     }
 

@@ -2,7 +2,6 @@
 
 namespace Ctrlweb\BadgeFactor2\Console\Commands;
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -43,7 +42,6 @@ trait CanImportWordPressImages
             ->first();
 
         if ($image) {
-
             $imageMeta = $wpdb
                 ->table("{$this->prefix}postmeta")
                 ->select('*')
@@ -66,7 +64,6 @@ trait CanImportWordPressImages
                     $fileName = substr($wpImageUrl, strrpos($wpImageUrl, '/') + 1);
                     $imagePath = 'uploads/'.$fileName;
                     if (Storage::disk('public')->put($imagePath, $image)) {
-
                         $modelInstance = (new $modelType())->find($modelId);
 
                         $exists = $modelInstance->getFirstMedia();
@@ -78,7 +75,6 @@ trait CanImportWordPressImages
                             ->toMediaCollection();
                         }
                     }
-
                 } catch (NotReadableException $e) {
                     return false;
                 }
