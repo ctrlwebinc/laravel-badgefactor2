@@ -12,8 +12,8 @@ class BackpackAssertionController extends Controller
     public function index($locale,$learner)
     {
         User::where('slug',$learner)->firstOrFail();
-        
-        $assertions = Assertion::all();
+
+        $assertions = Assertion::with(['issuer','badgeclass'])->get();
 
         if (!$assertions) {
             return response()->json([], 404);
