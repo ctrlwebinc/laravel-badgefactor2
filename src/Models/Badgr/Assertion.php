@@ -111,6 +111,10 @@ class Assertion extends Model
                 $viaResource = 'learners';
                 $arr = explode('/admin/resources/learners/', request()->getPathInfo());
                 $viaResourceId = end($arr);
+            } elseif (str_contains(request()->getPathInfo(), '/backpack-assertions/')) {
+                $viaResource = 'learnerSlug';
+                $arr = explode('/backpack-assertions/', request()->getPathInfo());
+                $viaResourceId = end($arr);
             }
         }
 
@@ -134,6 +138,12 @@ class Assertion extends Model
                 case 'learners':
                     $isFiltered = true;
                     $user = User::find($viaResourceId);
+                    $service = new BackpackAssertion($user);
+                    $assertions = $service->all();
+                    break;
+                case 'learnerSlug':
+                    $isFiltered = true;
+                    $user = User::where('slug',$viaResourceId)->firstOrFail();
                     $service = new BackpackAssertion($user);
                     $assertions = $service->all();
             }
