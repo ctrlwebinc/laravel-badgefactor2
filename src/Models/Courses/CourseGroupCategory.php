@@ -5,6 +5,7 @@ namespace Ctrlweb\BadgeFactor2\Models\Courses;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
 
 class CourseGroupCategory extends Model implements HasMedia
@@ -44,5 +45,11 @@ class CourseGroupCategory extends Model implements HasMedia
     public function courseGroups()
     {
         return $this->hasMany(CourseGroup::class);
+    }
+
+    public function registerMediaConversions(Media $media = null): void {
+        $this->addMediaConversion('thumb')
+            ->width(130)
+            ->height(130);
     }
 }

@@ -18,6 +18,7 @@ use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -210,5 +211,11 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
         return Attribute::make(
             get: fn ($value) => $isVerified,
         );
+    }
+
+    public function registerMediaConversions(Media $media = null): void {
+        $this->addMediaConversion('thumb')
+            ->width(130)
+            ->height(130);
     }
 }

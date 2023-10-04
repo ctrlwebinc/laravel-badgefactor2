@@ -3,11 +3,15 @@
 namespace Ctrlweb\BadgeFactor2\Models\Badges;
 
 use Ctrlweb\BadgeFactor2\Models\BadgeGroup as BadgeFactor2BadgeGroup;
+use Spatie\MediaLibrary\HasMedia;
 use Spatie\Translatable\HasTranslations;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class BadgeGroup extends BadgeFactor2BadgeGroup
+class BadgeGroup extends BadgeFactor2BadgeGroup implements HasMedia
 {
     use HasTranslations;
+    use InteractsWithMedia;
 
     public static function findBySlug($slug)
     {
@@ -20,4 +24,10 @@ class BadgeGroup extends BadgeFactor2BadgeGroup
         'slug',
         'description',
     ];
+
+    public function registerMediaConversions(Media $media = null): void {
+        $this->addMediaConversion('thumb')
+            ->width(130)
+            ->height(130);
+    }
 }

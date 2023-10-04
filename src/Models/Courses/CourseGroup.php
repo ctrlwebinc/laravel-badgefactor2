@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Translatable\HasTranslations;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class CourseGroup extends Model implements HasMedia
 {
@@ -90,5 +91,11 @@ class CourseGroup extends Model implements HasMedia
                 return $q->whereIn('id', $courseGroupIds);
             });
         });
+    }
+
+    public function registerMediaConversions(Media $media = null): void {
+        $this->addMediaConversion('thumb')
+            ->width(130)
+            ->height(130);
     }
 }
