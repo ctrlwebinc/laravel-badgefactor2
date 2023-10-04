@@ -50,7 +50,8 @@ class Setting extends Model implements HasMedia
         'privacy_content',
     ];
 
-    public function registerMediaConversions(Media $media = null): void {
+    public function registerMediaConversions(Media $media = null): void
+    {
         $this->addMediaConversion('thumb')
             ->width(130)
             ->height(130);

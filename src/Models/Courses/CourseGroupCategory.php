@@ -47,7 +47,8 @@ class CourseGroupCategory extends Model implements HasMedia
         return $this->hasMany(CourseGroup::class);
     }
 
-    public function registerMediaConversions(Media $media = null): void {
+    public function registerMediaConversions(Media $media = null): void
+    {
         $this->addMediaConversion('thumb')
             ->width(130)
             ->height(130);

@@ -213,7 +213,8 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
         );
     }
 
-    public function registerMediaConversions(Media $media = null): void {
+    public function registerMediaConversions(Media $media = null): void
+    {
         $this->addMediaConversion('thumb')
             ->width(130)
             ->height(130);
