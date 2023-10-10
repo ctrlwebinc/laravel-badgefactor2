@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 
-class Assertion extends BadgrProvider
+class Assertion extends BadgrAdminProvider
 {
     /**
      * @param string $entityId
@@ -21,14 +21,7 @@ class Assertion extends BadgrProvider
             return json_decode(Cache::get('assertion_'.$entityId));
         }
 
-        $client = $this->getClient();
-        if (!$client) {
-            return false;
-        }
-
-        $response = $client->get('/v2/assertions/'.$entityId);
-
-        $response = $this->getFirstResult($response);
+        $response = $this->getFirstResult('GET', '/v2/assertions/'.$entityId);
 
         if ($response) {
             Cache::put('assertion_'.$entityId, json_encode($response), 86400);
@@ -43,14 +36,7 @@ class Assertion extends BadgrProvider
             return Cache::get('assertions_by_issuer_'.$entityId);
         }
 
-        $client = $this->getClient();
-        if (!$client) {
-            return false;
-        }
-
-        $response = $client->get('/v2/issuers/'.$entityId.'/assertions');
-
-        $response = $this->getResult($response);
+        $response = $this->getResult('GET','/v2/issuers/'.$entityId.'/assertions');
 
         if ($response) {
             Cache::put('assertions_by_issuer_'.$entityId, $response, 86400);
@@ -65,14 +51,7 @@ class Assertion extends BadgrProvider
             return Cache::get('assertions_by_badgeclass_'.$entityId);
         }
 
-        $client = $this->getClient();
-        if (!$client) {
-            return false;
-        }
-
-        $response = $client->get('/v2/badgeclasses/'.$entityId.'/assertions');
-
-        $response = $this->getResult($response);
+        $response = $this->getResult('GET','/v2/badgeclasses/'.$entityId.'/assertions');
 
         if ($response) {
             Cache::put('assertions_by_badgeclass_'.$entityId, $response, 86400);
@@ -83,11 +62,6 @@ class Assertion extends BadgrProvider
 
     public function add(string $issuer, string $badge, string $recipient, string $recipientType = 'email', ?Carbon $issuedOn = null, ?string $evidenceUrl = null, ?string $evidenceNarrative = null): mixed
     {
-        $client = $this->getClient();
-        if (!$client) {
-            return false;
-        }
-
         $issuerId = json_decode($issuer)->entityId;
         $badgeId = json_decode($badge)->entityId;
         $recipientMail = json_decode($recipient)->email;
@@ -114,12 +88,9 @@ class Assertion extends BadgrProvider
             $payload['evidence'] = [$evidence];
         }
 
-        $response = $client->post('/v2/badgeclasses/'.$badgeId.'/assertions', $payload);
-
-        $entityId = $this->getEntityId($response);
+        $entityId = $this->getEntityId('POST','/v2/badgeclasses/'.$badgeId.'/assertions', $payload);
 
         if ($entityId) {
-            Cache::put('assertion_'.$entityId, json_encode($response), 86400);
             Cache::forget('assertions_by_badgeclass_'.$badgeId);
             Cache::forget('assertions_by_issuer_'.$issuerId);
         }
@@ -129,11 +100,6 @@ class Assertion extends BadgrProvider
 
     public function update(string $entityId, array $parameters = []): bool
     {
-        $client = $this->getClient();
-        if (!$client) {
-            return false;
-        }
-
         // Setup payload.
         $payload = [];
 
@@ -164,9 +130,7 @@ class Assertion extends BadgrProvider
             return false;
         }
 
-        $response = $client->put('/v2/assertions/'.$entityId, $payload);
-
-        $result = $this->getFirstResult($response);
+        $result = $this->getFirstResult('PUT','/v2/assertions/'.$entityId, $payload);
 
         if ($result) {
             Cache::put('assertion_'.$entityId, json_encode($result), 86400);
@@ -179,15 +143,8 @@ class Assertion extends BadgrProvider
 
     public function revoke(string $entityId, string $reason = null): bool
     {
-        $client = $this->getClient();
-        if (!$client) {
-            return false;
-        }
-
         // Get assertion first to determine issuer and badgeclass for the purpose of invalidating the cache
-        $response = $client->get('/v2/assertions/'.$entityId);
-
-        $result = $this->getFirstResult($response);
+        $result = $this->getFirstResult('GET','/v2/assertions/'.$entityId);
 
         if (!$result || $result['revoked'] == true) {
             // No cache operation required.
@@ -197,18 +154,8 @@ class Assertion extends BadgrProvider
         $issuerId = $result['issuer'];
         $badgeId = $result['badgeclass'];
 
-        $response = $client->delete('/v2/assertions/'.$entityId, [
+        return $this->confirmDeletion('DELETE','/v2/assertions/'.$entityId,[
             'revocation_reason' => $reason ?? 'No reason specified',
         ]);
-
-        if (null !== $response && ($response->status() === 204 || $response->status() === 200 || $response->status() === 404 || $response->status() === 400)) {
-            Cache::forget('assertion_'.$entityId);
-            Cache::forget('assertions_by_badgeclass_'.$badgeId);
-            Cache::forget('assertions_by_issuer_'.$issuerId);
-
-            return true;
-        }
-
-        return false;
     }
 }

@@ -21,8 +21,10 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
+use Ctrlweb\BadgeFactor2\Interfaces\TokenRepositoryInterface;
+use League\OAuth2\Client\Token\AccessTokenInterface;
 
-class User extends Authenticatable implements MustVerifyEmail, HasMedia
+class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRepositoryInterface
 {
     use HasApiTokens;
     use HasFactory;
@@ -91,10 +93,11 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
         'pm_type',
         'pm_last_four',
         'trial_ends_at',
-        'wp_application_password',
         'badgr_user_state',
         'badgr_user_slug',
         'badgr_password',
+        'badgr_encrypted_password',
+        'badgr_token_set',
     ];
 
     /**
@@ -106,6 +109,9 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
         'password',
         'remember_token',
         'wp_password',
+        'badgr_token_set',
+        'badgr_password',
+        'badgr_encrypted_password',
     ];
 
     /**
@@ -117,6 +123,7 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
         'created_at'        => 'datetime',
         'email_verified_at' => 'datetime',
         'is_validated'      => 'boolean',
+        'badgr_encrypted_password'    => 'encrypted',
     ];
 
     protected $with = [
@@ -201,12 +208,12 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
 
     public function assertions()
     {
-        return $this->hasMany(Assertion::class);
+        return $this->hasMany(Assertion::class,'recipient_id');
     }
 
     public function isVerified(): Attribute
     {
-        $isVerified = $this->badgr_user_slug ? app(BadgrUser::class)->checkVerified($this->badgr_user_slug) : false;
+        $isVerified = $this->badgr_user_slug ? app(BadgrUser::class)->hasVerifiedEmail($this->badgr_user_slug) : false;
 
         return Attribute::make(
             get: fn ($value) => $isVerified,
@@ -218,5 +225,22 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
         $this->addMediaConversion('thumb')
             ->width(130)
             ->height(130);
+    }
+
+    public function getTokenSet() : ?AccessTokenInterface
+    {
+        $tokenSet = unserialize($this->badgr_token_set);
+        if (!$tokenSet)
+        {
+            return null;
+        }
+        return $tokenSet;
+    }
+
+    public function saveTokenSet(AccessTokenInterface $tokenSet)
+    {
+        $this->refresh();
+        $this->badgr_token_set = serialize($tokenSet);
+        $this->save();
     }
 }

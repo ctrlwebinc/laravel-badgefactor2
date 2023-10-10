@@ -5,6 +5,7 @@ namespace Ctrlweb\BadgeFactor2\Models\Badgr;
 use Ctrlweb\BadgeFactor2\Events\AssertionIssued;
 use Ctrlweb\BadgeFactor2\Models\User;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Assertion as BadgrAssertion;
+use Ctrlweb\BadgeFactor2\Services\Badgr\BackpackAssertion;
 use Illuminate\Database\Eloquent\Model;
 
 class Assertion extends Model
@@ -106,6 +107,14 @@ class Assertion extends Model
                 $viaResource = 'direct';
                 $arr = explode('/nova-api/assertions/', request()->getPathInfo());
                 $viaResourceId = end($arr);
+            } elseif (str_contains(request()->getPathInfo(), '/admin/resources/learners/')) {
+                $viaResource = 'learners';
+                $arr = explode('/admin/resources/learners/', request()->getPathInfo());
+                $viaResourceId = end($arr);
+            } elseif (str_contains(request()->getPathInfo(), '/backpack-assertions/')) {
+                $viaResource = 'learnerSlug';
+                $arr = explode('/backpack-assertions/', request()->getPathInfo());
+                $viaResourceId = end($arr);
             }
         }
 
@@ -125,6 +134,18 @@ class Assertion extends Model
                 case 'direct':
                     $isFiltered = true;
                     $assertions = [json_decode(json_encode(app(BadgrAssertion::class)->getBySlug($viaResourceId)), true)];
+                    break;
+                case 'learners':
+                    $isFiltered = true;
+                    $user = User::find($viaResourceId);
+                    $service = new BackpackAssertion($user);
+                    $assertions = $service->all();
+                    break;
+                case 'learnerSlug':
+                    $isFiltered = true;
+                    $user = User::where('slug',$viaResourceId)->firstOrFail();
+                    $service = new BackpackAssertion($user);
+                    $assertions = $service->all();
             }
         }
 
@@ -140,7 +161,12 @@ class Assertion extends Model
                 unset($assertions[$i]['issuerOpenBadgeId']);
                 $assertions[$i]['recipient_email'] = $assertions[$i]['recipient']['plaintextIdentity'];
                 unset($assertions[$i]['recipient']);
-                $recipient = User::where('email', '=', $assertions[$i]['recipient_email'])->first();
+                if (isset($user))
+                {
+                    $recipient = $user;
+                } else {
+                    $recipient = User::where('email', '=', $assertions[$i]['recipient_email'])->first();
+                }
                 $assertions[$i]['recipient_id'] = $recipient->id ?? null;
 
                 $assertions[$i]['evidenceUrl'] = isset($assertion['evidence'][0]['url']) ? $assertions[$i]['evidence'][0]['url'] : null;

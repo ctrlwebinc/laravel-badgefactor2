@@ -14,15 +14,12 @@ return new class() extends Migration {
     {
         Schema::create('badgr_configs', function (Blueprint $table) {
             $table->id();
+            $table->string('badgr_server_base_url');
             $table->string('client_id');
             $table->string('client_secret');
-            $table->string('redirect_uri');
-            $table->text('scopes')->nullable();
-
-            $table->string('access_token')->nullable();
-            $table->string('refresh_token')->nullable();
-            $table->timestamp('expires_at')->nullable();
-
+            $table->string('password_client_id');
+            $table->string('password_client_secret');
+            $table->string('token_set', 1024)->default('N;');
             $table->timestamps();
         });
     }

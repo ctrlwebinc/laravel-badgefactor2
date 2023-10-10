@@ -15,7 +15,7 @@ return new class() extends Migration {
         Schema::table('users', function (Blueprint $table) {
             $table->string('badgr_user_state')->nullable();
             $table->string('badgr_user_slug')->nullable();
-            $table->string('badgr_password')->nullable();
+            $table->string('badgr_encrypted_password')->nullable();
         });
     }
 
@@ -29,7 +29,7 @@ return new class() extends Migration {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('badgr_user_state');
             $table->dropColumn('badgr_user_slug');
-            $table->dropColumn('badgr_password');
+            $table->dropColumn('badgr_encrypted_password');
         });
     }
 };
