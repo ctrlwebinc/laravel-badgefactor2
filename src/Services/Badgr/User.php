@@ -63,7 +63,6 @@ class User extends BadgrAdminProvider
      */
     public function get(string $entityId): mixed
     {
-
         return $this->getFirstResult('GET', '/v2/users/'.$entityId);
     }
 
@@ -103,11 +102,11 @@ class User extends BadgrAdminProvider
         $profile = $this->getProfile($entityId);
 
         if (false !== $profile && !empty($profile['emails'])) {
-			foreach ($profile['emails'] as $email) {
-				if (true == $email['verified']) {
-					return true;
-				}
-			}
-		}
+            foreach ($profile['emails'] as $email) {
+                if (true == $email['verified']) {
+                    return true;
+                }
+            }
+        }
     }
 }

@@ -12,7 +12,7 @@ class BackpackAssertionController extends Controller
     {
         User::where('slug', $learner)->firstOrFail();
 
-        $assertions = Assertion::with(['issuer','badgeclass'])->get();
+        $assertions = Assertion::with(['issuer', 'badgeclass'])->get();
 
         if (!$assertions) {
             return response()->json([], 404);

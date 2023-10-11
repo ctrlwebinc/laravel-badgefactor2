@@ -6,7 +6,7 @@ use League\OAuth2\Client\Token\AccessTokenInterface;
 
 interface TokenRepositoryInterface
 {
-    public function getTokenSet() : ?AccessTokenInterface;
+    public function getTokenSet(): ?AccessTokenInterface;
 
     public function saveTokenSet(AccessTokenInterface $tokenSet);
 }

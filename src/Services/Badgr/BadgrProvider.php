@@ -114,7 +114,7 @@ abstract class BadgrProvider
         }
     }
 
-    protected function makeRecoverableRequest(string $method, string $endpoint, array $payload = []) : Response
+    protected function makeRecoverableRequest(string $method, string $endpoint, array $payload = []): Response
     {
         try {
             $request = $this->buildRequest($method, $endpoint, [], $payload);
@@ -130,7 +130,7 @@ abstract class BadgrProvider
             $response = $this->getProvider()->getHttpClient()->send($request);
 
             return $response;
-        } catch( ExpiredTokenException $e) {
+        } catch (ExpiredTokenException $e) {
             // Let processing continue for these exceptions since rest of precessing is to try refresh
         } catch (ClientException $e) {
             // Check for 401 exception, rethrow anything else
@@ -176,7 +176,7 @@ abstract class BadgrProvider
         try {
             $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
             if ($response->getStatusCode() === 201) {
-                $response = json_decode($response->getBody(),true);
+                $response = json_decode($response->getBody(), true);
                 if (isset($response['status']['success']) && true === $response['status']['success'] &&
                     isset($response['result'][0]['entityId'])) {
                     return $response['result'][0]['entityId'];
@@ -206,8 +206,7 @@ abstract class BadgrProvider
                     return $response['result'];
                 }
             }
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
         }
 
         return [];
@@ -230,8 +229,7 @@ abstract class BadgrProvider
                     return intval($response['count']);
                 }
             }
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
         }
 
         return false;
@@ -247,7 +245,7 @@ abstract class BadgrProvider
         try {
             $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
             if ($response->getStatusCode() === 200) {
-                $response = json_decode($response->getBody(),true);
+                $response = json_decode($response->getBody(), true);
 
                 if (isset($response['status']['success']) && true === $response['status']['success'] && isset($response['result'][0])) {
                     return $response['result'][0];
