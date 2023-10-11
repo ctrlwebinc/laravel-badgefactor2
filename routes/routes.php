@@ -2,9 +2,9 @@
 
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\BadgePageController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr\AssertionController;
+use Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr\BackpackAssertionController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr\BadgeController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr\IssuerController;
-use Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr\BackpackAssertionController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseCategoryController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseGroupCategoryController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseGroupController;
@@ -55,7 +55,7 @@ Route::group([
     Route::apiResource('assertions', AssertionController::class)
         ->only(['index', 'show']);
 
-    Route::get('backpack-assertions/{learner:slug}',[BackpackAssertionController::class,'index']);
+    Route::get('backpack-assertions/{learner:slug}', [BackpackAssertionController::class,'index']);
 });
 
 /*
@@ -73,7 +73,7 @@ Route::group([
     'middleware' => 'web',
     'namespace'  => 'Ctrlweb\BadgeFactor2\Http\Controllers',
 ], function () {
-    Route::get('/bf2/init',[BadgeFactor2Controller::class, 'initiateAuthCodeRetrieval'])
+    Route::get('/bf2/init', [BadgeFactor2Controller::class, 'initiateAuthCodeRetrieval'])
         ->middleware('auth')
         ->name('bf2.initAuth');
     Route::get('/bf2/auth', [BadgeFactor2Controller::class, 'getAccessTokenFromAuthCode'])

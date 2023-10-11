@@ -35,20 +35,19 @@ class MigrateWordPressUsers extends Command
         parent::__construct();
     }
 
-    private function decryptWPEncryptedUserBadgrPassword(string $password) : string
+    private function decryptWPEncryptedUserBadgrPassword(string $password): string
     {
-		$encrypt_method = env('BF2_ENCRYPTION_ALGORITHM');
-		$secret_key = env('BF2_SECRET_KEY');
-		$secret_iv = env('BF2_SECRET_IV');
-	
-		// hash
-		$key = hash('sha256', $secret_key);
-		
-		// iv - encrypt method AES-256-CBC expects 16 bytes - else you will get a warning
-		$iv = substr(hash('sha256', $secret_iv), 0, 16);
-	
-		return openssl_decrypt($password, $encrypt_method, $key, 0, $iv);
+        $encrypt_method = env('BF2_ENCRYPTION_ALGORITHM');
+        $secret_key = env('BF2_SECRET_KEY');
+        $secret_iv = env('BF2_SECRET_IV');
 
+        // hash.
+        $key = hash('sha256', $secret_key);
+
+        // iv - encrypt method AES-256-CBC expects 16 bytes - else you will get a warning.
+        $iv = substr(hash('sha256', $secret_iv), 0, 16);
+
+        return openssl_decrypt($password, $encrypt_method, $key, 0, $iv);
     }
 
     /**

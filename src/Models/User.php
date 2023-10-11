@@ -223,8 +223,8 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
     public function registerMediaConversions(Media $media = null): void
     {
         $this->addMediaConversion('thumb')
-            ->width(130)
-            ->height(130);
+            ->width(32)
+            ->height(32);
     }
 
     public function getTokenSet() : ?AccessTokenInterface
