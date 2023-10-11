@@ -43,7 +43,7 @@ class BadgrConfig extends Model implements TokenRepositoryInterface
         $tokenSet = $this->getTokenSet();
         if (null !== $tokenSet) {
             $expiryTimestamp = $tokenSet->getExpires();
-            if(null !== $expiryTimestamp) {
+            if (null !== $expiryTimestamp) {
                 return Carbon::createFromTimestamp($expiryTimestamp);
             }
         }
