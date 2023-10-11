@@ -18,7 +18,7 @@ class Issuer extends BadgrAdminProvider
             return json_decode(Cache::get('issuers'));
         }
 
-        $response = $this->getResult('GET','/v2/issuers');
+        $response = $this->getResult('GET', '/v2/issuers');
 
         if ($response) {
             Cache::put('issuers', json_encode($response), 86400);
@@ -38,7 +38,7 @@ class Issuer extends BadgrAdminProvider
             return Cache::get('issuers_count');
         }
 
-        $response = $this->getCount('GET','/v2/issuers_count');
+        $response = $this->getCount('GET', '/v2/issuers_count');
 
         if ($response) {
             Cache::put('issuers_count', $response, 86400);
@@ -85,7 +85,7 @@ class Issuer extends BadgrAdminProvider
             return json_decode(Cache::get('issuer_'.$entityId));
         }
 
-        $response = $this->getFirstResult('GET','/v2/issuers/'.$entityId);
+        $response = $this->getFirstResult('GET', '/v2/issuers/'.$entityId);
 
         if ($response) {
             Cache::put('issuer_'.$entityId, json_encode($response), 86400);
@@ -145,8 +145,7 @@ class Issuer extends BadgrAdminProvider
         string $url,
         ?string $description = null,
         ?string $image = null
-    ): bool
-    {
+    ): bool {
         $payload = [
             'name'  => $name,
             'email' => $email,
@@ -164,7 +163,7 @@ class Issuer extends BadgrAdminProvider
         Cache::forget('issuers');
         Cache::forget('issuer_'.$entityId);
 
-        return $this->confirmUpdate('PUT','/v2/issuers/'.$entityId, $payload);
+        return $this->confirmUpdate('PUT', '/v2/issuers/'.$entityId, $payload);
     }
 
     /**
@@ -179,6 +178,6 @@ class Issuer extends BadgrAdminProvider
         Cache::forget('issuers');
         Cache::forget('issuer_'.$entityId);
 
-        return $this->confirmDeletion('DELETE','/v2/issuers/'.$entityId);
+        return $this->confirmDeletion('DELETE', '/v2/issuers/'.$entityId);
     }
 }

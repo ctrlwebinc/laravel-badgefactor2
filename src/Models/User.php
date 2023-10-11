@@ -2,6 +2,7 @@
 
 namespace Ctrlweb\Badgefactor2\Models;
 
+use Ctrlweb\BadgeFactor2\Interfaces\TokenRepositoryInterface;
 use Ctrlweb\BadgeFactor2\Models\Badgr\Assertion;
 use Ctrlweb\BadgeFactor2\Models\BillingInfo;
 use Ctrlweb\BadgeFactor2\Models\Courses\Course;
@@ -16,13 +17,12 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
+use League\OAuth2\Client\Token\AccessTokenInterface;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
-use Ctrlweb\BadgeFactor2\Interfaces\TokenRepositoryInterface;
-use League\OAuth2\Client\Token\AccessTokenInterface;
 
 class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRepositoryInterface
 {
@@ -120,9 +120,9 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
      * @var array<string, string>
      */
     protected $casts = [
-        'created_at'        => 'datetime',
-        'email_verified_at' => 'datetime',
-        'is_validated'      => 'boolean',
+        'created_at'                  => 'datetime',
+        'email_verified_at'           => 'datetime',
+        'is_validated'                => 'boolean',
         'badgr_encrypted_password'    => 'encrypted',
     ];
 
@@ -208,7 +208,7 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
 
     public function assertions()
     {
-        return $this->hasMany(Assertion::class,'recipient_id');
+        return $this->hasMany(Assertion::class, 'recipient_id');
     }
 
     public function isVerified(): Attribute
@@ -227,13 +227,13 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
             ->height(32);
     }
 
-    public function getTokenSet() : ?AccessTokenInterface
+    public function getTokenSet(): ?AccessTokenInterface
     {
         $tokenSet = unserialize($this->badgr_token_set);
-        if (!$tokenSet)
-        {
+        if (!$tokenSet) {
             return null;
         }
+
         return $tokenSet;
     }
 

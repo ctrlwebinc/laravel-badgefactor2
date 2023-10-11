@@ -43,7 +43,7 @@ class CoreServiceProvider extends ServiceProvider
     {
         $this->app->register(EventServiceProvider::class);
         $this->app->singleton(BadgrAdminProvider::class, function () {
-            return new BadgrAdminProvider;
+            return new BadgrAdminProvider();
         });
     }
 

@@ -32,7 +32,7 @@ class User extends BadgrAdminProvider
             'password'             => $password,
         ];
 
-        return $this->getEntityId('POST','/v1/user/profile', $payload);
+        return $this->getEntityId('POST', '/v1/user/profile', $payload);
     }
 
     /**
@@ -51,7 +51,7 @@ class User extends BadgrAdminProvider
             'currentPassword' => $oldPassword,
         ];
 
-        return $this->confirmUpdate('POST','/v2/users/'.$entityId, $payload);
+        return $this->confirmUpdate('POST', '/v2/users/'.$entityId, $payload);
     }
 
     /**
@@ -64,7 +64,7 @@ class User extends BadgrAdminProvider
     public function get(string $entityId): mixed
     {
 
-        return $this->getFirstResult('GET','/v2/users/'.$entityId);
+        return $this->getFirstResult('GET', '/v2/users/'.$entityId);
     }
 
     /**
@@ -90,21 +90,21 @@ class User extends BadgrAdminProvider
             ],
         ];
 
-        return $this->confirmUpdate('PUT','/v2/users/'.$entityId, $payload);
+        return $this->confirmUpdate('PUT', '/v2/users/'.$entityId, $payload);
     }
 
-    public function getProfile(string $entityId) : false|array
+    public function getProfile(string $entityId): false|array
     {
-        return $this->getFirstResult('GET','/v2/users/self');
+        return $this->getFirstResult('GET', '/v2/users/self');
     }
 
-    public function hasVerifiedEmail(string $entityId) : bool
+    public function hasVerifiedEmail(string $entityId): bool
     {
         $profile = $this->getProfile($entityId);
 
-        if ( false !== $profile && !empty($profile['emails'])) {
-			foreach ( $profile['emails'] as $email ) {
-				if ( true == $email['verified'] ) {
+        if (false !== $profile && !empty($profile['emails'])) {
+			foreach ($profile['emails'] as $email) {
+				if (true == $email['verified']) {
 					return true;
 				}
 			}

@@ -2,22 +2,15 @@
 
 namespace Ctrlweb\BadgeFactor2\Services\Badgr;
 
-use Ctrlweb\BadgeFactor2\Models\BadgrConfig;
-use Exception;
-use GuzzleHttp\Promise\PromiseInterface;
-use Illuminate\Http\Client\Response;
-use Illuminate\Support\Facades\Storage;
-use League\OAuth2\Client\Token\AccessTokenInterface;
 use Ctrlweb\BadgeFactor2\Models\User;
-use Ctrlweb\BadgeFactor2\Exceptions\MissingTokenException;
-use Ctrlweb\BadgeFactor2\Exceptions\ExpiredTokenException;
-
+use Exception;
+use League\OAuth2\Client\Token\AccessTokenInterface;
 
 class BadgrRecipientProvider extends BadgrProvider
 {
     protected $recipient;
 
-    function __construct(User $recipient)
+    public function __construct(User $recipient)
     {
         $this->recipient = $recipient;
     }
@@ -35,7 +28,7 @@ class BadgrRecipientProvider extends BadgrProvider
         $this->providerConfiguration['scopes'] = 'rw:profile rw:backpack';
     }
 
-    protected function getToken() : ?AccessTokenInterface
+    protected function getToken(): ?AccessTokenInterface
     {
         return $this->recipient->getTokenSet();
     }
@@ -45,10 +38,10 @@ class BadgrRecipientProvider extends BadgrProvider
         // Try to get token from password grant
         // Throw exception if fails
         // Save token if succeeds
-        $newToken = $this->getProvider()->getAccessToken('password',[
+        $newToken = $this->getProvider()->getAccessToken('password', [
             'username' => $this->recipient->email,
             'password' => $this->recipient->badgr_encrypted_password,
-            'scope' => $this->providerConfiguration['scopes'],
+            'scope'    => $this->providerConfiguration['scopes'],
         ]);
         $this->saveToken($newToken);
     }

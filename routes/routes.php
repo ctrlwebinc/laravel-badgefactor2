@@ -55,7 +55,7 @@ Route::group([
     Route::apiResource('assertions', AssertionController::class)
         ->only(['index', 'show']);
 
-    Route::get('backpack-assertions/{learner:slug}', [BackpackAssertionController::class,'index']);
+    Route::get('backpack-assertions/{learner:slug}', [BackpackAssertionController::class, 'index']);
 });
 
 /*

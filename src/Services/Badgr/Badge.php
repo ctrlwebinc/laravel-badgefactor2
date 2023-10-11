@@ -18,7 +18,7 @@ class Badge extends BadgrAdminProvider
             return json_decode(Cache::get('badges'));
         }
 
-        $response = $this->getResult('GET','/v2/badgeclasses');
+        $response = $this->getResult('GET', '/v2/badgeclasses');
 
         if ($response) {
             Cache::put('badges', json_encode($response), 86400);
@@ -38,7 +38,7 @@ class Badge extends BadgrAdminProvider
             return Cache::get('badges_count');
         }
 
-        $response = $this->getCount('GET','/v2/badgeclasses_count');
+        $response = $this->getCount('GET', '/v2/badgeclasses_count');
 
         if ($response) {
             Cache::put('badges_count', $response, 86400);
@@ -85,7 +85,7 @@ class Badge extends BadgrAdminProvider
             return json_decode(Cache::get('badge_'.$entityId));
         }
 
-        $response = $this->getFirstResult('GET','/v2/badgeclasses/'.$entityId);
+        $response = $this->getFirstResult('GET', '/v2/badgeclasses/'.$entityId);
 
         if ($response) {
             Cache::put('badge_'.$response['entityId'], json_encode($response), 86400);
@@ -100,7 +100,7 @@ class Badge extends BadgrAdminProvider
             return Cache::get('badges_by_issuer_'.$entityId);
         }
 
-        $response = $this->getResult('GET','/v2/issuers/'.$entityId.'/badgeclasses');
+        $response = $this->getResult('GET', '/v2/issuers/'.$entityId.'/badgeclasses');
 
         if ($response) {
             Cache::put('badges_by_issuer_'.$entityId, $response, 86400);
@@ -131,7 +131,7 @@ class Badge extends BadgrAdminProvider
 
         Cache::forget('badges');
 
-        return $this->getEntityId('POST','/v2/badgeclasses', $payload);
+        return $this->getEntityId('POST', '/v2/badgeclasses', $payload);
     }
 
     /**
@@ -153,8 +153,7 @@ class Badge extends BadgrAdminProvider
         ?string $description,
         ?string $criteriaNarrative,
         ?string $image
-    ): bool
-    {
+    ): bool {
         $issuer = json_decode($issuer)->entityId;
         $payload = [
             'name'              => $name,
@@ -170,7 +169,7 @@ class Badge extends BadgrAdminProvider
         Cache::forget('badges');
         Cache::forget('badge_'.$entityId);
 
-        return $this->confirmUpdate('PUT','/v2/badgeclasses/'.$entityId, $payload);
+        return $this->confirmUpdate('PUT', '/v2/badgeclasses/'.$entityId, $payload);
     }
 
     /**
@@ -185,6 +184,6 @@ class Badge extends BadgrAdminProvider
         Cache::forget('badges');
         Cache::forget('badge_'.$entityId);
 
-        return $this->confirmDeletion('DELETE','/v2/badgeclasses/'.$entityId);
+        return $this->confirmDeletion('DELETE', '/v2/badgeclasses/'.$entityId);
     }
 }

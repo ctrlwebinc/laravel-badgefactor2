@@ -143,7 +143,7 @@ class Assertion extends Model
                     break;
                 case 'learnerSlug':
                     $isFiltered = true;
-                    $user = User::where('slug',$viaResourceId)->firstOrFail();
+                    $user = User::where('slug', $viaResourceId)->firstOrFail();
                     $service = new BackpackAssertion($user);
                     $assertions = $service->all();
             }
@@ -161,8 +161,7 @@ class Assertion extends Model
                 unset($assertions[$i]['issuerOpenBadgeId']);
                 $assertions[$i]['recipient_email'] = $assertions[$i]['recipient']['plaintextIdentity'];
                 unset($assertions[$i]['recipient']);
-                if (isset($user))
-                {
+                if (isset($user)) {
                     $recipient = $user;
                 } else {
                     $recipient = User::where('email', '=', $assertions[$i]['recipient_email'])->first();

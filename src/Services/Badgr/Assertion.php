@@ -36,7 +36,7 @@ class Assertion extends BadgrAdminProvider
             return Cache::get('assertions_by_issuer_'.$entityId);
         }
 
-        $response = $this->getResult('GET','/v2/issuers/'.$entityId.'/assertions');
+        $response = $this->getResult('GET', '/v2/issuers/'.$entityId.'/assertions');
 
         if ($response) {
             Cache::put('assertions_by_issuer_'.$entityId, $response, 86400);
@@ -51,7 +51,7 @@ class Assertion extends BadgrAdminProvider
             return Cache::get('assertions_by_badgeclass_'.$entityId);
         }
 
-        $response = $this->getResult('GET','/v2/badgeclasses/'.$entityId.'/assertions');
+        $response = $this->getResult('GET', '/v2/badgeclasses/'.$entityId.'/assertions');
 
         if ($response) {
             Cache::put('assertions_by_badgeclass_'.$entityId, $response, 86400);
@@ -88,7 +88,7 @@ class Assertion extends BadgrAdminProvider
             $payload['evidence'] = [$evidence];
         }
 
-        $entityId = $this->getEntityId('POST','/v2/badgeclasses/'.$badgeId.'/assertions', $payload);
+        $entityId = $this->getEntityId('POST', '/v2/badgeclasses/'.$badgeId.'/assertions', $payload);
 
         if ($entityId) {
             Cache::forget('assertions_by_badgeclass_'.$badgeId);
@@ -130,7 +130,7 @@ class Assertion extends BadgrAdminProvider
             return false;
         }
 
-        $result = $this->getFirstResult('PUT','/v2/assertions/'.$entityId, $payload);
+        $result = $this->getFirstResult('PUT', '/v2/assertions/'.$entityId, $payload);
 
         if ($result) {
             Cache::put('assertion_'.$entityId, json_encode($result), 86400);
@@ -144,7 +144,7 @@ class Assertion extends BadgrAdminProvider
     public function revoke(string $entityId, string $reason = null): bool
     {
         // Get assertion first to determine issuer and badgeclass for the purpose of invalidating the cache
-        $result = $this->getFirstResult('GET','/v2/assertions/'.$entityId);
+        $result = $this->getFirstResult('GET', '/v2/assertions/'.$entityId);
 
         if (!$result || $result['revoked'] == true) {
             // No cache operation required.
@@ -154,7 +154,7 @@ class Assertion extends BadgrAdminProvider
         $issuerId = $result['issuer'];
         $badgeId = $result['badgeclass'];
 
-        return $this->confirmDeletion('DELETE','/v2/assertions/'.$entityId,[
+        return $this->confirmDeletion('DELETE', '/v2/assertions/'.$entityId, [
             'revocation_reason' => $reason ?? 'No reason specified',
         ]);
     }

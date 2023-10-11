@@ -2,12 +2,10 @@
 
 namespace Ctrlweb\BadgeFactor2\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Ctrlweb\BadgeFactor2\Interfaces\TokenRepositoryInterface;
-use League\OAuth2\Client\Token\AccessTokenInterface;
-use PHP_CodeSniffer\Util\Tokens;
 use Carbon\Carbon;
+use Ctrlweb\BadgeFactor2\Interfaces\TokenRepositoryInterface;
+use Illuminate\Database\Eloquent\Model;
+use League\OAuth2\Client\Token\AccessTokenInterface;
 
 class BadgrConfig extends Model implements TokenRepositoryInterface
 {
@@ -23,13 +21,13 @@ class BadgrConfig extends Model implements TokenRepositoryInterface
     protected $casts = [
     ];
 
-    public function getTokenSet() : ?AccessTokenInterface
+    public function getTokenSet(): ?AccessTokenInterface
     {
         $tokenSet = unserialize($this->token_set);
-        if (!$tokenSet)
-        {
+        if (!$tokenSet) {
             return null;
         }
+
         return $tokenSet;
     }
 
@@ -43,14 +41,13 @@ class BadgrConfig extends Model implements TokenRepositoryInterface
     public function getTokenExpiryAttribute()
     {
         $tokenSet = $this->getTokenSet();
-        if (null!==$tokenSet)
-        {
+        if (null!==$tokenSet) {
             $expiryTimestamp = $tokenSet->getExpires();
-            if(null!==$expiryTimestamp)
-            {
+            if(null!==$expiryTimestamp) {
                 return Carbon::createFromTimestamp($expiryTimestamp);
             }
         }
+
         return null;
     }
 }

@@ -3,18 +3,17 @@
 namespace Ctrlweb\BadgeFactor2\Services\Badgr;
 
 use BadgeFactor2\Exceptions\ConfigurationException;
-use Calotes\Component\Response as ComponentResponse;
 use Ctrlweb\BadgeFactor2\Exceptions\ExpiredTokenException;
 use Ctrlweb\BadgeFactor2\Exceptions\MissingTokenException;
 use Ctrlweb\BadgeFactor2\Models\BadgrConfig;
 use Exception;
-use Illuminate\Support\Facades\Storage;
-use League\OAuth2\Client\Provider\GenericProvider;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Storage;
+use League\OAuth2\Client\Provider\GenericProvider;
 use League\OAuth2\Client\Token\AccessTokenInterface;
-use GuzzleHttp\Exception\ClientException;
 
 abstract class BadgrProvider
 {
@@ -24,51 +23,51 @@ abstract class BadgrProvider
 
     protected function buildRequest($method, $url, array $options = [], array $payload = [])
     {
-        $defaultOptions = ['headers' => [
-            'Accept' => 'application/json',
+        $defaultOptions = [
+            'headers' => [
+                'Accept' => 'application/json',
             ],
         ];
 
         $mergedOptions = array_merge_recursive($defaultOptions, $options);
-        if (!empty($payload))
-        {
+        if (!empty($payload)) {
             $mergedOptions = array_merge_recursive($mergedOptions, ['body' => $payload]);
         }
+
         return $this->getProvider()->getAuthenticatedRequest($method, $url, $this->getVerifiedToken(), $mergedOptions);
     }
 
-    protected function getToken() : ?AccessTokenInterface
+    protected function getToken(): ?AccessTokenInterface
     {
         return $this->getConfig()->getTokenSet();
     }
 
-    protected function getVerifiedToken() : AccessTokenInterface
+    protected function getVerifiedToken(): AccessTokenInterface
     {
         $token = $this->getToken();
         $this->checkToken($token);
+
         return $token;
     }
 
-    protected function sendRequest(Request $request) : Response
+    protected function sendRequest(Request $request): Response
     {
         return $this->getProvider()->getHttpClient()->send($request);
     }
 
-    protected function getConfig() : BadgrConfig
+    protected function getConfig(): BadgrConfig
     {
-        if (null===$this->config)
-        {
+        if (null === $this->config) {
             $this->config = BadgrConfig::first();
         }
-        if (null===$this->config)
-        {
+        if (null === $this->config) {
             throw new ConfigurationException('No Badgr Config.');
         }
 
         return $this->config;
     }
 
-    protected function makeProvider() : void
+    protected function makeProvider(): void
     {
         $config = $this->getConfig();
         $httpClient = new Client(['base_uri' => $config->badgr_server_base_url]);
@@ -83,12 +82,12 @@ abstract class BadgrProvider
         $this->provider = new GenericProvider($this->providerConfiguration, ['httpClient' => $httpClient]);
     }
 
-    protected function getProvider() : GenericProvider
+    protected function getProvider(): GenericProvider
     {
-        if (null === $this->provider)
-        {
+        if (null === $this->provider) {
             $this->makeProvider();
         }
+
         return $this->provider;
     }
 
@@ -105,44 +104,37 @@ abstract class BadgrProvider
         $this->providerConfiguration['scopes'] = 'rw:profile rw:backpack rw:issuer rw:serverAdmin';
     }
 
-    protected function checkToken($token) : void
+    protected function checkToken($token): void
     {
-        if (null === $token)
-        {
+        if (null === $token) {
             throw new MissingTokenException('No token retreived from token repository');
         }
-        if ($token->hasExpired())
-        {
+        if ($token->hasExpired()) {
             throw new ExpiredTokenException('Token has expired.');
         }
     }
 
     protected function makeRecoverableRequest(string $method, string $endpoint, array $payload = []) : Response
     {
-        try
-        {
+        try {
             $request = $this->buildRequest($method, $endpoint, [], $payload);
             $response = $this->getProvider()->getHttpClient()->send($request);
+
             return $response;
-        }
-        catch (MissingTokenException $e)
-        {
+        } catch (MissingTokenException $e) {
             // No need to try refresh on a missing token
             // Try a new auth cycle
             // Let exceptions bubble up since they are not recoverable at this point.
             $this->tryNewAuthCycle();
             $request = $this->buildRequest($method, $endpoint, [], $payload);
             $response = $this->getProvider()->getHttpClient()->send($request);
-            return $response;
 
-        } catch( ExpiredTokenException $e)
-        {
+            return $response;
+        } catch( ExpiredTokenException $e) {
             // Let processing continue for these exceptions since rest of precessing is to try refresh
-        } catch (ClientException $e)
-        {
+        } catch (ClientException $e) {
             // Check for 401 exception, rethrow anything else
-            if ($e->getCode() != 401)
-            {
+            if ($e->getCode() != 401) {
                 throw $e;
             }
         }
@@ -151,6 +143,7 @@ abstract class BadgrProvider
         $this->refreshToken();
         $request = $this->buildRequest($method, $endpoint, [], $payload);
         $response = $this->getProvider()->getHttpClient()->send($request);
+
         return $response;
     }
 
@@ -162,7 +155,7 @@ abstract class BadgrProvider
     protected function refreshToken()
     {
         $newAccessToken = $this->getProvider()->getAccessToken('refresh_token', [
-            'refresh_token' => $this->getToken()->getRefreshToken()
+            'refresh_token' => $this->getToken()->getRefreshToken(),
         ]);
 
         $this->saveToken($newAccessToken);
@@ -178,10 +171,9 @@ abstract class BadgrProvider
      *
      * @return false|mixed
      */
-    protected function getEntityId(string $method, string $endpoint, array $payload = []) : string|false
+    protected function getEntityId(string $method, string $endpoint, array $payload = []): string|false
     {
-        try
-        {
+        try {
             $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
             if ($response->getStatusCode() === 201) {
                 $response = json_decode($response->getBody(),true);
@@ -190,11 +182,9 @@ abstract class BadgrProvider
                     return $response['result'][0]['entityId'];
                 }
             }
+        } catch (Exception $e) {
         }
-        catch (Exception $e)
-        {
 
-        }
         return false;
     }
 
@@ -203,13 +193,12 @@ abstract class BadgrProvider
      *
      * @return array|false
      */
-    public function getResult(string $method, string $endpoint, array $payload = []) : array|false
+    public function getResult(string $method, string $endpoint, array $payload = []): array|false
     {
-        try
-        {
+        try {
             $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
             if ($response->getStatusCode() === 200) {
-                $response = json_decode($response->getBody(),true);
+                $response = json_decode($response->getBody(), true);
                 if (
                     isset($response['status']['success']) && true === $response['status']['success'] &&
                     isset($response['result']) && is_array($response['result'])
@@ -218,14 +207,11 @@ abstract class BadgrProvider
                 }
             }
         }
-        catch (Exception $e)
-        {
-
+        catch (Exception $e) {
         }
+
         return [];
     }
-
-
 
     /**
      * @param PromiseInterface|Response $response
@@ -234,11 +220,10 @@ abstract class BadgrProvider
      */
     public function getCount(string $method, string $endpoint, array $payload = []): int|false
     {
-        try
-        {
+        try {
             $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
             if ($response->getStatusCode() === 200) {
-                $response = json_decode($response->getBody(),true);
+                $response = json_decode($response->getBody(), true);
                 if (
                     isset($response['count']) && is_numeric($response['count'])
                 ) {
@@ -246,9 +231,7 @@ abstract class BadgrProvider
                 }
             }
         }
-        catch (Exception $e)
-        {
-
+        catch (Exception $e) {
         }
 
         return false;
@@ -261,20 +244,16 @@ abstract class BadgrProvider
      */
     protected function getFirstResult(string $method, string $endpoint, array $payload = []): mixed
     {
-        try
-        {
+        try {
             $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
             if ($response->getStatusCode() === 200) {
                 $response = json_decode($response->getBody(),true);
-    
+
                 if (isset($response['status']['success']) && true === $response['status']['success'] && isset($response['result'][0])) {
                     return $response['result'][0];
                 }
             }
-        }
-        catch (Exception $e)
-        {
-
+        } catch (Exception $e) {
         }
 
         return false;
@@ -292,35 +271,27 @@ abstract class BadgrProvider
         return $this->getCount('PUT', '/v2/badgeclasses_count/issuer/'.$issuerId);
     }
 
-    protected function confirmDeletion(string $method, string $endpoint, array $payload = []) : bool
+    protected function confirmDeletion(string $method, string $endpoint, array $payload = []): bool
     {
-        try
-        {
+        try {
             $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
             if (null !== $response && ($response->getStatusCode() === 204 || $response->getStatusCode() === 404)) {
                 return true;
             }
-        }
-        catch (Exception $e)
-        {
-
+        } catch (Exception $e) {
         }
 
         return false;
     }
 
-    protected function confirmUpdate(string $method, string $endpoint, array $payload = []) : bool
+    protected function confirmUpdate(string $method, string $endpoint, array $payload = []): bool
     {
-        try
-        {
+        try {
             $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
             if (null !== $response && $response->getStatusCode() === 200) {
                 return true;
             }
-        }
-        catch (Exception $e)
-        {
-
+        } catch (Exception $e) {
         }
 
         return false;
@@ -335,7 +306,7 @@ abstract class BadgrProvider
      */
     public function deleteBadgeClass(string $badgeClassId): bool
     {
-        return $this->makeRecoverableRequest('DELETE','/v2/badgeclasses/'.$badgeClassId);
+        return $this->makeRecoverableRequest('DELETE', '/v2/badgeclasses/'.$badgeClassId);
     }
 
     /**
