@@ -31,7 +31,7 @@ class CourseGroupController extends Controller
 
         $query = CourseGroup::query();
 
-        $groups = $query->paginate();
+        $groups = $query->paginate(12);
 
         return CourseGroupResource::collection($groups);
     }
