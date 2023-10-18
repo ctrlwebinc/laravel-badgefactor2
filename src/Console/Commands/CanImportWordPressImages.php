@@ -17,7 +17,7 @@ trait CanImportWordPressImages
      *
      * @return bool
      */
-    private function importImage(string $modelType, int $modelId, ?int $imageId): bool
+    private function importImage(string $modelType, int $modelId, ?int $imageId, string $collectionName = 'image'): bool
     {
         if (!$imageId) {
             return false;
@@ -61,19 +61,14 @@ trait CanImportWordPressImages
             if ($wpImageFile->successful()) {
                 try {
                     $image = Image::make($wpImageFile->body());
-                    $fileName = substr($wpImageUrl, strrpos($wpImageUrl, '/') + 1);
-                    $imagePath = 'uploads/'.$fileName;
-                    if (Storage::disk('public')->put($imagePath, $image)) {
-                        $modelInstance = (new $modelType())->find($modelId);
-
-                        $exists = $modelInstance->getFirstMedia();
-                        if (!$exists) {
-                            $modelInstance->addMediaFromDisk($imagePath, 'public')
-                            ->withCustomProperties([
-                                'alt' => $wpImageAlt,
-                            ])
-                            ->toMediaCollection();
-                        }
+                    $modelInstance = (new $modelType())->find($modelId);
+                    $exists = $modelInstance->getFirstMedia();
+                    if (!$exists) {
+                        $modelInstance->addMediaFromBase64($image->encode('data-url'))
+                        ->withCustomProperties([
+                            'alt' => $wpImageAlt,
+                        ])
+                        ->toMediaCollection($collectionName);
                     }
                 } catch (NotReadableException $e) {
                     return false;

@@ -22,7 +22,6 @@ class CourseGroup extends Model implements HasMedia
         'slug',
         'title',
         'subtitle',
-        'image',
         'description',
         'course_group_category_id',
     ];
@@ -91,6 +90,11 @@ class CourseGroup extends Model implements HasMedia
                 return $q->whereIn('id', $courseGroupIds);
             });
         });
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('image')->singleFile();
     }
 
     public function registerMediaConversions(Media $media = null): void

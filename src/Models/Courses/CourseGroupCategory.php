@@ -17,7 +17,6 @@ class CourseGroupCategory extends Model implements HasMedia
         'slug',
         'title',
         'subtitle',
-        'image',
         'description',
         'menu_title',
         'is_featured',
@@ -45,6 +44,11 @@ class CourseGroupCategory extends Model implements HasMedia
     public function courseGroups()
     {
         return $this->hasMany(CourseGroup::class);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('image')->singleFile();
     }
 
     public function registerMediaConversions(Media $media = null): void

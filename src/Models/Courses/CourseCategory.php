@@ -23,7 +23,6 @@ class CourseCategory extends Model implements HasMedia
         'title',
         'slug',
         'description',
-        'image',
         'parent_id',
     ];
 
@@ -41,6 +40,11 @@ class CourseCategory extends Model implements HasMedia
     public function courses()
     {
         return $this->hasMany(Course::class);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('image')->singleFile();
     }
 
     public function registerMediaConversions(Media $media = null): void

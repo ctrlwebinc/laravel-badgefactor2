@@ -19,7 +19,6 @@ class Responsible extends Model implements HasMedia
         'name',
         'slug',
         'description',
-        'image',
     ];
 
     protected $translatable = [
@@ -30,6 +29,11 @@ class Responsible extends Model implements HasMedia
     public function courseGroups()
     {
         return $this->belongsToMany(CourseGroup::class);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('image')->singleFile();
     }
 
     public function registerMediaConversions(Media $media = null): void
