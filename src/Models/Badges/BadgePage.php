@@ -46,6 +46,7 @@ class BadgePage extends Model
         'content',
         'criteria',
         'request_form_url',
+        'last_updated_at',
     ];
 
     protected $appends = ['badge'];
