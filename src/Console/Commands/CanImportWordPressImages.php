@@ -4,7 +4,6 @@ namespace Ctrlweb\BadgeFactor2\Console\Commands;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Exception\NotReadableException;
 use Intervention\Image\ImageManagerStatic as Image;
 
