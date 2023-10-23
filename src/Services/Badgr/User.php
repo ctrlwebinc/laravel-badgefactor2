@@ -108,5 +108,7 @@ class User extends BadgrAdminProvider
                 }
             }
         }
+
+        return false;
     }
 }
