@@ -227,6 +227,12 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
             ->height(32);
     }
 
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('memberPhotos')->singleFile();
+    }
+
+
     public function getTokenSet(): ?AccessTokenInterface
     {
         $tokenSet = unserialize($this->badgr_token_set);
