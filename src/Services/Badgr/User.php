@@ -32,7 +32,7 @@ class User extends BadgrAdminProvider
             'password'             => $password,
         ];
 
-        return $this->getEntityId('POST', '/v1/user/profile', $payload);
+        return $this->getV1Id('POST', '/v1/user/profile', $payload);
     }
 
     /**

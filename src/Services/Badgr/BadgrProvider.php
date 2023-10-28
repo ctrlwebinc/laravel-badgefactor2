@@ -26,12 +26,13 @@ abstract class BadgrProvider
         $defaultOptions = [
             'headers' => [
                 'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
             ],
         ];
 
         $mergedOptions = array_merge_recursive($defaultOptions, $options);
         if (!empty($payload)) {
-            $mergedOptions = array_merge_recursive($mergedOptions, ['body' => $payload]);
+            $mergedOptions = array_merge_recursive($mergedOptions, ['body' => json_encode($payload)]);
         }
 
         return $this->getProvider()->getAuthenticatedRequest($method, $url, $this->getVerifiedToken(), $mergedOptions);
@@ -181,6 +182,25 @@ abstract class BadgrProvider
                     isset($response['result'][0]['entityId'])) {
                     return $response['result'][0]['entityId'];
                 }
+            }
+        } catch (Exception $e) {
+        }
+
+        return false;
+    }
+
+    /**
+     * @param PromiseInterface|Response $response
+     *
+     * @return false|mixed
+     */
+    protected function getV1Id(string $method, string $endpoint, array $payload = []): string|false
+    {
+        try {
+            $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
+            if ($response->getStatusCode() === 201) {
+                $response = json_decode($response->getBody(), true);
+                return $response['slug'];
             }
         } catch (Exception $e) {
         }

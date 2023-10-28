@@ -137,11 +137,19 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
         parent::boot();
 
         self::creating(function (User $user) {
-            $user->name = $user->first_name.' '.$user->first_name;
-            if (60 !== strlen($user->password) && !preg_match('/^\$2y\$/', $user->password)) {
-                $user->password = Hash::make($user->password) ?? Str::random(16);
+            $user->name = $user->first_name.' '.$user->last_name;
+            if ('' == $user->badgr_encrypted_password)
+            {
+                $user->badgr_encrypted_password = Str::random(16);
             }
             $user->slug = Str::slug($user->username);
+
+            $user->badgr_user_slug = (new BadgrUser)->add(
+                $user->first_name,
+                $user->last_name,
+                $user->email,
+                $user->badgr_encrypted_password
+            );
         });
 
         self::created(function (User $user) {
