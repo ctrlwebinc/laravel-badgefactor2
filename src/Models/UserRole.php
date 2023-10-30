@@ -2,7 +2,7 @@
 
 namespace Ctrlweb\BadgeFactor2\Models;
 
-use Ctrlweb\Badgefactor2\Models\User;
+use Ctrlweb\BadgeFactor2\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Models\Role;

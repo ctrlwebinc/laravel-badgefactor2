@@ -1,6 +1,6 @@
 <?php
 
-namespace Ctrlweb\Badgefactor2\Models;
+namespace Ctrlweb\BadgeFactor2\Models;
 
 use Ctrlweb\BadgeFactor2\Interfaces\TokenRepositoryInterface;
 use Ctrlweb\BadgeFactor2\Models\Badgr\Assertion;
