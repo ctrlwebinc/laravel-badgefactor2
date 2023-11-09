@@ -22,6 +22,7 @@ class CourseGroupResource extends JsonResource
             'id'                       => $this->resource->id,
             'slug'                     => $this->resource->slug,
             'title'                    => $this->resource->title,
+            'subtitle'                 => $this->resource->subtitle,
             'description'              => $this->resource->description,
             'excerpt'                  => mb_substr(strip_tags($this->resource->description), 0, 134, 'UTF-8').' [...]',
             'image'                    => $this->resource->image,
