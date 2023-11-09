@@ -237,7 +237,7 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('memberPhotos')->singleFile();
+        $this->addMediaCollection('photo')->singleFile();
     }
 
 
