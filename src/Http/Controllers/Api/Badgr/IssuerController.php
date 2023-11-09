@@ -17,7 +17,7 @@ class IssuerController extends Controller
     {
         $issuers = app(Issuer::class)->all();
         if (request('course-category')) {
-            $filteredBadgePages = CourseCategory::findBySlug(request('course-category'))->first()->courses->pluck('badge_id');
+            $filteredBadgePages = CourseCategory::findBySlug(request('course-category'))->firstOrFail()->courses->pluck('badge_id');
             $filteredBadges = BadgePage::whereIn('id', $filteredBadgePages)->pluck('badgeclass_id');
             $filteredIssuers = collect(app(Badge::class)->all())->whereIn('entityId', $filteredBadges)->pluck('issuer');
             $issuers = collect($issuers);

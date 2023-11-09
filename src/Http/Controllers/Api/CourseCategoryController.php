@@ -3,8 +3,8 @@
 namespace Ctrlweb\BadgeFactor2\Http\Controllers\Api;
 
 use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
-use Ctrlweb\BadgeFactor2\Http\Resources\CourseCategoryResource;
-use Ctrlweb\BadgeFactor2\Models\CourseCategory;
+use Ctrlweb\BadgeFactor2\Http\Resources\Courses\CourseCategoryResource;
+use Ctrlweb\BadgeFactor2\Models\Courses\CourseCategory;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
