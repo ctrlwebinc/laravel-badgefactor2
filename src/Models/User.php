@@ -4,7 +4,6 @@ namespace Ctrlweb\BadgeFactor2\Models;
 
 use Ctrlweb\BadgeFactor2\Interfaces\TokenRepositoryInterface;
 use Ctrlweb\BadgeFactor2\Models\Badgr\Assertion;
-use Ctrlweb\BadgeFactor2\Models\BillingInfo;
 use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 use Ctrlweb\BadgeFactor2\Notifications\ResetPasswordNotification;
 use Ctrlweb\BadgeFactor2\Services\Badgr\User as BadgrUser;
@@ -14,7 +13,6 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 use League\OAuth2\Client\Token\AccessTokenInterface;
@@ -138,13 +136,12 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
 
         self::creating(function (User $user) {
             $user->name = $user->first_name.' '.$user->last_name;
-            if ('' == $user->badgr_encrypted_password)
-            {
+            if ('' == $user->badgr_encrypted_password) {
                 $user->badgr_encrypted_password = Str::random(16);
             }
             $user->slug = Str::slug($user->username);
 
-            $user->badgr_user_slug = (new BadgrUser)->add(
+            $user->badgr_user_slug = (new BadgrUser())->add(
                 $user->first_name,
                 $user->last_name,
                 $user->email,
@@ -239,7 +236,6 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
     {
         $this->addMediaCollection('photo')->singleFile();
     }
-
 
     public function getTokenSet(): ?AccessTokenInterface
     {

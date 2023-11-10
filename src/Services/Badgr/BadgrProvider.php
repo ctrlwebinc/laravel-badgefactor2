@@ -25,7 +25,7 @@ abstract class BadgrProvider
     {
         $defaultOptions = [
             'headers' => [
-                'Accept' => 'application/json',
+                'Accept'       => 'application/json',
                 'Content-Type' => 'application/json',
             ],
         ];
@@ -200,6 +200,7 @@ abstract class BadgrProvider
             $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
             if ($response->getStatusCode() === 201) {
                 $response = json_decode($response->getBody(), true);
+
                 return $response['slug'];
             }
         } catch (Exception $e) {
