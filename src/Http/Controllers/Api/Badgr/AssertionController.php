@@ -6,7 +6,7 @@ use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
 use Ctrlweb\BadgeFactor2\Models\Badgr\Assertion;
 
 /**
- * @tags Emetteurs
+ * @tags Assertions
  */
 class AssertionController extends Controller
 {
@@ -23,13 +23,7 @@ class AssertionController extends Controller
 
     public function show(string $locale, string $entityId)
     {
-        $badge = app(Badge::class)->getBySlug($entityId);
-
-        return response()->json($badge);
-    }
-
-    public function count()
-    {
-        return app(Badge::class)->count();
+        $assertion = app(Assertion::class)->where('entityId', $entityId)->get();
+        return response()->json($assertion);
     }
 }

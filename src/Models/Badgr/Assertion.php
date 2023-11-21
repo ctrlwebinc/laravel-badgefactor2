@@ -115,6 +115,10 @@ class Assertion extends Model
                 $viaResource = 'learnerSlug';
                 $arr = explode('/backpack-assertions/', request()->getPathInfo());
                 $viaResourceId = end($arr);
+            } elseif (str_contains(request()->getPathInfo(), '/api/fr/assertions/')) {
+                $viaResource = 'direct';
+                $arr = explode('/api/fr/assertions/', request()->getPathInfo());
+                $viaResourceId = end($arr);
             }
         }
 
@@ -133,7 +137,8 @@ class Assertion extends Model
                     break;
                 case 'direct':
                     $isFiltered = true;
-                    $assertions = [json_decode(json_encode(app(BadgrAssertion::class)->getBySlug($viaResourceId)), true)];
+                    $assertions = json_decode(json_encode(app(BadgrAssertion::class)->getBySlug($viaResourceId)), true);
+                    $assertions = false === $assertions ? [] : [$assertions];
                     break;
                 case 'learners':
                     $isFiltered = true;

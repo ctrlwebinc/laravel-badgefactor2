@@ -23,7 +23,7 @@ class Assertion extends BadgrAdminProvider
 
         $response = $this->getFirstResult('GET', '/v2/assertions/'.$entityId);
 
-        if ($response) {
+        if ($response && is_array($response)) {
             Cache::put('assertion_'.$entityId, json_encode($response), 86400);
         }
 
