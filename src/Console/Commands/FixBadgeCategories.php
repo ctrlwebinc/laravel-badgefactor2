@@ -1,6 +1,7 @@
 <?php
 
 namespace Ctrlweb\BadgeFactor2\Console\Commands;
+
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgeCategory;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Illuminate\Console\Command;
@@ -58,7 +59,6 @@ class FixBadgeCategories extends Command
                     ->where('post_status', 'publish')
                     ->get(),
                 function ($wpBadgePage) {
-
                     $locale = config('app.locale');
                     $badgePage = BadgePage::where("slug->{$locale}", '=', $wpBadgePage->post_name)->first();
 
@@ -72,7 +72,6 @@ class FixBadgeCategories extends Command
                         ->groupBy("{$this->prefix}term_taxonomy.term_id")
                         ->orderBy("{$this->prefix}terms.name")
                         ->first();
-
 
                     $badgeCategory = $wpBadgePageCategory ? BadgeCategory::where("slug->{$locale}", '=', $wpBadgePageCategory->slug)->first() : null;
 
