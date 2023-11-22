@@ -24,6 +24,7 @@ class AssertionController extends Controller
     public function show(string $locale, string $entityId)
     {
         $assertion = app(Assertion::class)->where('entityId', $entityId)->get();
+
         return response()->json($assertion);
     }
 }

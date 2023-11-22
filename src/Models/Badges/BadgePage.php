@@ -131,6 +131,11 @@ class BadgePage extends Model
         return $this->hasOne(Course::class);
     }
 
+    public function badgeCategory()
+    {
+        return $this->belongsTo(BadgeCategory::class);
+    }
+
     public function courseCategory()
     {
         return $this->belongsTo(CourseCategory::class);
