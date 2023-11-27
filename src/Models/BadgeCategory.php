@@ -4,10 +4,9 @@ namespace Ctrlweb\BadgeFactor2\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
+use Laravel\Scout\Searchable;
 
-class BadgeCategory extends Model implements HasMedia
+class BadgeCategory extends Model
 {
     use HasFactory;
     use InteractsWithMedia;
@@ -22,7 +21,6 @@ class BadgeCategory extends Model implements HasMedia
         'subtitle',
         'description',
         'slug',
-        'image',
     ];
 
     public function badges()

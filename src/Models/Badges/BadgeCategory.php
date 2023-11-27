@@ -3,8 +3,6 @@
 namespace Ctrlweb\BadgeFactor2\Models\Badges;
 
 use Ctrlweb\BadgeFactor2\Models\BadgeCategory as BadgeFactor2BadgeCategory;
-use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
 
 class BadgeCategory extends BadgeFactor2BadgeCategory
