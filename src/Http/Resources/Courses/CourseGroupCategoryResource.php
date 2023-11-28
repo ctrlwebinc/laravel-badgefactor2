@@ -25,8 +25,7 @@ class CourseGroupCategoryResource extends JsonResource
             'label'          => $this->resource->title,
             'subtitle'       => $this->resource->subtitle,
             'description'    => $this->resource->description,
-            'image'          => $this->resource->image,
-            'featured_image' => $this->resource->image,
+            'image'          => $this->resource->getMedia('*')->first(),
             'createdAt'      => $this->resource->created_at,
             'updatedAt'      => $this->resource->updated_at,
         ];

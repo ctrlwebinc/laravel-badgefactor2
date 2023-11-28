@@ -1,7 +1,6 @@
 <?php
 
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgeCategory;
-use Ctrlweb\BadgeFactor2\Models\Badges\BadgeGroup;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -27,7 +26,6 @@ class CreateBadgesTable extends Migration
             $table->enum('request_type', ['internal', 'external'])->default('internal');
             $table->string('request_form_url', 1024)->nullable();
             $table->foreignIdFor(BadgeCategory::class)->nullable();
-            $table->foreignIdFor(BadgeGroup::class)->nullable();
             $table->timestamps();
         });
     }
