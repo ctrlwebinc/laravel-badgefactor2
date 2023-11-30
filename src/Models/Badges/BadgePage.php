@@ -7,6 +7,7 @@ use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Badge as BadgrBadge;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 use Spatie\Translatable\HasTranslations;
 
 class BadgePage extends Model
@@ -15,6 +16,7 @@ class BadgePage extends Model
 
     protected $casts = [
         'badgeclass_id' => 'string',
+        'last_updated_at' => 'date',
     ];
 
     protected $fillable = [
@@ -46,7 +48,6 @@ class BadgePage extends Model
         'content',
         'criteria',
         'request_form_url',
-        'last_updated_at',
     ];
 
     protected $appends = ['badge'];
