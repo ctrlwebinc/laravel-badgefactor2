@@ -1,10 +1,12 @@
 <?php
 
+use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class() extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -12,8 +14,9 @@ return new class() extends Migration {
      */
     public function up()
     {
+        BadgePage::where('last_updated_at', '!=', null)->update(['last_updated_at' => null]);
         Schema::table('badge_pages', function (Blueprint $table) {
-            $table->string('last_updated_at')->after('video_url')->nullable();
+            $table->date('last_updated_at')->nullable()->change();
         });
     }
 
@@ -25,9 +28,7 @@ return new class() extends Migration {
     public function down()
     {
         Schema::table('badge_pages', function (Blueprint $table) {
-            $table->dropColumn('video_url');
-            $table->dropColumn('image');
-            $table->dropColumn('duration');
+            $table->string('last_updated_at')->nullable()->change();
         });
     }
 };
