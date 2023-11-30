@@ -23,7 +23,7 @@ class BadgePageResource extends JsonResource
         Carbon::mixin(SeasonMixin::class);
         $season = Carbon::parse($this->resource->last_updated_at)->getSeason()->getName();
         switch ($season) {
-            case "fall":
+            case 'fall':
                 // FIXME
                 //$season = __('Fall');
                 $season = 'Automne';
@@ -45,7 +45,7 @@ class BadgePageResource extends JsonResource
                 break;
         }
 
-        $season .= ' ' . Carbon::parse($this->resource->last_updated_at)->year;
+        $season .= ' '.Carbon::parse($this->resource->last_updated_at)->year;
 
         return [
             'id'                    => $this->resource->id,

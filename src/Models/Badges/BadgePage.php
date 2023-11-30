@@ -15,7 +15,7 @@ class BadgePage extends Model
     use HasTranslations;
 
     protected $casts = [
-        'badgeclass_id' => 'string',
+        'badgeclass_id'   => 'string',
         'last_updated_at' => 'date',
     ];
 
