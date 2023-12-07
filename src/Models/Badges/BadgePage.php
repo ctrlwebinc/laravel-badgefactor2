@@ -13,6 +13,7 @@ use Spatie\Translatable\HasTranslations;
 class BadgePage extends Model
 {
     use HasTranslations;
+    use Searchable;
 
     protected $casts = [
         'badgeclass_id'   => 'string',
