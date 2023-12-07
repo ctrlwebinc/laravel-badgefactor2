@@ -3,6 +3,7 @@
 namespace Ctrlweb\BadgeFactor2\Models\Courses;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -12,6 +13,7 @@ class CourseGroupCategory extends Model implements HasMedia
 {
     use HasTranslations;
     use InteractsWithMedia;
+    use Searchable;
 
     protected $fillable = [
         'slug',

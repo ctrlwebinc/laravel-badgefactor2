@@ -5,12 +5,14 @@ namespace Ctrlweb\BadgeFactor2\Models\Courses;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 use Spatie\Translatable\HasTranslations;
 
 class Course extends Model
 {
     use HasFactory;
     use HasTranslations;
+    use Searchable;
 
     protected $translatable = [
         'title',

@@ -56,6 +56,9 @@ Route::group([
         ->only(['index', 'show']);
 
     Route::get('backpack-assertions/{learner:slug}', [BackpackAssertionController::class, 'index']);
+
+    // Search
+    Route::get('search/{string}', config('badgefactor2.search_controller'));
 });
 
 /*
