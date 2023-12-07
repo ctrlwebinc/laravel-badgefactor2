@@ -21,6 +21,7 @@ class Setting extends Model implements HasMedia
         'email',
         'facebook',
         'phone',
+        'phone2',
         'privacy_content',
         'register_email_confirmation_content',
         'register_email_confirmation_header',
