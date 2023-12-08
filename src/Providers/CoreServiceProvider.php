@@ -106,10 +106,9 @@ class CoreServiceProvider extends ServiceProvider
      */
     protected function registerResources()
     {
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'badgefactor2');
-        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'badgefactor2');
+        $this->loadTranslationsFrom(__DIR__.'/../../resources/lang', 'badgefactor2');
         $this->loadJsonTranslationsFrom(resource_path('lang/vendor/badgefactor2'));
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
         $this->registerRoutes();
     }
 
