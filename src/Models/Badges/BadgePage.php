@@ -8,11 +8,15 @@ use Ctrlweb\BadgeFactor2\Services\Badgr\Badge as BadgrBadge;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
 
-class BadgePage extends Model
+class BadgePage extends Model implements HasMedia
 {
     use HasTranslations;
+    use InteractsWithMedia;
     use Searchable;
 
     protected $casts = [
@@ -32,7 +36,6 @@ class BadgePage extends Model
         'request_form_url',
         'badge_category_id',
         'duration',
-        'image',
         'video_url',
         'last_updated_at',
     ];
@@ -49,6 +52,7 @@ class BadgePage extends Model
         'content',
         'criteria',
         'request_form_url',
+        'video_url',
     ];
 
     protected $appends = ['badge'];
@@ -152,5 +156,17 @@ class BadgePage extends Model
         }
 
         return null;
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('image')->singleFile();
+    }
+
+    public function registerMediaConversions(Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+            ->width(32)
+            ->height(32);
     }
 }
