@@ -14,7 +14,7 @@ return [
     'badgr' => [
         'server_url'      => env('BADGR_SERVER_URL'),
         'admin_scopes'    => 'rw:backpack rw:profile rw:issuer rw:serverAdmin',
-        'personal_scopes' => 'rw:backpack rw:profile'
+        'personal_scopes' => 'rw:backpack rw:profile',
     ],
     'search_controller' => env('BF2_SEARCH_CONTROLLER', Ctrlweb\BadgeFactor2\Http\Controllers\Api\SearchController::class),
 ];
