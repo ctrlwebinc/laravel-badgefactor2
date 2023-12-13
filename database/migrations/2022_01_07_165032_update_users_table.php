@@ -86,7 +86,7 @@ class UpdateUsersTable extends Migration
             $table->dropColumn('billing_phone');
             $table->dropColumn('billing_email');
             $table->dropColumn('user_status');
-            $table->dropColumn('wp_application_password');
+            $table->dropColumn('badgr_token_set');
             $table->dropColumn('last_connexion');
         });
     }
