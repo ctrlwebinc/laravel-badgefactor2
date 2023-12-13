@@ -24,6 +24,8 @@ return new class() extends Migration {
      */
     public function down()
     {
-        $table->text('subtitle')->after('title');
+        Schema::table('badge_categories', function (Blueprint $table) {
+            $table->text('subtitle')->after('title');
+        });
     }
 };

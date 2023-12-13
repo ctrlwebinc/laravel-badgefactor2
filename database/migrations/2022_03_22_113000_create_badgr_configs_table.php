@@ -14,11 +14,11 @@ return new class() extends Migration {
     {
         Schema::create('badgr_configs', function (Blueprint $table) {
             $table->id();
-            $table->string('badgr_server_base_url');
+            $table->string('badgr_server_base_url', 255)->default('');
             $table->string('client_id');
             $table->string('client_secret');
-            $table->string('password_client_id');
-            $table->string('password_client_secret');
+            $table->string('password_client_id', 255)->default('');
+            $table->string('password_client_secret', 255)->default('');
             $table->string('token_set', 1024)->default('N;');
             $table->timestamps();
         });
