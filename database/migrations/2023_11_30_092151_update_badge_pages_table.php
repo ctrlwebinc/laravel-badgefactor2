@@ -13,9 +13,8 @@ return new class() extends Migration {
      */
     public function up()
     {
-        BadgePage::where('last_updated_at', '!=', null)->update(['last_updated_at' => null]);
         Schema::table('badge_pages', function (Blueprint $table) {
-            $table->date('last_updated_at')->nullable()->change();
+            $table->string('last_updated_at')->after('video_url')->nullable();
         });
     }
 
@@ -27,7 +26,7 @@ return new class() extends Migration {
     public function down()
     {
         Schema::table('badge_pages', function (Blueprint $table) {
-            $table->string('last_updated_at')->nullable()->change();
+            $table->dropColumn('last_updated_at');
         });
     }
 };
