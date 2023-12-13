@@ -1,6 +1,5 @@
 <?php
 
-use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
