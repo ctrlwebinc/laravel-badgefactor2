@@ -2,7 +2,7 @@
 
 namespace Ctrlweb\BadgeFactor2\Services\Badgr;
 
-use BadgeFactor2\Exceptions\ConfigurationException;
+use Ctrlweb\BadgeFactor2\Exceptions\ConfigurationException;
 use Ctrlweb\BadgeFactor2\Exceptions\ExpiredTokenException;
 use Ctrlweb\BadgeFactor2\Exceptions\MissingTokenException;
 use Ctrlweb\BadgeFactor2\Models\BadgrConfig;
