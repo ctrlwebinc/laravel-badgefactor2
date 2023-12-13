@@ -24,6 +24,8 @@ return new class() extends Migration {
      */
     public function down()
     {
-        $table->dropColumn('phone_2');
+        Schema::table('settings', function (Blueprint $table) {
+            $table->dropColumn('phone_2');
+        });
     }
 };
