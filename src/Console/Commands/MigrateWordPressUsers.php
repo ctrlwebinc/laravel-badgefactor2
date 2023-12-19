@@ -8,6 +8,8 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Intervention\Image\Exception\NotReadableException;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class MigrateWordPressUsers extends Command
 {
@@ -175,8 +177,26 @@ class MigrateWordPressUsers extends Command
                         }
                     }
 
-                    // Import profile picture if any.
+                    // Import profile picture, if any.
                     $avatarsDir = config('badgefactor2.wordpress.avatars_dir');
+                    $avatarImage = null;
+
+                    if (is_dir($avatarsDir.'/'.$wpUser->ID)) {
+                        $matches = glob($avatarsDir.'/'.$wpUser->ID.'/*bpfull.*');
+                        $avatarImage = isset($matches[0]) ? $matches[0] : null;
+                    }
+
+                    if (null !== $avatarImage && ! $user->getFirstMedia()) {
+
+                        try {
+                            $image = Image::make($avatarImage);
+                            $user->addMediaFromBase64($image->encode('data-url'))
+                                ->withCustomProperties([
+                                    'alt' => $user->first_name . ' ' . $user->last_name,
+                                ])
+                                ->toMediaCollection('photo');
+                        } catch (NotReadableException $e) {}
+                    }
 
                 });
             }
