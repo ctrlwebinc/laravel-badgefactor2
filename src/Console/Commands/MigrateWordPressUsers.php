@@ -3,7 +3,6 @@
 namespace Ctrlweb\BadgeFactor2\Console\Commands;
 
 use Carbon\Carbon;
-use Ctrlweb\BadgeFactor2\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -93,8 +92,9 @@ class MigrateWordPressUsers extends Command
                 );
 
                 // Create user.
-                User::withoutEvents(function () use ($wpUser, $userMeta, $bpProfile, $wordpressDb, $prefix) {
-                    $user = User::updateOrCreate(
+                $userModel = config('badgefactor2.user_model');
+                $userModel::withoutEvents(function () use ($wpUser, $userMeta, $bpProfile, $wordpressDb, $prefix) {
+                    $user = $userModel::updateOrCreate(
                         [
                             'email' => $wpUser->user_email,
                         ],
@@ -141,11 +141,11 @@ class MigrateWordPressUsers extends Command
                         $capabilities = \unserialize($userMeta->firstwhere('meta_key', 'wp_capabilities')->meta_value);
 
                         if (array_key_exists('administrator', $capabilities) && $capabilities['administrator'] === true) {
-                            $user->assignRole(User::ADMINISTRATOR);
+                            $user->assignRole($userModel::ADMINISTRATOR);
                         } elseif (array_key_exists('approver', $capabilities) && $capabilities['approver'] === true) {
-                            $user->assignRole(User::APPROVER);
+                            $user->assignRole($userModel::APPROVER);
                         } else {
-                            $user->assignRole(User::LEARNER);
+                            $user->assignRole($userModel::LEARNER);
                         }
                         if (array_key_exists('customer', $capabilities) && $capabilities['customer'] === true) {
                             $wcOrders = DB::connection($wordpressDb)
@@ -171,7 +171,7 @@ class MigrateWordPressUsers extends Command
 
                                 if (0 !== intval($wcOrderMeta->firstWhere('meta_key', '_order_total')->meta_value)) {
                                     // Give access to specific courses.
-                                    $user->assignRole(User::CLIENT);
+                                    $user->assignRole($userModel::CLIENT);
                                 }
                             }
                         }
