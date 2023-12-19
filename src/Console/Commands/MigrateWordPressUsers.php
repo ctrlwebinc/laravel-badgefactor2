@@ -93,7 +93,7 @@ class MigrateWordPressUsers extends Command
 
                 // Create user.
                 $userModel = config('badgefactor2.user_model');
-                $userModel::withoutEvents(function () use ($wpUser, $userMeta, $bpProfile, $wordpressDb, $prefix) {
+                $userModel::withoutEvents(function () use ($wpUser, $userMeta, $bpProfile, $wordpressDb, $prefix, $userModel) {
                     $user = $userModel::updateOrCreate(
                         [
                             'email' => $wpUser->user_email,
