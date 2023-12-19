@@ -50,8 +50,8 @@ trait CanImportWordPressImages
             $wpImageUrl = $basePath.$imageMeta->where('meta_key', '_wp_attached_file')->pluck('meta_value')->first();
             $wpImageAlt = $imageMeta->where('meta_key', '_wp_attachment_image_alt')->pluck('meta_value')->first();
 
-            if (config('cadre21.htaccess.user')) {
-                $wpImageFile = Http::withBasicAuth(config('cadre21.htaccess.user'), config('cadre21.htaccess.password'))
+            if (config('badgefactor2.wordpress.htaccess.user')) {
+                $wpImageFile = Http::withBasicAuth(config('badgefactor2.wordpress.htaccess.user'), config('badgefactor2.wordpress.htaccess.password'))
                     ->get($wpImageUrl);
             } else {
                 $wpImageFile = Http::get($wpImageUrl);

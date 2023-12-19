@@ -174,6 +174,10 @@ class MigrateWordPressUsers extends Command
                             }
                         }
                     }
+
+                    // Import profile picture if any.
+                    $avatarsDir = config('badgefactor2.wordpress.avatars_dir');
+
                 });
             }
         );
