@@ -16,6 +16,7 @@ class Setting extends Model implements HasMedia
     use InteractsWithMedia;
 
     protected $fillable = [
+        'id',
         'address',
         'copyright',
         'email',
