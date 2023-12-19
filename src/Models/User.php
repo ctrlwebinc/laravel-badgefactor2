@@ -47,7 +47,6 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
      */
     protected $fillable = [
         'id',
-        'name',
         'email',
         'email_verified_at',
         'password',
@@ -57,6 +56,10 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
         'remember_token',
         'created_at',
         'updated_at',
+        'stripe_id',
+        'pm_type',
+        'pm_last_four',
+        'trial_ends_at',
         'first_name',
         'last_name',
         'description',
@@ -64,7 +67,7 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
         'slug',
         'wp_id',
         'wp_password',
-        'establishment_id',
+        'username',
         'place',
         'organisation',
         'job',
@@ -85,17 +88,14 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
         'billing_phone',
         'billing_email',
         'user_status',
+        'badgr_token_set',
         'last_connexion',
-        'username',
-        'stripe_id',
-        'pm_type',
-        'pm_last_four',
-        'trial_ends_at',
         'badgr_user_state',
         'badgr_user_slug',
         'badgr_password',
         'badgr_encrypted_password',
-        'badgr_token_set',
+        'establishment_id',
+
     ];
 
     /**
@@ -119,6 +119,7 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
      */
     protected $casts = [
         'created_at'                  => 'datetime',
+        'updated_at'                  => 'datetime',
         'email_verified_at'           => 'datetime',
         'is_validated'                => 'boolean',
         'badgr_encrypted_password'    => 'encrypted',
@@ -135,7 +136,6 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
         parent::boot();
 
         self::creating(function (User $user) {
-            $user->name = $user->first_name.' '.$user->last_name;
             if ('' == $user->badgr_encrypted_password) {
                 $user->badgr_encrypted_password = Str::random(16);
             }
