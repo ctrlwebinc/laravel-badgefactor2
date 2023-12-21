@@ -187,7 +187,6 @@ class MigrateWordPressUsers extends Command
                     }
 
                     if (null !== $avatarImage && !$user->getFirstMedia()) {
-
                         try {
                             $image = Image::make($avatarImage);
                             $user->addMediaFromBase64($image->encode('data-url'))
