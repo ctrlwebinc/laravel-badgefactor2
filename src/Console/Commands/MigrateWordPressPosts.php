@@ -110,7 +110,7 @@ class MigrateWordPressPosts extends Command
                     $thumbnailId = $postMeta->firstWhere('meta_key', '_thumbnail_id') ? $postMeta->firstWhere('meta_key', '_thumbnail_id')->meta_value : null;
                     $this->importImage(Article::class, $article->id, $thumbnailId, 'featured_image');
 
-                    $seoImageId = $postMeta->firstWhere('meta_key', '_yoast_wpseo_opengraph-image-id') ? $postMeta->firstWhere('meta_key', '_yoast_wpseo_opengraph-image-id') : null;
+                    $seoImageId = $postMeta->firstWhere('meta_key', '_yoast_wpseo_opengraph-image-id') ? $postMeta->firstWhere('meta_key', '_yoast_wpseo_opengraph-image-id')->meta_value : null;
                     $this->importImage(Article::class, $article->id, $seoImageId, 'meta_image');
 
 
