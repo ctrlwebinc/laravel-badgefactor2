@@ -117,7 +117,6 @@ class MigrateWordPressPosts extends Command
                     $seoImageId = $postMeta->firstWhere('meta_key', '_yoast_wpseo_opengraph-image-id') ? $postMeta->firstWhere('meta_key', '_yoast_wpseo_opengraph-image-id')->meta_value : null;
                     $this->importImage(Article::class, $article->id, $seoImageId, 'meta_image');
 
-
                     $postTags = $this->wpdb
                         ->table("{$this->prefix}term_relationships")
                         ->select("{$this->prefix}term_taxonomy.term_id", "{$this->prefix}terms.name", "{$this->prefix}terms.slug", "{$this->prefix}term_taxonomy.description")

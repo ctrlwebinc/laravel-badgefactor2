@@ -186,18 +186,18 @@ class MigrateWordPressUsers extends Command
                         $avatarImage = isset($matches[0]) ? $matches[0] : null;
                     }
 
-                    if (null !== $avatarImage && ! $user->getFirstMedia()) {
+                    if (null !== $avatarImage && !$user->getFirstMedia()) {
 
                         try {
                             $image = Image::make($avatarImage);
                             $user->addMediaFromBase64($image->encode('data-url'))
                                 ->withCustomProperties([
-                                    'alt' => $user->first_name . ' ' . $user->last_name,
+                                    'alt' => $user->first_name.' '.$user->last_name,
                                 ])
                                 ->toMediaCollection('photo');
-                        } catch (NotReadableException $e) {}
+                        } catch (NotReadableException $e) {
+                        }
                     }
-
                 });
             }
         );
