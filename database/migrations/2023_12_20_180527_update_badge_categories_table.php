@@ -27,6 +27,5 @@ return new class() extends Migration {
         Schema::table('badge_categories', function (Blueprint $table) {
             $table->string('image')->after('slug');
         });
-
     }
 };
