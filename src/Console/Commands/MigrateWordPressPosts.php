@@ -92,6 +92,8 @@ class MigrateWordPressPosts extends Command
 
                     $locale = app()->currentLocale();
 
+                    $metaDescription = $postMeta->firstWhere('meta_key', '_wds_trimmed_excerpt') ? $postMeta->firstWhere('meta_key', '_wds_trimmed_excerpt')->meta_value : null;
+
                     $article = Article::updateOrCreate(
                         [
                             "slug->{$locale}" => $wpPost->post_name,
@@ -104,6 +106,8 @@ class MigrateWordPressPosts extends Command
                             'user_id'             => $postUser ? $postUser->id : null,
                             'article_category_id' => $this->ids['category'][$category->term_id],
                             'publication_date'    => $wpPost->post_date,
+                            'meta_title'          => $wpPost->post_title,
+                            'meta_description'    => $metaDescription,
                         ]
                     );
 
