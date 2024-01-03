@@ -8,7 +8,9 @@ use Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr\IssuerController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseCategoryController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseGroupCategoryController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseGroupController;
+use Ctrlweb\BadgeFactor2\Http\Controllers\Api\SettingsController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\BadgeFactor2Controller;
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -52,10 +54,13 @@ Route::group([
         ->only(['index', 'show']);
 
     // Assertions.
+    Route::get('assertions/{entityId}/share/fb', [AssertionController::class, 'shareToFacebook']);
     Route::apiResource('assertions', AssertionController::class)
         ->only(['index', 'show']);
-
     Route::get('backpack-assertions/{learner:slug}', [BackpackAssertionController::class, 'index']);
+
+    // Settings.
+    Route::get('settings', SettingsController::class);
 
     // Search
     Route::get('search/{string}', config('badgefactor2.search_controller'));
