@@ -7,6 +7,7 @@ use Cmixin\SeasonMixin;
 use Ctrlweb\BadgeFactor2\Http\Resources\Courses\BasicCourseGroupResource;
 use Ctrlweb\BadgeFactor2\Http\Resources\Courses\CourseGroupCategoryResource;
 use Ctrlweb\BadgeFactor2\Http\Resources\Courses\CourseResource;
+use Ctrlweb\BadgeFactor2\Models\BadgeCategory;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class BadgePageResource extends JsonResource
@@ -47,9 +48,17 @@ class BadgePageResource extends JsonResource
 
         $season .= ' '.Carbon::parse($this->resource->last_updated_at)->year;
 
+        $locale = app()->currentLocale();
+
+        $badgeCategory = $this->resource->badge_category_id ? BadgeCategory::where('id', $this->resource->badge_category_id)->first() : null;
+        if (null !== $badgeCategory) {
+            $badgeCategory = json_decode($badgeCategory->title)->fr;
+
+        }
+
         return [
             'id'                    => $this->resource->id,
-            'type'                  => $this->resource->type,
+            'badge_category'        => $badgeCategory,
             'badgeclass_id'         => $this->resource->badgeclass_id,
             'title'                 => $this->resource->title,
             'slug'                  => $this->resource->slug,
