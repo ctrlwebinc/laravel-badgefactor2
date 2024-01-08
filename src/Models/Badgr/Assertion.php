@@ -117,8 +117,8 @@ class Assertion extends Model
                 $viaResourceId = end($arr);
             } elseif (str_contains(request()->getPathInfo(), '/api/fr/assertions/')) {
                 $viaResource = 'direct';
-                $arr = explode('/api/fr/assertions/', request()->getPathInfo());
-                $viaResourceId = end($arr);
+                $arr = explode('/', request()->getPathInfo());
+                $viaResourceId = $arr[4];
             }
         }
 

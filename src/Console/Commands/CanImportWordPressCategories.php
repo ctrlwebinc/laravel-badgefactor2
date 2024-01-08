@@ -2,6 +2,7 @@
 
 namespace Ctrlweb\BadgeFactor2\Console\Commands;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\DB;
 
 trait CanImportWordPressCategories
@@ -57,21 +58,22 @@ trait CanImportWordPressCategories
                         ->where('option_name', '=', 'z_taxonomy_image'.$wpCategory->term_id)
                         ->first();
 
-                    $categoryImageUrl = isset($categoryImageUrl->option_value) ? parse_url($categoryImageUrl->option_value) : null;
-
-                    if (!empty($categoryImageUrl['path'])) {
-                        $wpAttachedFile = str_replace('/wp-content/uploads/', '', $categoryImageUrl['path']);
-                        $attachment = $this->wpdb
-                            ->table("{$this->prefix}posts")
-                            ->join("{$this->prefix}postmeta", "{$this->prefix}posts.ID", '=', "{$this->prefix}postmeta.post_id")
-                            ->select("{$this->prefix}posts.*")
-                            ->where('meta_key', '=', '_wp_attached_file')
-                            ->where('meta_value', '=', $wpAttachedFile)
-                            ->first();
-                        if ($attachment) {
-                            $this->importImage($categoryClass, $category->id, $attachment->ID);
+                    try {
+                        $categoryImageUrl = isset($categoryImageUrl->option_value) ? parse_url($categoryImageUrl->option_value) : null;
+                        if (!empty($categoryImageUrl['path'])) {
+                            $wpAttachedFile = str_replace('/wp-content/uploads/', '', $categoryImageUrl['path']);
+                            $attachment = $this->wpdb
+                                ->table("{$this->prefix}posts")
+                                ->join("{$this->prefix}postmeta", "{$this->prefix}posts.ID", '=', "{$this->prefix}postmeta.post_id")
+                                ->select("{$this->prefix}posts.*")
+                                ->where('meta_key', '=', '_wp_attached_file')
+                                ->where('meta_value', '=', $wpAttachedFile)
+                                ->first();
+                            if ($attachment) {
+                                $this->importImage($categoryClass, $category->id, $attachment->ID);
+                            }
                         }
-                    }
+                    } catch (ConnectionException $e) {}
 
                     $this->ids[$slug][$wpCategory->term_id] = $category->id;
                 }

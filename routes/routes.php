@@ -54,7 +54,7 @@ Route::group([
         ->only(['index', 'show']);
 
     // Assertions.
-    Route::get('assertions/{entityId}/share/fb', [AssertionController::class, 'shareToFacebook']);
+    Route::get('assertions/{entityId}/share/linkedin', [AssertionController::class, 'shareToLinkedIn']);
     Route::apiResource('assertions', AssertionController::class)
         ->only(['index', 'show']);
     Route::get('backpack-assertions/{learner:slug}', [BackpackAssertionController::class, 'index']);

@@ -2,6 +2,7 @@
 
 namespace Ctrlweb\BadgeFactor2\Console\Commands;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Intervention\Image\Exception\NotReadableException;
@@ -50,29 +51,31 @@ trait CanImportWordPressImages
             $wpImageUrl = $basePath.$imageMeta->where('meta_key', '_wp_attached_file')->pluck('meta_value')->first();
             $wpImageAlt = $imageMeta->where('meta_key', '_wp_attachment_image_alt')->pluck('meta_value')->first();
 
-            if (config('badgefactor2.wordpress.htaccess.user')) {
-                $wpImageFile = Http::withBasicAuth(config('badgefactor2.wordpress.htaccess.user'), config('badgefactor2.wordpress.htaccess.password'))
-                    ->get($wpImageUrl);
-            } else {
-                $wpImageFile = Http::get($wpImageUrl);
-            }
-
-            if ($wpImageFile->successful()) {
-                try {
-                    $image = Image::make($wpImageFile->body());
-                    $modelInstance = (new $modelType())->find($modelId);
-                    $exists = $modelInstance->getFirstMedia();
-                    if (!$exists) {
-                        $modelInstance->addMediaFromBase64($image->encode('data-url'))
-                        ->withCustomProperties([
-                            'alt' => $wpImageAlt,
-                        ])
-                        ->toMediaCollection($collectionName);
-                    }
-                } catch (NotReadableException $e) {
-                    return false;
+            try {
+                if (config('badgefactor2.wordpress.htaccess.user')) {
+                    $wpImageFile = Http::withBasicAuth(config('badgefactor2.wordpress.htaccess.user'), config('badgefactor2.wordpress.htaccess.password'))
+                        ->get($wpImageUrl);
+                } else {
+                    $wpImageFile = Http::get($wpImageUrl);
                 }
-            }
+
+                if ($wpImageFile->successful()) {
+                    try {
+                        $image = Image::make($wpImageFile->body());
+                        $modelInstance = (new $modelType())->find($modelId);
+                        $exists = $modelInstance->getFirstMedia();
+                        if (!$exists) {
+                            $modelInstance->addMediaFromBase64($image->encode('data-url'))
+                            ->withCustomProperties([
+                                'alt' => $wpImageAlt,
+                            ])
+                            ->toMediaCollection($collectionName);
+                        }
+                    } catch (NotReadableException $e) {
+                        return false;
+                    }
+                }
+            } catch (ConnectionException $e) {}
         }
 
         return true;

@@ -296,6 +296,8 @@ class MigrateWordPressCourses extends Command
                             ->get()
                     );
 
+                    $wpCourseLink = config('badgefactor2.wordpress.base_url').'/courses/'.$wpCourse->post_name;
+
                     $wpBadgePageId = isset($courseMeta->firstWhere('meta_key', 'course_badge_page')->meta_value) ? $courseMeta->firstWhere('meta_key', 'course_badge_page')->meta_value : null;
 
                     $wpBadgePage = $this->wpdb
@@ -340,11 +342,11 @@ class MigrateWordPressCourses extends Command
 
                     $course = Course::updateOrCreate(
                         [
-                            'url' => $wpCourse->guid,
+                            'title->fr'                   => $wpCourse->post_title, // FIXME import language properly.
                         ],
                         [
                             'duration'                => isset($courseMeta->firstWhere('meta_key', 'course_duration')->meta_value) ? $courseMeta->firstWhere('meta_key', 'course_duration')->meta_value : 0,
-                            'url'                     => $wpCourse->guid,
+                            'url'                     => $wpCourseLink,
                             'autoevaluation_form_url' => $autoevaluationFormUrl,
                             'badge_page_id'           => $wpBadgePageId && isset($this->ids['badge-page'][$wpBadgePageId]) ? $this->ids['badge-page'][$wpBadgePageId] : null,
                             'course_category_id'      => $courseGroupCategoryId,
