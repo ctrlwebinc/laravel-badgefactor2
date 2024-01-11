@@ -23,32 +23,36 @@ class BadgePageResource extends JsonResource
      */
     public function toArray($request)
     {
-        Carbon::mixin(SeasonMixin::class);
-        $season = Carbon::parse($this->resource->last_updated_at)->getSeason()->getName();
-        switch ($season) {
-            case 'fall':
-                // FIXME
-                //$season = __('Fall');
-                $season = 'Automne';
-                break;
-            case 'winter':
-                // FIXME
-                //$season = __('Winter');
-                $season = 'Hiver';
-                break;
-            case 'spring':
-                // FIXME
-                //$season = __('Spring');
-                $season = 'Printemps';
-                break;
-            case 'summer':
-                // FIXME
-                //$season = __('Summer');
-                $season = 'Été';
-                break;
-        }
+        if ($this->resource->last_updated_at) {
+            Carbon::mixin(SeasonMixin::class);
+            $season = Carbon::parse($this->resource->last_updated_at)->getSeason()->getName();
+            switch ($season) {
+                case 'fall':
+                    // FIXME
+                    //$season = __('Fall');
+                    $season = 'Automne';
+                    break;
+                case 'winter':
+                    // FIXME
+                    //$season = __('Winter');
+                    $season = 'Hiver';
+                    break;
+                case 'spring':
+                    // FIXME
+                    //$season = __('Spring');
+                    $season = 'Printemps';
+                    break;
+                case 'summer':
+                    // FIXME
+                    //$season = __('Summer');
+                    $season = 'Été';
+                    break;
+            }
 
-        $season .= ' '.Carbon::parse($this->resource->last_updated_at)->year;
+            $season .= ' '.Carbon::parse($this->resource->last_updated_at)->year;
+        } else {
+            $season = null;
+        }
 
         $locale = app()->currentLocale();
 
