@@ -22,5 +22,4 @@ class LinkedIn
 
         return sprintf('https://www.linkedin.com/uas/login?session_redirect=%s', $sessionRedirect);
     }
-
 }

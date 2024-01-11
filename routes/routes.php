@@ -10,7 +10,6 @@ use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseGroupCategoryController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseGroupController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\SettingsController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\BadgeFactor2Controller;
-
 use Illuminate\Support\Facades\Route;
 
 /*

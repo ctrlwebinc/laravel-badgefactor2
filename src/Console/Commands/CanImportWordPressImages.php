@@ -75,7 +75,8 @@ trait CanImportWordPressImages
                         return false;
                     }
                 }
-            } catch (ConnectionException $e) {}
+            } catch (ConnectionException $e) {
+            }
         }
 
         return true;

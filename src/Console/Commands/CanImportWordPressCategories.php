@@ -73,7 +73,8 @@ trait CanImportWordPressCategories
                                 $this->importImage($categoryClass, $category->id, $attachment->ID);
                             }
                         }
-                    } catch (ConnectionException $e) {}
+                    } catch (ConnectionException $e) {
+                    }
 
                     $this->ids[$slug][$wpCategory->term_id] = $category->id;
                 }

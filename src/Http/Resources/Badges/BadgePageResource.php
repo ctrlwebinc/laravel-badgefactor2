@@ -4,12 +4,11 @@ namespace Ctrlweb\BadgeFactor2\Http\Resources\Badges;
 
 use Carbon\Carbon;
 use Cmixin\SeasonMixin;
-use Ctrlweb\BadgeFactor2\Http\Resources\Badgr\BadgeResource;
 use Ctrlweb\BadgeFactor2\Http\Resources\Courses\BasicCourseGroupResource;
 use Ctrlweb\BadgeFactor2\Http\Resources\Courses\CourseGroupCategoryResource;
 use Ctrlweb\BadgeFactor2\Http\Resources\Courses\CourseResource;
-use Ctrlweb\BadgeFactor2\Models\Badgr\Badge;
 use Ctrlweb\BadgeFactor2\Models\BadgeCategory;
+use Ctrlweb\BadgeFactor2\Models\Badgr\Badge;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class BadgePageResource extends JsonResource
@@ -59,7 +58,6 @@ class BadgePageResource extends JsonResource
         $badgeCategory = $this->resource->badge_category_id ? BadgeCategory::where('id', $this->resource->badge_category_id)->first() : null;
         if (null !== $badgeCategory) {
             $badgeCategory = json_decode($badgeCategory->title)->fr;
-
         }
 
         $badge = Badge::find($this->resource->badgeclass_id);
