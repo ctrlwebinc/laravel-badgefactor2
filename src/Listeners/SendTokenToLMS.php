@@ -33,7 +33,7 @@ class SendTokenToLMS implements ShouldQueue
             ->withOptions([
                 'verify' => false,
             ])
-            ->post(config('badgefactor2.wordpress.base_url').'/wp-admin/admin-ajax.php?action=register_laravel_api_token', [
+            ->post(config('badgefactor2.wordpress.base_url').'/wp-admin/admin-ajax.php?action=register_laravel_session_token', [
                 'email' => $event->user->email,
                 'token' => $event->token,
             ]
