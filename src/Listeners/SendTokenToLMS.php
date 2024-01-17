@@ -23,7 +23,8 @@ class SendTokenToLMS implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param  \App\Events\SessionTokenCreated  $event
+     * @param  \App\Events\SessionTokenCreated $event
+     *
      * @return void
      */
     public function handle(SessionTokenCreated $event)
