@@ -94,7 +94,7 @@ class User extends BadgrAdminProvider
 
     public function getProfile(string $entityId): false|array
     {
-        return $this->getFirstResult('GET', '/v2/users/self');
+        return $this->getFirstResult('GET', '/v2/users/'.$entityId);
     }
 
     public function hasVerifiedEmail(string $entityId): bool
