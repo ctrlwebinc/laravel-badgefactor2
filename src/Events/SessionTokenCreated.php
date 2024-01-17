@@ -3,17 +3,15 @@
 namespace Ctrlweb\BadgeFactor2\Events;
 
 use Ctrlweb\BadgeFactor2\Models\User;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
 class SessionTokenCreated
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     /**
      * Create a new event instance.
@@ -23,5 +21,4 @@ class SessionTokenCreated
     public function __construct(public User $user, public string $token)
     {
     }
-
 }
