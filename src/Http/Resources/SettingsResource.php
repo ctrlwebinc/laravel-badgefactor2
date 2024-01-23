@@ -20,6 +20,7 @@ class SettingsResource extends JsonResource
             'copyright'                           => $this->copyright,
             'email'                               => $this->email,
             'facebook'                            => $this->facebook,
+            'linkedin'                            => $this->linkedin,
             'phone'                               => $this->phone,
             'phone_2'                             => $this->phone_2,
             'privacy_header'                      => $this->privacy_header,

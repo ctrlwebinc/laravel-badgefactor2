@@ -21,6 +21,7 @@ class Setting extends Model implements HasMedia
         'copyright',
         'email',
         'facebook',
+        'linkedin',
         'phone',
         'phone_2',
         'privacy_content',
