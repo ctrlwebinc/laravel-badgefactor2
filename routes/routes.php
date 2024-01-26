@@ -6,6 +6,7 @@ use Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr\BackpackAssertionController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr\BadgeController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr\IssuerController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseCategoryController;
+use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseGroupCategoryController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseGroupController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\SettingsController;
@@ -63,6 +64,16 @@ Route::group([
 
     // Search
     Route::get('search/{string}', config('badgefactor2.search_controller'));
+});
+
+Route::group([
+    'prefix'     => 'api/{locale}',
+    'middleware' => ['api', 'locale', 'auth:sanctum'],
+    'namespace'  => 'Ctrlweb\BadgeFactor2\Http\Controllers\Api',
+    'domain'     => config('badgefactor2.domain', null),
+], function () {
+    // Courses.
+    Route::get('courses/{course}/validate-access', [CourseController::class, 'validateAccess']);
 });
 
 /*
