@@ -34,6 +34,5 @@ class CourseController extends Controller
                 'redirect' => config('badgefactor2.frontend.url').'/badges/'.$badgePage->slug,
             ], 302);
         }
-
     }
 }
