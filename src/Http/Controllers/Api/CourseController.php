@@ -2,11 +2,9 @@
 
 namespace Ctrlweb\BadgeFactor2\Http\Controllers\Api;
 
-
+use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Ctrlweb\BadgeFactor2\Models\Courses\Course;
-use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
-use Ctrlweb\BadgeFactor2\Http\Resources\Courses\CourseResource;
 
 /**
  * @tags Catégories de groupes de cours
@@ -32,7 +30,7 @@ class CourseController extends Controller
             ]);
         } else {
             return response()->json([
-                'access' => $hasAccess,
+                'access'   => $hasAccess,
                 'redirect' => config('badgefactor2.frontend.url').'/badges/'.$badgePage->slug,
             ], 302);
         }
