@@ -6,6 +6,7 @@ use Ctrlweb\BadgeFactor2\Interfaces\TokenRepositoryInterface;
 use Ctrlweb\BadgeFactor2\Models\Badgr\Assertion;
 use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 use Ctrlweb\BadgeFactor2\Notifications\ResetPasswordNotification;
+use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrRecipientProvider;
 use Ctrlweb\BadgeFactor2\Services\Badgr\User as BadgrUser;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -218,7 +219,24 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
 
     public function isVerified(): Attribute
     {
-        $isVerified = $this->badgr_user_slug ? app(BadgrUser::class)->hasVerifiedEmail($this->badgr_user_slug) : false;
+        $isVerified = false;
+        if ($this->hasVerifiedEmail())
+        {
+            $isVerified = true;
+        } else
+        {
+            $badgrUser = User::find($this->id);
+
+            if ( null !== $badgrUser)
+            {
+                $recipientService = new BadgrRecipientProvider($badgrUser);
+                if ( $recipientService->hasVerifiedEmail())
+                {
+                    $this->markEmailAsVerified();
+                    $isVerified = true;
+                }
+            }
+        }
 
         return Attribute::make(
             get: fn ($value) => $isVerified,

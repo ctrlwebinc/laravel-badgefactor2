@@ -261,7 +261,7 @@ abstract class BadgrProvider
      *
      * @return false|mixed
      */
-    protected function getFirstResult(string $method, string $endpoint, array $payload = []): mixed
+    public function getFirstResult(string $method, string $endpoint, array $payload = []): mixed
     {
         try {
             $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
