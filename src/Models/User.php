@@ -231,9 +231,9 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
         } else {
             $badgrUser = User::find($this->id);
 
-            if ( null !== $badgrUser) {
+            if (null !== $badgrUser) {
                 $recipientService = new BadgrRecipientProvider($badgrUser);
-                if ( $recipientService->hasVerifiedEmail()) {
+                if ($recipientService->hasVerifiedEmail()) {
                     $this->markEmailAsVerified();
                     $isVerified = true;
                 }
