@@ -91,24 +91,4 @@ class User extends BadgrAdminProvider
 
         return $this->confirmUpdate('PUT', '/v2/users/'.$entityId, $payload);
     }
-
-    public function getProfile(string $entityId): false|array
-    {
-        return $this->getFirstResult('GET', '/v2/users/'.$entityId);
-    }
-
-    public function hasVerifiedEmail(string $entityId): bool
-    {
-        $profile = $this->getProfile($entityId);
-
-        if (false !== $profile && !empty($profile['emails'])) {
-            foreach ($profile['emails'] as $email) {
-                if (true == $email['verified']) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
 }

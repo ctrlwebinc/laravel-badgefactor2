@@ -50,4 +50,24 @@ class BadgrRecipientProvider extends BadgrProvider
     {
         $this->recipient->saveTokenSet($token);
     }
+
+    public function getProfile() : array|false
+    {
+        return $this->getFirstResult('GET','/v2/users/self');
+    }
+
+    public function hasVerifiedEmail() : bool
+    {
+        $profile = $this->getProfile();
+
+        if (false !== $profile && !empty($profile['emails'])) {
+            foreach ($profile['emails'] as $email) {
+                if (true == $email['verified']) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }
