@@ -91,9 +91,18 @@ class MigrateWordPressUsers extends Command
                         )
                 );
 
+                $lastConnexion = null;
+                if ($userMeta->firstWhere('meta_key', 'session_tokens')) {
+                    $sessionTokens = unserialize($userMeta->firstWhere('meta_key', 'session_tokens')->meta_value);
+                    $sessionTokens = array_pop($sessionTokens);
+                    $lastConnexion = Carbon::createFromTimestamp($sessionTokens['login'])
+                        ->setTimeZone(config('app.timezone'))
+                        ->toDateTimeString();
+                }
+
                 // Create user.
                 $userModel = config('badgefactor2.user_model');
-                $userModel::withoutEvents(function () use ($wpUser, $userMeta, $bpProfile, $wordpressDb, $prefix, $userModel) {
+                $userModel::withoutEvents(function () use ($wpUser, $userMeta, $bpProfile, $wordpressDb, $prefix, $userModel, $lastConnexion) {
                     $user = $userModel::updateOrCreate(
                         [
                             'email' => $wpUser->user_email,
@@ -122,11 +131,7 @@ class MigrateWordPressUsers extends Command
                             'twitter'          => $bpProfile->firstWhere('field_id', 8) ? $bpProfile->firstWhere('field_id', 8)->value : null,
                             'linkedin'         => $bpProfile->firstWhere('field_id', 9) ? $bpProfile->firstWhere('field_id', 9)->value : null,
                             'user_status'      => 'ACTIVE',
-                            'last_connexion'   => $userMeta->firstWhere('meta_key', 'last_activity') ?
-                                Carbon::parse($userMeta->firstWhere('meta_key', 'last_activity')->meta_value)
-                                    ->setTimeZone(config('app.timezone'))
-                                    ->toDateTimeString() :
-                                null,
+                            'last_connexion'   => $lastConnexion,
                             'username'         => $wpUser->user_login,
                             'badgr_user_state' => $userMeta->firstWhere('meta_key', 'badgr_user_state') ? $userMeta->firstWhere('meta_key', 'badgr_user_state')->meta_value : null,
                             'badgr_user_slug'  => $userMeta->firstWhere('meta_key', 'badgr_user_slug') ? $userMeta->firstWhere('meta_key', 'badgr_user_slug')->meta_value : null,

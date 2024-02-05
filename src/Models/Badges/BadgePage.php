@@ -4,6 +4,7 @@ namespace Ctrlweb\BadgeFactor2\Models\Badges;
 
 use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
+use Ctrlweb\BadgeFactor2\Models\User;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Badge as BadgrBadge;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -130,6 +131,11 @@ class BadgePage extends Model implements HasMedia
     public function scopeCertification($query)
     {
         return $query->where('type', 'certification');
+    }
+
+    public function approvers()
+    {
+        return $this->belongsToMany(User::class, 'approver_badge_page', 'badge_page_id', 'approver_id');
     }
 
     public function course()

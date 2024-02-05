@@ -13,15 +13,12 @@ class UserRegistered
     use InteractsWithSockets;
     use SerializesModels;
 
-    public $user;
-
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(User $user)
+    public function __construct(public User $user, public string $password)
     {
-        $this->user = $user;
     }
 }

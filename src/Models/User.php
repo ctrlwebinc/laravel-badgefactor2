@@ -3,6 +3,7 @@
 namespace Ctrlweb\BadgeFactor2\Models;
 
 use Ctrlweb\BadgeFactor2\Interfaces\TokenRepositoryInterface;
+use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Ctrlweb\BadgeFactor2\Models\Badgr\Assertion;
 use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 use Ctrlweb\BadgeFactor2\Notifications\ResetPasswordNotification;
@@ -214,6 +215,11 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
     public function assertions()
     {
         return $this->hasMany(Assertion::class, 'recipient_id');
+    }
+
+    public function badge_pages()
+    {
+        return $this->belongsToMany(BadgePage::class, 'approver_badge_page', 'approver_id', 'badge_page_id');
     }
 
     public function isVerified(): Attribute
