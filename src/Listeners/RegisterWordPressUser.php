@@ -7,14 +7,13 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Http;
 
-
 class RegisterWordPressUser implements ShouldQueue
 {
     use InteractsWithQueue;
 
     public function handle(UserRegistered $event)
     {
-/*
+        /*
         $registerUser = Http::asForm()
             ->acceptJson()
             ->withOptions([
@@ -29,6 +28,6 @@ class RegisterWordPressUser implements ShouldQueue
                 ]
             );
         Log::debug($registerUser);
-*/
+        */
     }
 }
