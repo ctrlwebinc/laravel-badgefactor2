@@ -128,11 +128,15 @@ class MigrateWordPressCourses extends Command
                                 'request_form_url'  => null, // FIXME
                                 'badge_category_id' => $badgePageCategoryId,
                                 'duration'          => null,
-                                'image'             => null,
-                                'video_url'         => null,
+                                'video_url'         => $badgePageMeta->firstWhere('meta_key', 'badgepage_video_url') ? $badgePageMeta->firstWhere('meta_key', 'badgepage_video_url')->meta_value : null,
                                 'last_updated_at'   => $badgePageMeta->firstWhere('meta_key', 'badgepage_latest_update_date') ? $badgePageMeta->firstWhere('meta_key', 'badgepage_latest_update_date')->meta_value : null,
                             ]
                         );
+
+
+                        if ($badgePageMeta->firstWhere('meta_key', 'supplementary_image_id')) {
+                            $this->importImage(BadgePage::class, $badgePage->id, $badgePageMeta->firstWhere('meta_key', 'supplementary_image_id')->meta_value);
+                        }
 
                         $this->ids['badge-page'][$wpBadgePage->ID] = $badgePage->id;
                     }
