@@ -5,7 +5,6 @@ namespace Ctrlweb\BadgeFactor2\Console\Commands;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgeCategory;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Ctrlweb\BadgeFactor2\Models\Courses\Course;
-use Ctrlweb\BadgeFactor2\Models\Courses\CourseCategory;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroupCategory;
 use Ctrlweb\BadgeFactor2\Models\Courses\Responsible;
@@ -58,7 +57,6 @@ class MigrateWordPressCourses extends Command
     public function handle()
     {
         $this->importCategory(BadgeCategory::class, 'badge-category');
-        $this->importCategory(CourseCategory::class, 'course-category');
         $this->importCategory(CourseGroupCategory::class, 'course_group_categories');
         $this->importCategory(TargetAudience::class, 'public-cible');
         $this->importCategory(TechnicalRequirement::class, 'exigence_technique_de_cours');
@@ -353,7 +351,6 @@ class MigrateWordPressCourses extends Command
                             'url'                     => $wpCourseLink,
                             'autoevaluation_form_url' => $autoevaluationFormUrl,
                             'badge_page_id'           => $wpBadgePageId && isset($this->ids['badge-page'][$wpBadgePageId]) ? $this->ids['badge-page'][$wpBadgePageId] : null,
-                            'course_category_id'      => $courseGroupCategoryId,
                             'title'                   => $wpCourse->post_title,
                             'decription'              => null,
                             'course_group_id'         => isset($courseGroupId->ID) ? $this->ids['course_groups'][$courseGroupId->ID] : null,

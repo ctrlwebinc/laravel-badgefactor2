@@ -5,7 +5,6 @@ use Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr\AssertionController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr\BackpackAssertionController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr\BadgeController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr\IssuerController;
-use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseCategoryController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseGroupCategoryController;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Api\CourseGroupController;
@@ -48,10 +47,6 @@ Route::group([
     // Course Group Categories.
     Route::get('course-group-categories', [CourseGroupCategoryController::class, 'index']);
     Route::get('course-group-categories/{courseGroupCategory}', [CourseGroupCategoryController::class, 'show']);
-
-    // Course Categories.
-    Route::apiResource('course-categories', CourseCategoryController::class)
-        ->only(['index', 'show']);
 
     // Assertions.
     Route::get('assertions/{entityId}/share/linkedin', [AssertionController::class, 'shareToLinkedIn']);

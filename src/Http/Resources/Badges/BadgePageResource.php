@@ -75,7 +75,6 @@ class BadgePageResource extends JsonResource
             'badge_image'           => $badge->image,
             'image'                 => $this->resource->getMedia('*')->first(),
             'video_url'             => $this->video_url,
-            'course_category_id'    => $this->resource->course->course_category_id ?? null,
             'course_group_id'       => $this->resource->course->course_group_id ?? null,
             'last_updated_at'       => $season,
             'product_id'            => $this->resource->course->product_id ?? null,

@@ -18,7 +18,6 @@ class CourseResource extends JsonResource
             'created_at'              => $this->resource->created_at,
             'updated_at'              => $this->resource->updated_at,
             'product_id'              => $this->resource->product_id,
-            'course_category_id'      => $this->resource->course_category_id,
             'course_group_id'         => $this->resource->course_group_id,
             'badge_page'              => $this->resource->badgePage,
             'regular_price'           => $this->resource->regular_price,

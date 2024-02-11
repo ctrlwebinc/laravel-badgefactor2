@@ -27,7 +27,6 @@ class Course extends Model
         'url',
         'autoevaluation_form_url',
         'badge_page_id',
-        'course_category_id',
         'course_group_id',
         'regular_price',
     ];
@@ -37,11 +36,6 @@ class Course extends Model
     public function generateCourseLink()
     {
         $url = $this->url;
-    }
-
-    public function courseCategory()
-    {
-        return $this->belongsTo(CourseCategory::class);
     }
 
     public function courseGroup()
