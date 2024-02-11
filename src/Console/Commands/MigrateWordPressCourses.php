@@ -131,7 +131,6 @@ class MigrateWordPressCourses extends Command
                             ]
                         );
 
-
                         if ($badgePageMeta->firstWhere('meta_key', 'supplementary_image_id')) {
                             $this->importImage(BadgePage::class, $badgePage->id, $badgePageMeta->firstWhere('meta_key', 'supplementary_image_id')->meta_value);
                         }

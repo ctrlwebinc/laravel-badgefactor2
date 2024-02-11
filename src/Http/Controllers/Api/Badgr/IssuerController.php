@@ -3,8 +3,6 @@
 namespace Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr;
 
 use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
-use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
-use Ctrlweb\BadgeFactor2\Services\Badgr\Badge;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Issuer;
 
 /**
