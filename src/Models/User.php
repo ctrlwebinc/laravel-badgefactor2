@@ -58,10 +58,6 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
         'remember_token',
         'created_at',
         'updated_at',
-        'stripe_id',
-        'pm_type',
-        'pm_last_four',
-        'trial_ends_at',
         'first_name',
         'last_name',
         'description',
@@ -78,17 +74,6 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
         'twitter',
         'linkedin',
         'photo',
-        'billing_last_name',
-        'billing_first_name',
-        'billing_society',
-        'billing_address_line_1',
-        'billing_address_line_2',
-        'billing_city',
-        'billing_postal_code',
-        'billing_country',
-        'billing_state',
-        'billing_phone',
-        'billing_email',
         'user_status',
         'badgr_token_set',
         'last_connexion',
@@ -128,7 +113,7 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
     ];
 
     protected $with = [
-        'roles', 'billingInfo',
+        'roles',
     ];
 
     protected $guard_name = 'web';
@@ -206,11 +191,6 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
     public function courses()
     {
         return $this->belongsToMany(Course::class);
-    }
-
-    public function billingInfo()
-    {
-        return $this->hasOne(BillingInfo::class);
     }
 
     public function assertions()
