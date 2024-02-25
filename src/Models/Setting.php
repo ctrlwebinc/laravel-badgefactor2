@@ -42,6 +42,7 @@ class Setting extends Model implements HasMedia
         'phone_2',
         'facebook',
         'twitter',
+        'linkedin',
         'copyright',
         'website_name',
         'website_slogan',
