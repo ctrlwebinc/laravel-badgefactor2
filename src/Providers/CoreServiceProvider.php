@@ -3,6 +3,7 @@
 namespace Ctrlweb\BadgeFactor2\Providers;
 
 use Ctrlweb\BadgeFactor2\Console\Commands\FixBadgeCategories;
+use Ctrlweb\BadgeFactor2\Console\Commands\ImportBadgeRequestFormLinks;
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWooCommerceData;
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWordPressCourses;
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWordPressPosts;
@@ -26,6 +27,7 @@ class CoreServiceProvider extends ServiceProvider
             $this->registerPublishing();
             $this->commands([
                 FixBadgeCategories::class,
+                ImportBadgeRequestFormLinks::class,
                 MigrateWooCommerceData::class,
                 MigrateWordPressCourses::class,
                 MigrateWordPressPosts::class,
