@@ -11,7 +11,7 @@ use Ctrlweb\BadgeFactor2\Models\BadgeCategory;
 use Ctrlweb\BadgeFactor2\Models\Badgr\Badge;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class BadgePageResource extends JsonResource
+class SimplifiedBadgePageResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
