@@ -20,7 +20,13 @@ class CourseResource extends JsonResource
             'updated_at'              => $this->resource->updated_at,
             'product_id'              => $this->resource->product_id,
             'course_group_id'         => $this->resource->course_group_id,
-            'badge_page'              => BadgePageResource::make($this->resource->badgePage ?? null),
+            'badge_page'              => BadgePageResource::make($this->resource->badgePage ?? null)->additional([
+                'without' => [
+                    'course',
+                    'course_group',
+                    'course_group_category',
+                ],
+            ]),
             'regular_price'           => $this->resource->regular_price,
         ];
     }
