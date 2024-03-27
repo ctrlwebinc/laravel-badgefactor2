@@ -38,6 +38,7 @@ Route::group([
 
     // Badge pages.
     Route::apiResource('badge-pages', BadgePageController::class)->only(['index', 'show']);
+    Route::get('badge-pages/{entityId}/issued', [BadgePageController::class, 'showIssued']);
     Route::get('badge-pages-by-course-group/{courseGroup}', [BadgePageController::class, 'badgePageByCourseGroup']);
 
     // Course Groups.
