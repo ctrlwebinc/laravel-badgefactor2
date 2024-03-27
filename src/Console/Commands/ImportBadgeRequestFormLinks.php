@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\DB;
 
 class ImportBadgeRequestFormLinks extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -78,7 +77,6 @@ class ImportBadgeRequestFormLinks extends Command
                 }
             );
         });
-
 
         $this->newLine();
         $this->line('All done!');
