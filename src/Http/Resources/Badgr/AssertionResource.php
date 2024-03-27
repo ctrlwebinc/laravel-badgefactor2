@@ -18,12 +18,12 @@ class AssertionResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'   => $this['entityId'],
-            'issued_on' => $this['issuedOn'],
+            'id'         => $this['entityId'],
+            'issued_on'  => $this['issuedOn'],
             'badgeclass' => $this['badgeclass'],
-            'issuer' => $this['issuer'],
-            'image' => $this['image'],
-            'recipient' => LearnerPublicResource::make(User::where('email', '=', $this['recipient']['plaintextIdentity'])->first()),
+            'issuer'     => $this['issuer'],
+            'image'      => $this['image'],
+            'recipient'  => LearnerPublicResource::make(User::where('email', '=', $this['recipient']['plaintextIdentity'])->first()),
         ];
     }
 }

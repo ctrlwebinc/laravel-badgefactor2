@@ -4,9 +4,6 @@ namespace Ctrlweb\BadgeFactor2\Http\Resources\Badges;
 
 use Carbon\Carbon;
 use Cmixin\SeasonMixin;
-use Ctrlweb\BadgeFactor2\Http\Resources\Courses\BasicCourseGroupResource;
-use Ctrlweb\BadgeFactor2\Http\Resources\Courses\CourseGroupCategoryResource;
-use Ctrlweb\BadgeFactor2\Http\Resources\Courses\CourseResource;
 use Ctrlweb\BadgeFactor2\Models\BadgeCategory;
 use Ctrlweb\BadgeFactor2\Models\Badgr\Badge;
 use Illuminate\Http\Resources\Json\JsonResource;

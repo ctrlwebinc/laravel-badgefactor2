@@ -71,7 +71,7 @@ class ImportBadgeRequestFormLinks extends Command
 
                     if ($badgeClass) {
                         foreach (BadgePage::where('badgeclass_id', '=', $badgeClass)->get() as $badgePage) {
-                            $badgePage->request_form_url = config('badgefactor2.wordpress.base_url') . '/badges/' . $wpBadgeRequestForm->post_name . '/formulaire/';
+                            $badgePage->request_form_url = config('badgefactor2.wordpress.base_url').'/badges/'.$wpBadgeRequestForm->post_name.'/formulaire/';
                             $badgePage->save();
                         }
                     }

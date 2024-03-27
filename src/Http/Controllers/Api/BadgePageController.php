@@ -53,7 +53,7 @@ class BadgePageController extends Controller
     {
         $badgePage = BadgePage::where("slug->{$locale}", '=', $slug)->first();
         $assertions = app(Assertion::class)->getByBadgeClass($badgePage->badgeclass_id);
-        //dd($assertions);
+
         return AssertionResource::collection($assertions);
     }
 
