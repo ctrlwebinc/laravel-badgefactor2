@@ -13,7 +13,6 @@ class RegisterWordPressUser implements ShouldQueue
 
     public function handle(UserRegistered $event)
     {
-        /*
         $registerUser = Http::asForm()
             ->acceptJson()
             ->withOptions([
@@ -25,9 +24,10 @@ class RegisterWordPressUser implements ShouldQueue
                     'username' => $event->user->username,
                     'email' => $event->user->email,
                     'password' => $event->password,
+                    'first_name' => $event->user->first_name,
+                    'last_name' => $event->user->last_name,
+                    'user_nicename' => $event->user->first_name.' '.$event->user->last_name,
                 ]
             );
-        Log::debug($registerUser);
-        */
     }
 }

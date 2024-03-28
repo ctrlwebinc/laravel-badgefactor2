@@ -69,7 +69,7 @@ class SimplifiedBadgePageResource extends JsonResource
             'criteria'              => $this->resource->criteria,
             'approval_type'         => $this->resource->approval_type,
             'request_form_url'      => $this->resource->request_form_url,
-            'badge_image'           => $badge->image,
+            'badge_image'           => $badge !== null ? $badge->image : null,
             'image'                 => $this->resource->getMedia('*')->first(),
             'video_url'             => $this->video_url,
             'course_group_id'       => $this->resource->course->course_group_id ?? null,
