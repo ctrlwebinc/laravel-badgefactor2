@@ -19,6 +19,7 @@ class CourseGroupResource extends JsonResource
     public function toArray($request): array|JsonSerializable|Arrayable
     {
         return [
+            'type'                     => 'course-group',
             'id'                       => $this->resource->id,
             'slug'                     => $this->resource->slug,
             'title'                    => $this->resource->title,

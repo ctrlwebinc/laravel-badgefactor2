@@ -63,6 +63,7 @@ class BadgePageResource extends JsonResource
         $badge = Badge::find($this->resource->badgeclass_id);
 
         return [
+            'type'                  => 'badge-page',
             'id'                    => $this->resource->id,
             'badge_category'        => $badgeCategory,
             'badgeclass_id'         => $this->resource->badgeclass_id,
