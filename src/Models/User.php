@@ -61,18 +61,27 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
         'first_name',
         'last_name',
         'description',
+        'description_visible',
         'website',
+        'website_visible',
         'slug',
         'wp_id',
         'wp_password',
         'username',
         'place',
+        'place_visible',
         'organisation',
+        'organisation_visible',
         'job',
+        'job_visible',
         'biography',
+        'biography_visible',
         'facebook',
+        'facebook_visible',
         'twitter',
+        'twitter_visible',
         'linkedin',
+        'linkedin_visible',
         'photo',
         'user_status',
         'badgr_token_set',
@@ -82,7 +91,6 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
         'badgr_password',
         'badgr_encrypted_password',
         'establishment_id',
-
     ];
 
     /**
@@ -110,6 +118,15 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
         'email_verified_at'           => 'datetime',
         'is_validated'                => 'boolean',
         'badgr_encrypted_password'    => 'encrypted',
+        'description_visible'         => 'boolean',
+        'website_visible'             => 'boolean',
+        'place_visible'               => 'boolean',
+        'organisation_visible'        => 'boolean',
+        'job_visible'                 => 'boolean',
+        'biography_visible'           => 'boolean',
+        'facebook_visible'            => 'boolean',
+        'twitter_visible'             => 'boolean',
+        'linkedin_visible'            => 'boolean',
     ];
 
     protected $with = [
