@@ -64,7 +64,11 @@ class BadgePage extends Model implements HasMedia
 
         self::addGlobalScope('badgeCategory', function (Builder $query) {
             if (request('badge_category')) {
-                $query->where('type', request('badge_category'));
+                $locale = app()->getLocale();
+                $badgeCategory = request()->input('badge_category');
+                $query->whereHas('badgeCategory', function (Builder $q) use ($badgeCategory, $locale) {
+                    $q->where("slug->{$locale}", '=', $badgeCategory);
+                });
             }
         });
 

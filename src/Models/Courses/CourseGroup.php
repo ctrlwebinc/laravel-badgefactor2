@@ -86,7 +86,7 @@ class CourseGroup extends Model implements HasMedia
             $query->when(!empty(request()->input('issuer')), function ($q) {
                 $issuer = request()->input('issuer');
                 $badgeClassIds = collect(app(BadgrBadge::class)->getByIssuer($issuer))->pluck('entityId')->toArray();
-                $badgePageIds = BadgePage::withoutGlobalScope('issuer')->withoutGlobalScope('q')->withoutGlobalScope('badge-category')->whereIn('badgeclass_id', $badgeClassIds)->pluck('id');
+                $badgePageIds = BadgePage::withoutGlobalScope('issuer')->withoutGlobalScope('q')->withoutGlobalScope('badge_category')->whereIn('badgeclass_id', $badgeClassIds)->pluck('id');
                 $courseGroupIds = Course::whereIn('badge_page_id', $badgePageIds)->pluck('course_group_id');
 
                 return $q->whereIn('id', $courseGroupIds);
