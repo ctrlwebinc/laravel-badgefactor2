@@ -21,11 +21,11 @@ class RegisterWordPressUser implements ShouldQueue
             ->post(
                 config('badgefactor2.wordpress.base_url').'/wp-admin/admin-ajax.php?action=register_user_from_bf2',
                 [
-                    'username' => $event->user->username,
-                    'email' => $event->user->email,
-                    'password' => $event->password,
-                    'first_name' => $event->user->first_name,
-                    'last_name' => $event->user->last_name,
+                    'username'      => $event->user->username,
+                    'email'         => $event->user->email,
+                    'password'      => $event->password,
+                    'first_name'    => $event->user->first_name,
+                    'last_name'     => $event->user->last_name,
                     'user_nicename' => $event->user->first_name.' '.$event->user->last_name,
                 ]
             );

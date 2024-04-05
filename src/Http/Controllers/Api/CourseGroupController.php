@@ -7,7 +7,6 @@ use Ctrlweb\BadgeFactor2\Http\Resources\Badges\BadgePageResource;
 use Ctrlweb\BadgeFactor2\Http\Resources\Courses\CourseGroupResource;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 /**
@@ -35,13 +34,13 @@ class CourseGroupController extends Controller
 
         $badgeCategory = request()->input('badge_category');
 
-        if (!empty($badgeCategory) && $badgeCategory !== 'certification') {;
+        if (!empty($badgeCategory) && $badgeCategory !== 'certification') {
             $query = BadgePage::query();
             $groups = $query->paginate(12);
 
             return BadgePageResource::collection($groups);
         } else {
-            $query  = CourseGroup::query();
+            $query = CourseGroup::query();
             $groups = $query->paginate(12);
 
             return CourseGroupResource::collection($groups);

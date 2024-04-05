@@ -14,7 +14,6 @@ class CourseGroupCategoryController extends Controller
 {
     public function index()
     {
-
         $categories = CourseGroupCategory::paginate();
 
         return CourseGroupCategoryResource::collection($categories);
