@@ -75,9 +75,9 @@ class CourseGroup extends Model implements HasMedia
             }
         });
 
-        self::addGlobalScope('course_group_category', function ($query) {
-            if (request('course_group_category')) {
-                $query->where('course_group_category_id', request('course_group_category'));
+        self::addGlobalScope('course_group_categorie', function ($query) {
+            if (request()->input('course_group_categorie')) {
+                $query->where('course_group_category_id', request()->input('course_group_categorie'));
             }
         });
 
