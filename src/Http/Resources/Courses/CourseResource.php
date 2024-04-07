@@ -4,7 +4,7 @@ namespace Ctrlweb\BadgeFactor2\Http\Resources\Courses;
 
 use Ctrlweb\BadgeFactor2\Http\Resources\Badges\SimplifiedBadgePageResource;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Helpers\EcommerceHelper;
+use App\Helpers\ECommerceHelper;
 use Illuminate\Support\Facades\Auth;
 
 class CourseResource extends JsonResource
