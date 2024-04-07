@@ -23,7 +23,6 @@ class Badge extends Model
         'name'              => 'string',
         'description'       => 'string',
         'criteriaNarrative' => 'string',
-        'type'              => 'string',
         'title'             => 'json',
         'slug'              => 'json',
         'content'           => 'json',
@@ -61,7 +60,6 @@ class Badge extends Model
 
             $badgePage = new BadgePage();
             $badgePage->badgeclass_id = $badgeclassId;
-            $badgePage->type = $badge->type;
             $badgePage->title = $badge->title;
             $badgePage->slug = $badge->slug;
             $badgePage->content = $badge->content;
@@ -87,7 +85,6 @@ class Badge extends Model
             $badgePage = BadgePage::updateOrCreate(
                 ['badgeclass_id' => $badge->entityId],
                 [
-                    'type'              => $badge->type,
                     'title'             => $badge->title,
                     'slug'              => $badge->slug,
                     'content'           => $badge->content,
@@ -125,7 +122,6 @@ class Badge extends Model
                 unset($row['issuer']);
 
                 $badgePage = $badgePages->where('badgeclass_id', $row['entityId'])->first();
-                $row['type'] = !empty($badgePage) ? $badgePage->type : '';
                 $row['title'] = !empty($badgePage) ? json_encode($badgePage->getTranslations('title')) : '';
                 $row['slug'] = !empty($badgePage) ? json_encode($badgePage->getTranslations('slug')) : '';
                 $row['content'] = !empty($badgePage) ? json_encode($badgePage->getTranslations('content')) : '';
