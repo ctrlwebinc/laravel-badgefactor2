@@ -35,7 +35,6 @@ class BadgePage extends Model implements HasMedia
         'request_type',
         'request_form_url',
         'badge_category_id',
-        'duration',
         'video_url',
         'last_updated_at',
     ];
