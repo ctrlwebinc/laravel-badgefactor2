@@ -26,7 +26,6 @@ class BadgePage extends Model implements HasMedia
     ];
 
     protected $fillable = [
-        'type',
         'badgeclass_id',
         'title',
         'slug',
@@ -125,16 +124,6 @@ class BadgePage extends Model implements HasMedia
                 });
             }
         });
-    }
-
-    public function scopeExcludeCertification()
-    {
-        return $this->whereNot('type', 'certification');
-    }
-
-    public function scopeCertification($query)
-    {
-        return $query->where('type', 'certification');
     }
 
     public function approvers()
