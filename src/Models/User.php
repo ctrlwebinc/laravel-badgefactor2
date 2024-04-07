@@ -50,6 +50,8 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
     protected $fillable = [
         'id',
         'email',
+        'new_email',
+        'new_email_validation_token',
         'email_verified_at',
         'password',
         'two_factor_secret',
@@ -58,6 +60,10 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
         'remember_token',
         'created_at',
         'updated_at',
+        'stripe_id',
+        'pm_type',
+        'pm_last_four',
+        'trial_ends_at',
         'first_name',
         'last_name',
         'description',
@@ -73,6 +79,7 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
         'organisation',
         'organisation_visible',
         'job',
+        'new_job',
         'job_visible',
         'biography',
         'biography_visible',
@@ -91,6 +98,7 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
         'badgr_password',
         'badgr_encrypted_password',
         'establishment_id',
+        'new_establishment_id',
     ];
 
     /**
