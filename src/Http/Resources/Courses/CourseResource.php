@@ -4,6 +4,8 @@ namespace Ctrlweb\BadgeFactor2\Http\Resources\Courses;
 
 use Ctrlweb\BadgeFactor2\Http\Resources\Badges\SimplifiedBadgePageResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Helpers\EcommerceHelper;
+use Illuminate\Support\Facades\Auth;
 
 class CourseResource extends JsonResource
 {
@@ -28,6 +30,7 @@ class CourseResource extends JsonResource
                 ],
             ]),
             'regular_price'           => $this->resource->regular_price,
+            'needs_purchase'          => (null == Auth::user() ? false : ECommerceHelper::needsPurchase(Auth::user(), $this->resource)),
         ];
     }
 }
