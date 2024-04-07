@@ -23,6 +23,7 @@ class Badge extends Model
         'name'              => 'string',
         'description'       => 'string',
         'criteriaNarrative' => 'string',
+        'badgeclass_id'     => 'string',
         'title'             => 'json',
         'slug'              => 'json',
         'content'           => 'json',
@@ -60,12 +61,13 @@ class Badge extends Model
 
             $badgePage = new BadgePage();
             $badgePage->badgeclass_id = $badgeclassId;
-            $badgePage->title = $badge->title;
-            $badgePage->slug = $badge->slug;
-            $badgePage->content = $badge->content;
-            $badgePage->criteria = $badge->criteria;
-            $badgePage->approval_type = $badge->approval_type;
-            $badgePage->request_form_url = $badge->request_form_url;
+            $badgePage->title = $badge->badgePage['title'];
+            $badgePage->slug = $badge->badgePage['slug'];
+            $badgePage->content = $badge->badgePage['content'];
+            $badgePage->criteria = $badge->badgePage['criteria'];
+            $badgePage->approval_type = $badge->badgePage['approval_type'];
+            $badgePage->request_form_url = $badge->badgePage['request_form_url'];
+            $badgePage->badge_category_id = $badge->badgePage['badge_category_id'];
 
             $badgePage->saveQuietly();
 
@@ -85,13 +87,13 @@ class Badge extends Model
             $badgePage = BadgePage::updateOrCreate(
                 ['badgeclass_id' => $badge->entityId],
                 [
-                    'title'             => $badge->title,
-                    'slug'              => $badge->slug,
-                    'content'           => $badge->content,
-                    'criteria'          => $badge->criteria,
-                    'approval_type'     => $badge->approval_type,
-                    'request_form_url'  => $badge->request_form_url,
-                    'badge_category_id' => $badge->badge_category_id,
+                    'title'             => $badge->badgePage['title'],
+                    'slug'              => $badge->badgePage['slug'],
+                    'content'           => $badge->badgePage['content'],
+                    'criteria'          => $badge->badgePage['criteria'],
+                    'approval_type'     => $badge->badgePage['approval_type'],
+                    'request_form_url'  => $badge->badgePage['request_form_url'],
+                    'badge_category_id' => $badge->badgePage['badge_category_id'],
                 ]
             );
 
@@ -122,6 +124,7 @@ class Badge extends Model
                 unset($row['issuer']);
 
                 $badgePage = $badgePages->where('badgeclass_id', $row['entityId'])->first();
+                $row['badgeclass_id'] = !empty($badgePage) ? $badgePage->badgeclass_id : '';
                 $row['title'] = !empty($badgePage) ? json_encode($badgePage->getTranslations('title')) : '';
                 $row['slug'] = !empty($badgePage) ? json_encode($badgePage->getTranslations('slug')) : '';
                 $row['content'] = !empty($badgePage) ? json_encode($badgePage->getTranslations('content')) : '';
