@@ -31,6 +31,8 @@ class CourseResource extends JsonResource
             ]),
             'regular_price'           => $this->resource->regular_price,
             'needs_purchase'          => (null == Auth::user() ? null : ECommerceHelper::needsPurchase(Auth::user(), $this->resource)),
+            'target_audiences'         => $this->resource->targetAudiences->pluck('title'),
+            'technical_requirements'  => $this->resource->technicalRequirements->pluck('title'),
         ];
     }
 }
