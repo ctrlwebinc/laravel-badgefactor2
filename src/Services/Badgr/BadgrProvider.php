@@ -71,7 +71,7 @@ abstract class BadgrProvider
     protected function makeProvider(): void
     {
         $config = $this->getConfig();
-        $httpClient = new Client(['base_uri' => $config->badgr_server_base_url]);
+        $httpClient = new Client(['base_uri' => $config->badgr_server_base_url, 'verify' => false]);
 
         $this->providerConfiguration['redirectUri'] = route('bf2.auth');
         $this->providerConfiguration['urlAuthorize'] = '/o/authorize';
@@ -271,6 +271,26 @@ abstract class BadgrProvider
                 if (isset($response['status']['success']) && true === $response['status']['success'] && isset($response['result'][0])) {
                     return $response['result'][0];
                 }
+            }
+        } catch (Exception $e) {
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $method
+     * @param string $endpoint
+     * @param array $payload
+     *
+     * @return mixed
+     */
+    public function getEmptyResponse(string $method, string $endpoint, array $payload = []): mixed
+    {
+        try {
+            $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
+            if ($response->getStatusCode() === 200) {
+                return true;
             }
         } catch (Exception $e) {
         }
