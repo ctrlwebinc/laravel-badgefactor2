@@ -4,6 +4,7 @@ namespace Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr;
 
 use App\Http\Requests\AssertionVisibilityRequest;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
+use Ctrlweb\BadgeFactor2\Http\Resources\Badgr\AssertionUserResource;
 use Ctrlweb\BadgeFactor2\Models\Badgr\Assertion;
 use Ctrlweb\BadgeFactor2\Models\Badgr\AssertionUser;
 use Ctrlweb\BadgeFactor2\Models\User;

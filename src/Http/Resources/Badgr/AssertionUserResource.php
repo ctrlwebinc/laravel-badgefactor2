@@ -6,7 +6,7 @@ use App\Http\Resources\LearnerPublicResource;
 use Ctrlweb\BadgeFactor2\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class AssertioUserResource extends JsonResource
+class AssertionUserResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
