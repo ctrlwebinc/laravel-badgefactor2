@@ -1,9 +1,9 @@
 <?php
 
 return [
-    'domain' => env('BF2_DOMAIN_NAME', null),
+    'domain'         => env('BF2_DOMAIN_NAME', null),
     'cache_duration' => env('BF2_CACHE_DURATION', 86400),
-    'encryption' => [
+    'encryption'     => [
         'algorithm'  => env('BF2_ENCRYPTION_ALGORITHM'),
         'secret_key' => env('BF2_SECRET_KEY'),
         'secret_iv'  => env('BF2_SECRET_IV'),
@@ -24,7 +24,7 @@ return [
     'badgr' => [
         'server_url'      => env('BADGR_SERVER_URL'),
         'admin_scopes'    => 'rw:backpack rw:profile rw:issuer rw:serverAdmin',
-        'personal_scopes' => 'rw:backpack rw:profile'
+        'personal_scopes' => 'rw:backpack rw:profile',
     ],
     'user_model'        => env('BF2_USER_MODEL', \Ctrlweb\BadgeFactor2\Models\User::class),
     'search_controller' => env('BF2_SEARCH_CONTROLLER', \Ctrlweb\BadgeFactor2\Http\Controllers\Api\SearchController::class),

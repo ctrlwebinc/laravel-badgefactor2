@@ -2,8 +2,6 @@
 
 namespace Ctrlweb\BadgeFactor2\Http\Resources\Badgr;
 
-use App\Http\Resources\LearnerPublicResource;
-use Ctrlweb\BadgeFactor2\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AssertionUserResource extends JsonResource

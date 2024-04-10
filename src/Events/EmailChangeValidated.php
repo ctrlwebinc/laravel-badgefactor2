@@ -2,7 +2,6 @@
 
 namespace Ctrlweb\BadgeFactor2\Events;
 
-use Ctrlweb\BadgeFactor2\Models\User;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -21,5 +20,4 @@ class EmailChangeValidated
     public function __construct(public int $userId, public string $oldEmail, public string $newEmail)
     {
     }
-
 }

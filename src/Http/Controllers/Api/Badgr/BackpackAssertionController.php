@@ -36,11 +36,11 @@ class BackpackAssertionController extends Controller
 
         $assertionVisibility = AssertionUser::updateOrCreate(
             [
-                'user_id' => $request->user()->id,
+                'user_id'      => $request->user()->id,
                 'assertion_id' => $entityId,
             ],
             [
-                'is_visible' => $request->input('is_visible')
+                'is_visible' => $request->input('is_visible'),
             ]
         );
 
@@ -52,7 +52,7 @@ class BackpackAssertionController extends Controller
         }
 
         return response()->json([
-            'success' => true,
+            'success'   => true,
             'assertion' => AssertionUserResource::make($assertionVisibility),
         ]);
     }

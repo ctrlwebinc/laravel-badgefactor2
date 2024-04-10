@@ -281,7 +281,7 @@ abstract class BadgrProvider
     /**
      * @param string $method
      * @param string $endpoint
-     * @param array $payload
+     * @param array  $payload
      *
      * @return mixed
      */

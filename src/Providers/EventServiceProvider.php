@@ -10,7 +10,6 @@ use Ctrlweb\BadgeFactor2\Listeners\RegisterBadgrUser;
 use Ctrlweb\BadgeFactor2\Listeners\RegisterWordPressUser;
 use Ctrlweb\BadgeFactor2\Listeners\SendEmailChangeConfirmationRequest;
 use Ctrlweb\BadgeFactor2\Listeners\SendTokenToLMS;
-use Ctrlweb\BadgeFactor2\Listeners\UpdateEmailInBadgr;
 use Ctrlweb\BadgeFactor2\Listeners\UpdateEmailInExternalSystems;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
@@ -29,7 +28,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         EmailChangeValidated::class => [
             UpdateEmailInExternalSystems::class,
-        ]
+        ],
     ];
 
     /**

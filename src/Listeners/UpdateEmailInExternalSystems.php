@@ -5,12 +5,8 @@ namespace Ctrlweb\BadgeFactor2\Listeners;
 use Ctrlweb\BadgeFactor2\Events\EmailChangeValidated;
 use Ctrlweb\BadgeFactor2\Models\User;
 use Ctrlweb\BadgeFactor2\Services\Badgr\BackpackAssertion;
-use Ctrlweb\BadgeFactor2\Services\Badgr\User as BadgrUser;
-use Hautelook\Phpass\PasswordHash;
-use Illuminate\Auth\Events\Attempting;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -39,10 +35,11 @@ class UpdateEmailInExternalSystems implements ShouldQueue
             $badgrUser = array_pop($badgrUser);
 
             // Update Badgr user.
-            $rowsAffected = $badgrDb->update('update users set email = ? where id = ?',
+            $rowsAffected = $badgrDb->update(
+                'update users set email = ? where id = ?',
                 [
                     $newEmail,
-                    $badgrUser->id
+                    $badgrUser->id,
                 ]
             );
             if ($rowsAffected === 0) {
@@ -54,10 +51,11 @@ class UpdateEmailInExternalSystems implements ShouldQueue
             }
 
             // Update Badgr account email address.
-            $rowsAffected = $badgrDb->update('update account_emailaddress set email = ?, verified = true where user_id = ?',
+            $rowsAffected = $badgrDb->update(
+                'update account_emailaddress set email = ?, verified = true where user_id = ?',
                 [
                     $newEmail,
-                    $badgrUser->id
+                    $badgrUser->id,
                 ]
             );
             if ($rowsAffected === 0) {
@@ -69,7 +67,8 @@ class UpdateEmailInExternalSystems implements ShouldQueue
             }
 
             // Reassign Badgr badge instances.
-            $rowsAffected = $badgrDb->update('update issuer_badgeinstance set recipient_identifier = ? where recipient_identifier = ?',
+            $rowsAffected = $badgrDb->update(
+                'update issuer_badgeinstance set recipient_identifier = ? where recipient_identifier = ?',
                 [
                     $newEmail,
                     $oldEmail,
