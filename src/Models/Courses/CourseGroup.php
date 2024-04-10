@@ -67,10 +67,10 @@ class CourseGroup extends Model implements HasMedia
 
         self::addGlobalScope('q', function (Builder $query) {
             $locale = app()->getLocale();
-            if (request('q')) {
+            if (request()->input('q')) {
                 $query->where(function ($q) {
-                    $q->where('title', 'LIKE', '%'.request('q').'%')
-                        ->orWhere('description', 'LIKE', '%'.request('q').'%');
+                    $q->where("title->{$locale}", 'LIKE', '%'.request()->input('q').'%')
+                        ->orWhere("description->{$locale}", 'LIKE', '%'.request()->input('q').'%');
                 });
             }
         });
