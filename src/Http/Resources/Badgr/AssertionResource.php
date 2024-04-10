@@ -20,7 +20,7 @@ class AssertionResource extends JsonResource
     {
         $recipient = LearnerPublicResource::make(User::where('email', '=', $this['recipient']['plaintextIdentity'])->first());
         $visibility = AssertionUser::where('assertion_id', '=', $this['entityId'])->where('user_id', '=', $recipient->id)->first();
-        if ($visibility->is_visible) {
+        if (!$visibility || $visibility->is_visible) {
             return [
                 'id'         => $this['entityId'],
                 'issued_on'  => $this['issuedOn'],
