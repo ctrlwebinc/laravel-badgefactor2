@@ -2,6 +2,7 @@
 
 return [
     'domain' => env('BF2_DOMAIN_NAME', null),
+    'cache_duration' => env('BF2_CACHE_DURATION', 86400),
     'encryption' => [
         'algorithm'  => env('BF2_ENCRYPTION_ALGORITHM'),
         'secret_key' => env('BF2_SECRET_KEY'),

@@ -21,7 +21,7 @@ class Issuer extends BadgrAdminProvider
         $response = $this->getResult('GET', '/v2/issuers');
 
         if ($response) {
-            Cache::put('issuers', json_encode($response), 86400);
+            Cache::put('issuers', json_encode($response), config('badgefactor2.cache_duration'));
         }
 
         return $response;
@@ -41,7 +41,7 @@ class Issuer extends BadgrAdminProvider
         $response = $this->getCount('GET', '/v2/issuers_count');
 
         if ($response) {
-            Cache::put('issuers_count', $response, 86400);
+            Cache::put('issuers_count', $response, config('badgefactor2.cache_duration'));
         }
 
         return $response;
@@ -88,7 +88,7 @@ class Issuer extends BadgrAdminProvider
         $response = $this->getFirstResult('GET', '/v2/issuers/'.$entityId);
 
         if ($response) {
-            Cache::put('issuer_'.$entityId, json_encode($response), 86400);
+            Cache::put('issuer_'.$entityId, json_encode($response), config('badgefactor2.cache_duration'));
         }
 
         return $response;

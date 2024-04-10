@@ -24,7 +24,7 @@ class Assertion extends BadgrAdminProvider
         $response = $this->getFirstResult('GET', '/v2/assertions/'.$entityId);
 
         if ($response && is_array($response)) {
-            Cache::put('assertion_'.$entityId, json_encode($response), 86400);
+            Cache::put('assertion_'.$entityId, json_encode($response), config('badgefactor2.cache_duration'));
         }
 
         return $response;
@@ -39,7 +39,7 @@ class Assertion extends BadgrAdminProvider
         $response = $this->getResult('GET', '/v2/issuers/'.$entityId.'/assertions');
 
         if ($response) {
-            Cache::put('assertions_by_issuer_'.$entityId, $response, 86400);
+            Cache::put('assertions_by_issuer_'.$entityId, $response, config('badgefactor2.cache_duration'));
         }
 
         return $response;
@@ -54,7 +54,7 @@ class Assertion extends BadgrAdminProvider
         $response = $this->getResult('GET', '/v2/badgeclasses/'.$entityId.'/assertions');
 
         if ($response) {
-            Cache::put('assertions_by_badgeclass_'.$entityId, $response, 86400);
+            Cache::put('assertions_by_badgeclass_'.$entityId, $response, config('badgefactor2.cache_duration'));
         }
 
         return $response;
@@ -133,7 +133,7 @@ class Assertion extends BadgrAdminProvider
         $result = $this->getFirstResult('PUT', '/v2/assertions/'.$entityId, $payload);
 
         if ($result) {
-            Cache::put('assertion_'.$entityId, json_encode($result), 86400);
+            Cache::put('assertion_'.$entityId, json_encode($result), config('badgefactor2.cache_duration'));
             Cache::forget('assertions_by_badgeclass_'.$result['badgeclass']);
             Cache::forget('assertions_by_issuer_'.$result['issuer']);
         }

@@ -21,7 +21,7 @@ class Badge extends BadgrAdminProvider
         $response = $this->getResult('GET', '/v2/badgeclasses');
 
         if ($response) {
-            Cache::put('badges', json_encode($response), 86400);
+            Cache::put('badges', json_encode($response), config('badgefactor2.cache_duration'));
         }
 
         return $response;
@@ -41,7 +41,7 @@ class Badge extends BadgrAdminProvider
         $response = $this->getCount('GET', '/v2/badgeclasses_count');
 
         if ($response) {
-            Cache::put('badges_count', $response, 86400);
+            Cache::put('badges_count', $response, config('badgefactor2.cache_duration'));
         }
 
         return $response;
@@ -88,7 +88,7 @@ class Badge extends BadgrAdminProvider
         $response = $this->getFirstResult('GET', '/v2/badgeclasses/'.$entityId);
 
         if ($response) {
-            Cache::put('badge_'.$response['entityId'], json_encode($response), 86400);
+            Cache::put('badge_'.$response['entityId'], json_encode($response), config('badgefactor2.cache_duration'));
         }
 
         return $response;
@@ -103,7 +103,7 @@ class Badge extends BadgrAdminProvider
         $response = $this->getResult('GET', '/v2/issuers/'.$entityId.'/badgeclasses');
 
         if ($response) {
-            Cache::put('badges_by_issuer_'.$entityId, $response, 86400);
+            Cache::put('badges_by_issuer_'.$entityId, $response, config('badgefactor2.cache_duration'));
         }
 
         return $response;
