@@ -18,18 +18,29 @@ class AssertionResource extends JsonResource
      */
     public function toArray($request)
     {
-        $recipient = LearnerPublicResource::make(User::where('email', '=', $this['recipient']['plaintextIdentity'])->firstOrFail());
-        $visibility = AssertionUser::where('assertion_id', '=', $this['entityId'])->where('user_id', '=', $recipient->id)->first();
-        if (!$visibility || $visibility->is_visible) {
-            return [
-                'id'         => $this['entityId'],
-                'issued_on'  => $this['issuedOn'],
-                'badgeclass' => $this['badgeclass'],
-                'issuer'     => $this['issuer'],
-                'image'      => $this['image'],
-                'recipient'  => LearnerPublicResource::make(User::where('email', '=', $this['recipient']['plaintextIdentity'])->first()),
-            ];
+        $recipient = User::where('email', '=', $this['recipient']['plaintextIdentity'])->first();
+
+        if (!$recipient) {
+            return $this->anonymousRecipient();
+        } else {
+            $recipientResource = LearnerPublicResource::make($recipient);
+            $visibility = AssertionUser::where('assertion_id', '=', $this['entityId'])->where('user_id', '=', $recipient->id)->first();
+            if (!$visibility || $visibility->is_visible) {
+                return [
+                    'id'         => $this['entityId'],
+                    'issued_on'  => $this['issuedOn'],
+                    'badgeclass' => $this['badgeclass'],
+                    'issuer'     => $this['issuer'],
+                    'image'      => $this['image'],
+                    'recipient'  => LearnerPublicResource::make(User::where('email', '=', $this['recipient']['plaintextIdentity'])->first()),
+                ];
+            }
+            return $this->anonymousRecipient()
+
         }
+    }
+
+    private function anonymousRecipient(): array {
         return [
             'id'         => $this['entityId'],
             'issued_on'  => $this['issuedOn'],
@@ -53,7 +64,7 @@ class AssertionResource extends JsonResource
                 'linkedin'       => null,
                 'photo'          => null,
                 'last_connexion' => null,
-            ]
+            ],
         ];
     }
 }
