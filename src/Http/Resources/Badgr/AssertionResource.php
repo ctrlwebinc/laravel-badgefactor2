@@ -18,7 +18,7 @@ class AssertionResource extends JsonResource
      */
     public function toArray($request)
     {
-        $recipient = LearnerPublicResource::make(User::where('email', '=', $this['recipient']['plaintextIdentity'])->first());
+        $recipient = LearnerPublicResource::make(User::where('email', '=', $this['recipient']['plaintextIdentity'])->firstOrFail());
         $visibility = AssertionUser::where('assertion_id', '=', $this['entityId'])->where('user_id', '=', $recipient->id)->first();
         if (!$visibility || $visibility->is_visible) {
             return [
