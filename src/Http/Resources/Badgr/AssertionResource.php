@@ -35,12 +35,13 @@ class AssertionResource extends JsonResource
                     'recipient'  => LearnerPublicResource::make(User::where('email', '=', $this['recipient']['plaintextIdentity'])->first()),
                 ];
             }
-            return $this->anonymousRecipient()
 
+            return $this->anonymousRecipient();
         }
     }
 
-    private function anonymousRecipient(): array {
+    private function anonymousRecipient(): array
+    {
         return [
             'id'         => $this['entityId'],
             'issued_on'  => $this['issuedOn'],
