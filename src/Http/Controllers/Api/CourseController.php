@@ -14,10 +14,10 @@ class CourseController extends Controller
 {
     public function validateAccess(string $locale, string $slug)
     {
-        $course = Course::where('slug->fr', $slug)->firstOrFail();
+        $course = BadgePage::where('slug->fr', $slug)->firstOrFail()->course;
         $currentUser = auth()->user();
 
-        if ($currentUser->freeAccess || ECommerceHelper::hasAccess($currentUser, $course)) {
+        if ($course && $currentUser->freeAccess || ECommerceHelper::hasAccess($currentUser, $course)) {
             return response()->json([
                 'access' => true,
             ]);
