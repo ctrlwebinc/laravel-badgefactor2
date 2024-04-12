@@ -2,6 +2,7 @@
 
 namespace Ctrlweb\BadgeFactor2\Http\Controllers\Api;
 
+use App\Helpers\ECommerceHelper;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Ctrlweb\BadgeFactor2\Models\Courses\Course;
@@ -11,27 +12,19 @@ use Ctrlweb\BadgeFactor2\Models\Courses\Course;
  */
 class CourseController extends Controller
 {
-    public function validateAccess(string $locale, $course)
+    public function validateAccess(string $locale, string $slug)
     {
-        $hasAccess = false;
-        $badgePage = BadgePage::where('slug->fr', $course)->first();
+        $course = Course::where('slug->fr', $slug)->firstOrFail();
         $currentUser = auth()->user();
-        if ($currentUser && $badgePage) {
-            if ($currentUser->free_access) {
-                $hasAccess = true;
-            } else {
-                // TODO Check if course purchased.
-            }
-        }
 
-        if ($hasAccess) {
+        if ($currentUser->freeAccess || ECommerceHelper::hasAccess($currentUser, $course)) {
             return response()->json([
-                'access' => $hasAccess,
+                'access' => true,
             ]);
         } else {
             return response()->json([
-                'access'   => $hasAccess,
-                'redirect' => config('badgefactor2.frontend.url').'/badges/'.$badgePage->slug,
+                'access'   => false,
+                'redirect' => config('badgefactor2.frontend.url').'/badges/'.$course->badgePage->slug,
             ], 302);
         }
     }
