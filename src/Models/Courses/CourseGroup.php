@@ -69,7 +69,7 @@ class CourseGroup extends Model implements HasMedia
             $locale = app()->getLocale();
             if (request()->input('q')) {
                 $query->where(function ($q) use ($locale) {
-                    $q->where("title->{$locale}", 'LIKE', '%'.request()->input('q').'%')
+                    return $q->where("title->{$locale}", 'LIKE', '%'.request()->input('q').'%')
                         ->orWhere("description->{$locale}", 'LIKE', '%'.request()->input('q').'%');
                 });
             }

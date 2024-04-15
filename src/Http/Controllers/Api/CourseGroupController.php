@@ -26,9 +26,9 @@ class CourseGroupController extends Controller
     public function index(string $locale, Request $request)
     {
         $request->validate([
-            'course_group_category' => 'integer',
-            'q'                     => 'nullable',
-            'issuer'                => 'string',
+            'course_group_category' => 'nullable|integer',
+            'q'                     => 'nullable|string',
+            'issuer'                => 'nullable|string',
             'badge_category'        => 'string',
         ]);
 
