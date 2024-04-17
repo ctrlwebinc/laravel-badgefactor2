@@ -35,7 +35,7 @@ class ChangeEmailNotification extends Notification
         $oldEstablishment = Establishment::find($notifiable->establishment_id);
         $newEstablishment = Establishment::find($notifiable->new_establishment_id);
 
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject(config('app.name').' - Confirmation de changement d\'adresse courriel')
             ->from(config('cadre21.mail.default_sender'))
             ->markdown('notifications.email-change', [

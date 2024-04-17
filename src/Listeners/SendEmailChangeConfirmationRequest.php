@@ -19,6 +19,5 @@ class SendEmailChangeConfirmationRequest implements ShouldQueue
     public function handle(EmailChangeRequested $event)
     {
         $event->user->notify(new ChangeEmailNotification());
-
     }
 }

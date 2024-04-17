@@ -32,6 +32,7 @@ class BackpackAssertionController extends Controller
     public function indexByEmail($locale, $learnerEmail)
     {
         $user = User::where('email', '=', $learnerEmail)->firstOrFail();
+
         return $this->index($locale, $user->slug);
     }
 

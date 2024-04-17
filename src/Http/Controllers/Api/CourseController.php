@@ -5,7 +5,6 @@ namespace Ctrlweb\BadgeFactor2\Http\Controllers\Api;
 use App\Helpers\ECommerceHelper;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
-use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 
 /**
  * @tags Catégories de groupes de cours
