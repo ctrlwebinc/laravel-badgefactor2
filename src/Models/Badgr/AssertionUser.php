@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class AssertionUser extends Model
 {
-
     protected $table = 'assertion_user';
 
     protected $casts = [
@@ -24,5 +23,4 @@ class AssertionUser extends Model
     {
         parent::boot();
     }
-
 }

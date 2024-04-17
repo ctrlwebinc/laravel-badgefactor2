@@ -16,7 +16,6 @@ class BackpackAssertionController extends Controller
         $user = User::where('slug', $learner)->firstOrFail();
         $assertionsVisibility = AssertionUser::where('user_id', '=', $user->id)->get()->keyBy('assertion_id');
 
-        //dd($assertionsVisibility);
         $assertions = Assertion::with(['issuer', 'badgeclass'])->get();
 
         if (!$assertions) {
@@ -28,6 +27,12 @@ class BackpackAssertionController extends Controller
         }
 
         return response()->json($assertions);
+    }
+
+    public function indexByEmail($locale, $learnerEmail)
+    {
+        $user = User::where('email', '=', $learnerEmail)->firstOrFail();
+        return $this->index($locale, $user->slug);
     }
 
     public function toggleVisibility(AssertionVisibilityRequest $request, string $entityId)

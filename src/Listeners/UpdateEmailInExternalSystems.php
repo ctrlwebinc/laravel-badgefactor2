@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-
 class UpdateEmailInExternalSystems implements ShouldQueue
 {
     public function handle(EmailChangeValidated $event)

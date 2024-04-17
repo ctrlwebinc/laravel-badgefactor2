@@ -70,6 +70,7 @@ Route::group([
 ], function () {
     // Courses.
     Route::get('courses/{course}/validate-access', [CourseController::class, 'validateAccess']);
+    Route::get('backpack/assertions/{learnerEmail}', [BackpackAssertionController::class, 'indexByEmail']);
 });
 
 /*
