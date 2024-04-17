@@ -8,7 +8,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 
 class SendEmailChangeConfirmationRequest implements ShouldQueue
 {
-
     /**
      * Handle the event.
      *
