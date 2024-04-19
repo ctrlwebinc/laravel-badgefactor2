@@ -69,8 +69,8 @@ class CourseGroup extends Model implements HasMedia
             $locale = app()->getLocale();
             if (request()->input('q')) {
                 $query->where(function ($q) use ($locale) {
-                    return $q->whereRaw('LOWER(title) LIKE %'.strtolower(request()->input('q')).'%')
-                        ->orWhereRaw('LOWER(description) LIKE %'.strtolower(request()->input('q')).'%');
+                    return $q->whereRaw('LOWER(title) LIKE "%'.strtolower(request()->input('q')).'%"')
+                        ->orWhereRaw('LOWER(description) LIKE "%'.strtolower(request()->input('q')).'%"');
                 });
             }
         });
