@@ -34,7 +34,8 @@ Route::group([
     Route::get('issuers-count', [IssuerController::class, 'count']);
 
     // Badges.
-    Route::apiResource('badges', BadgeController::class)->only(['index', 'show']);
+    Route::get('badges/{entityId}', [BadgeController::class, 'show']);
+    Route::get('badges', [BadgeController::class, 'index']);
 
     // Badge pages.
     Route::apiResource('badge-pages', BadgePageController::class)->only(['index', 'show']);
