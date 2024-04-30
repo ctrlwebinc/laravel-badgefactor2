@@ -43,8 +43,8 @@ class ChangeEmailNotification extends Notification
                 'new_email'         => $notifiable->new_email,
                 'old_job'           => $notifiable->job,
                 'new_job'           => $notifiable->new_job,
-                'old_establishment' => $oldEstablishment->name,
-                'new_establishment' => $newEstablishment->name,
+                'old_establishment' => $oldEstablishment->name ?? null,
+                'new_establishment' => $newEstablishment->name ?? null,
                 'confirmation_link' => route('confirm-email-change').'?new_email_validation_token='.$notifiable->new_email_validation_token,
             ]);
     }
