@@ -19,13 +19,4 @@ class BackpackAssertion extends BadgrRecipientProvider
 
         return $response;
     }
-
-    public function rebake()
-    {
-        foreach (self::all() as $assertion) {
-            if ($this->getEmptyResponse('GET', '/v2/assertions/'.$assertion['entityId'].'/rebake') === false) {
-                Log::error('Rebake failed while updating Badgr User email address.');
-            }
-        }
-    }
 }

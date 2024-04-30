@@ -64,18 +64,6 @@ class UpdateEmailInExternalSystems implements ShouldQueue
                 Log::error('An error occured while updating Badgr User Email: there seems to be user duplicates in Badgr!');
                 $error = true;
             }
-
-            // Reassign Badgr badge instances.
-            $rowsAffected = $badgrDb->update(
-                'update issuer_badgeinstance set recipient_identifier = ? where recipient_identifier = ?',
-                [
-                    $newEmail,
-                    $oldEmail,
-                ]
-            );
-            // Rebake all Badgr badge instances in backpack.
-            $user = User::find($userId);
-            (new BackpackAssertion($user))->rebake();
         }
 
         if ($error) {
