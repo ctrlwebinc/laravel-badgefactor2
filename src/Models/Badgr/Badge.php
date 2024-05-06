@@ -32,6 +32,7 @@ class Badge extends Model
         'request_form_url'  => 'json',
         'badge_category_id' => 'integer',
         'course_id'         => 'integer',
+        'last_updated_at'   => 'date',
         'created_at'        => 'datetime',
         'updated_at'        => 'datetime',
     ];
@@ -68,6 +69,7 @@ class Badge extends Model
             $badgePage->approval_type = $badge->badgePage['approval_type'];
             $badgePage->request_form_url = $badge->badgePage['request_form_url'];
             $badgePage->badge_category_id = $badge->badgePage['badge_category_id'];
+            $badgePage->last_updated_at = $badge->badgePage['last_updated_at'];
 
             $badgePage->saveQuietly();
 
@@ -75,6 +77,7 @@ class Badge extends Model
         });
 
         static::updating(function (Badge $badge) {
+
             app(BadgrBadge::class)->update(
                 $badge->entityId,
                 $badge->name,
@@ -94,6 +97,7 @@ class Badge extends Model
                     'approval_type'     => $badge->badgePage['approval_type'],
                     'request_form_url'  => $badge->badgePage['request_form_url'],
                     'badge_category_id' => $badge->badgePage['badge_category_id'],
+                    'last_updated_at'   => $badge->badgePage['last_updated_at'],
                 ]
             );
 
@@ -133,6 +137,7 @@ class Badge extends Model
                 $row['request_form_url'] = !empty($badgePage) ? json_encode($badgePage->getTranslations('request_form_url')) : '';
                 $row['badge_category_id'] = !empty($badgePage) ? $badgePage->badge_category_id : '';
                 $row['course_id'] = !empty($badgePage) && !empty($badgePage->course) ? $badgePage->course->id : '';
+                $row['last_updated_at'] = !empty($badgePage) && !empty($badgePage->last_updated_at) ? $badgePage->last_updated_at : '';
 
                 return $row->except(['alignments', 'tags', 'extensions', 'expires'])
                     ->toArray();
