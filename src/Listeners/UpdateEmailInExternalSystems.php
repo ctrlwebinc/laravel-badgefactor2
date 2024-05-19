@@ -4,7 +4,6 @@ namespace Ctrlweb\BadgeFactor2\Listeners;
 
 use Ctrlweb\BadgeFactor2\Events\EmailChangeValidated;
 use Ctrlweb\BadgeFactor2\Models\User;
-use Ctrlweb\BadgeFactor2\Services\Badgr\BackpackAssertion;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;

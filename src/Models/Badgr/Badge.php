@@ -77,7 +77,6 @@ class Badge extends Model
         });
 
         static::updating(function (Badge $badge) {
-
             app(BadgrBadge::class)->update(
                 $badge->entityId,
                 $badge->name,

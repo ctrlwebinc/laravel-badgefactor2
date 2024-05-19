@@ -2,8 +2,6 @@
 
 namespace Ctrlweb\BadgeFactor2\Services\Badgr;
 
-use Illuminate\Support\Facades\Log;
-
 class BackpackAssertion extends BadgrRecipientProvider
 {
     public function all(): array|bool
