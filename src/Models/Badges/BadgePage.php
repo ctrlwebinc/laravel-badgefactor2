@@ -2,6 +2,7 @@
 
 namespace Ctrlweb\BadgeFactor2\Models\Badges;
 
+use Ctrlweb\BadgeFactor2\Models\Badgr\Badge;
 use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
 use Ctrlweb\BadgeFactor2\Models\User;
@@ -140,15 +141,9 @@ class BadgePage extends Model implements HasMedia
         return $this->belongsTo(BadgeCategory::class);
     }
 
-    public function getBadgeAttribute()
+    public function badge()
     {
-        if ($this->badgeclass_id) {
-            $badge = app(BadgrBadge::class)->getBySlug($this->badgeclass_id);
-
-            return $badge;
-        }
-
-        return null;
+        return $this->belongsTo(Badge::class);
     }
 
     public function registerMediaCollections(): void
