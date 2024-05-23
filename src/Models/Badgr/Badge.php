@@ -48,7 +48,6 @@ class Badge extends Model
     protected static function booted(): void
     {
         static::creating(function (Badge $badge) {
-
             $badgeclassId = app(BadgrBadge::class)->add(
                 $badge->image,
                 $badge->name,
