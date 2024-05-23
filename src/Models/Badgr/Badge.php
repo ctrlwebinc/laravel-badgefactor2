@@ -61,6 +61,7 @@ class Badge extends Model
                 return false;
             }
 
+            /*
             $badgePage = new BadgePage();
             $badgePage->badgeclass_id = $badgeclassId;
             $badgePage->title = request()->input('title');
@@ -76,6 +77,7 @@ class Badge extends Model
             $badgePage->addMediaFromRequest('badgePage.__media__.image')
                 ->preservingOriginal()
                 ->toMediaCollection('image');
+            */
 
             return true;
         });
@@ -90,6 +92,7 @@ class Badge extends Model
                 $badge->image
             );
 
+            /*
             $badgePage = BadgePage::updateOrCreate(
                 ['badgeclass_id' => $badge->entityId],
                 [
@@ -103,6 +106,7 @@ class Badge extends Model
                     'last_updated_at'   => $badge->badgePage['last_updated_at'],
                 ]
             );
+            */
 
             return true;
         });
