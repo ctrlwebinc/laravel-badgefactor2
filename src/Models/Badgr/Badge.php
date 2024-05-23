@@ -24,7 +24,7 @@ class Badge extends Model
         'description'       => 'string',
         'criteriaNarrative' => 'string',
         'badgeclass_id'     => 'string',
-        'title'             => 'json',
+        'badgePage.title'   => 'json',
         'slug'              => 'json',
         'content'           => 'json',
         'criteria'          => 'json',
@@ -48,6 +48,7 @@ class Badge extends Model
     protected static function booted(): void
     {
         static::creating(function (Badge $badge) {
+
             $badgeclassId = app(BadgrBadge::class)->add(
                 $badge->image,
                 $badge->name,
@@ -62,16 +63,19 @@ class Badge extends Model
 
             $badgePage = new BadgePage();
             $badgePage->badgeclass_id = $badgeclassId;
-            $badgePage->title = $badge->badgePage['title'];
-            $badgePage->slug = $badge->badgePage['slug'];
-            $badgePage->content = $badge->badgePage['content'];
-            $badgePage->criteria = $badge->badgePage['criteria'];
-            $badgePage->approval_type = $badge->badgePage['approval_type'];
-            $badgePage->request_form_url = $badge->badgePage['request_form_url'];
-            $badgePage->badge_category_id = $badge->badgePage['badge_category_id'];
-            $badgePage->last_updated_at = $badge->badgePage['last_updated_at'];
-
+            $badgePage->title = request()->input('title');
+            $badgePage->slug = request()->input('slug');
+            $badgePage->content = request()->input('content');
+            $badgePage->criteria = request()->input('criteria');
+            $badgePage->approval_type = request()->input('badgePage.approval_type');
+            $badgePage->request_form_url = request()->input('request_form_url');
+            $badgePage->badge_category_id = request()->input('badgePage.badgeCategory');
+            $badgePage->video_url = request()->input('video_url');
+            $badgePage->last_updated_at = request()->input('badgePage.last_updated_at');
             $badgePage->saveQuietly();
+            $badgePage->addMediaFromRequest('badgePage.__media__.image')
+                ->preservingOriginal()
+                ->toMediaCollection('image');
 
             return true;
         });
