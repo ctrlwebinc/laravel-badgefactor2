@@ -23,26 +23,26 @@ class Badge extends Model
         'name'              => 'string',
         'description'       => 'string',
         'criteriaNarrative' => 'string',
-        'badgeclass_id'     => 'string',
-        'badgePage.title'   => 'json',
-        'slug'              => 'json',
-        'content'           => 'json',
-        'criteria'          => 'json',
-        'approval_type'     => 'string',
-        'request_form_url'  => 'json',
-        'badge_category_id' => 'integer',
-        'course_id'         => 'integer',
-        'last_updated_at'   => 'date',
-        'created_at'        => 'datetime',
-        'updated_at'        => 'datetime',
+        //'badgeclass_id'     => 'string',
+        //'badgePage.title'   => 'json',
+        //'slug'              => 'json',
+        //'content'           => 'json',
+        //'criteria'          => 'json',
+        //'approval_type'     => 'string',
+        //'request_form_url'  => 'json',
+        //'badge_category_id' => 'integer',
+        //'course_id'         => 'integer',
+        //'last_updated_at'   => 'date',
+        //'created_at'        => 'datetime',
+        //'updated_at'        => 'datetime',
     ];
 
     protected $translatable = [
-        'title',
-        'slug',
-        'content',
-        'criteria',
-        'request_form_url',
+        //'title',
+        //'slug',
+        //'content',
+        //'criteria',
+        //'request_form_url',
     ];
 
     protected static function booted(): void
@@ -134,6 +134,7 @@ class Badge extends Model
                 $row['issuer_id'] = $row['issuer'];
                 unset($row['issuer']);
 
+                /*
                 $badgePage = $badgePages->where('badgeclass_id', $row['entityId'])->first();
                 $row['badgeclass_id'] = !empty($badgePage) ? $badgePage->badgeclass_id : '';
                 $row['title'] = !empty($badgePage) ? json_encode($badgePage->getTranslations('title')) : '';
@@ -145,6 +146,7 @@ class Badge extends Model
                 $row['badge_category_id'] = !empty($badgePage) ? $badgePage->badge_category_id : '';
                 $row['course_id'] = !empty($badgePage) && !empty($badgePage->course) ? $badgePage->course->id : '';
                 $row['last_updated_at'] = !empty($badgePage) && !empty($badgePage->last_updated_at) ? $badgePage->last_updated_at : '';
+                */
 
                 return $row->except(['alignments', 'tags', 'extensions', 'expires'])
                     ->toArray();
