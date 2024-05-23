@@ -90,20 +90,6 @@ class Badge extends Model
                 $badge->image
             );
 
-            $badgePage = BadgePage::updateOrCreate(
-                ['badgeclass_id' => $badge->entityId],
-                [
-                    'title'             => $badge->badgePage['title'],
-                    'slug'              => $badge->badgePage['slug'],
-                    'content'           => $badge->badgePage['content'],
-                    'criteria'          => $badge->badgePage['criteria'],
-                    'approval_type'     => $badge->badgePage['approval_type'],
-                    'request_form_url'  => $badge->badgePage['request_form_url'],
-                    'badge_category_id' => $badge->badgePage['badge_category_id'],
-                    'last_updated_at'   => $badge->badgePage['last_updated_at'],
-                ]
-            );
-
             return true;
         });
 
