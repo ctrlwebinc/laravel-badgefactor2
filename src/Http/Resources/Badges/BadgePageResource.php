@@ -57,7 +57,7 @@ class BadgePageResource extends JsonResource
 
         $badgeCategory = $this->resource->badge_category_id ? BadgeCategory::where('id', $this->resource->badge_category_id)->first() : null;
         if (null !== $badgeCategory) {
-            $badgeCategory = json_decode($badgeCategory->title)->fr;
+            $badgeCategory = $badgeCategory->title;
         }
 
         $badge = Badge::find($this->resource->badgeclass_id);
