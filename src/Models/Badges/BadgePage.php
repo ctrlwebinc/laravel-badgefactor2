@@ -141,9 +141,15 @@ class BadgePage extends Model implements HasMedia
         return $this->belongsTo(BadgeCategory::class);
     }
 
-    public function badge()
+    public function getBadgeAttribute()
     {
-        return $this->belongsTo(Badge::class, 'badgeclass_id', 'entityId');
+        if ($this->badgeclass_id) {
+            $badge = app(BadgrBadge::class)->getBySlug($this->badgeclass_id);
+
+            return $badge;
+        }
+
+        return null;
     }
 
     public function registerMediaCollections(): void
