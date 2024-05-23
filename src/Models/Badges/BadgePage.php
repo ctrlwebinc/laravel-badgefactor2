@@ -150,8 +150,11 @@ class BadgePage extends Model implements HasMedia
     {
         if ($this->badgeclass_id) {
             $badge = app(BadgrBadge::class)->getBySlug($this->badgeclass_id);
-
-            return $badge;
+            if (is_array($badge)) {
+                return Badge::where('entityId', '=', $badge['entityId'])->first();
+            } else {
+                return Badge::where('entityId', '=', $badge->entityId)->first();
+            }
         }
 
         return null;
