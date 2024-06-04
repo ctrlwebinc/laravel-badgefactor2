@@ -36,6 +36,7 @@ Route::group([
     // Badges.
     Route::get('badges/{entityId}', [BadgeController::class, 'show']);
     Route::get('badges', [BadgeController::class, 'index']);
+    Route::get('badges/{entityId}/validate-access', [BadgeController::class, 'validateAccess']);
 
     // Badge pages.
     Route::apiResource('badge-pages', BadgePageController::class)->only(['index', 'show']);
@@ -73,6 +74,7 @@ Route::group([
     Route::get('courses/{course}/validate-access', [CourseController::class, 'validateAccess']);
     Route::get('backpack/assertions/{learnerEmail}', [BackpackAssertionController::class, 'indexByEmail']);
 });
+
 
 /*
 |--------------------------------------------------------------------------
