@@ -17,7 +17,7 @@ class BackpackAssertionController extends Controller
         $assertionsVisibility = AssertionUser::where('user_id', '=', $user->id)->get()->keyBy('assertion_id');
 
         $assertions = Assertion::with(['issuer', 'badgeclass.badgePage'])->get();
-        
+
         if (!$assertions) {
             return response()->json([], 404);
         }

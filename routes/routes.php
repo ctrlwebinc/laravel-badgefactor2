@@ -75,7 +75,6 @@ Route::group([
     Route::get('backpack/assertions/{learnerEmail}', [BackpackAssertionController::class, 'indexByEmail']);
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes

@@ -3,9 +3,9 @@
 namespace Ctrlweb\BadgeFactor2\Http\Controllers\Api\Badgr;
 
 use App\Helpers\ECommerceHelper;
+use Ctrlweb\BadgeFactor2\Events\BadgeRequestFormAccessed;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
-use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Badge;
 
 /**
@@ -45,6 +45,7 @@ class BadgeController extends Controller
         $currentUser = auth()->user();
 
         if ($course && $currentUser->freeAccess || ECommerceHelper::hasAccess($currentUser, $course)) {
+            BadgeRequestFormAccessed::dispatch($currentUser, $badgePage->badge);
             return response()->json([
                 'access' => true,
             ]);

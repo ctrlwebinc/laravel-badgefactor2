@@ -48,7 +48,6 @@ class Badge extends Model
     protected static function booted(): void
     {
         static::creating(function (Badge $badge) {
-
             $badgeclassId = app(BadgrBadge::class)->add(
                 $badge->image,
                 $badge->name,
@@ -129,7 +128,7 @@ class Badge extends Model
 
             $badgePages = BadgePage::with('course')->get();
 
-            $badges = $badges->map(function ($row) use ($badgePages) {
+            $badges = $badges->map(function ($row) {
                 $row = collect($row);
                 $row['issuer_id'] = $row['issuer'];
                 unset($row['issuer']);
