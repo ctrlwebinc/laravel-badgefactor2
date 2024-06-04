@@ -5,7 +5,6 @@ namespace Ctrlweb\BadgeFactor2\Events;
 use App\Models\User;
 use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 

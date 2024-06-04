@@ -36,6 +36,7 @@ class BadgeController extends Controller
     {
         $badgePage = BadgePage::where('badgeclass_id', '=', $entityId)->first();
         if (!$badgePage) {
+
             return response()->json([
                 'access'   => false,
                 'redirect' => config('badgefactor2.frontend.url'),
@@ -46,10 +47,12 @@ class BadgeController extends Controller
 
         if ($course && $currentUser->freeAccess || ECommerceHelper::hasAccess($currentUser, $course)) {
             BadgeRequestFormAccessed::dispatch($currentUser, $badgePage->badge);
+
             return response()->json([
                 'access' => true,
             ]);
         } else {
+
             return response()->json([
                 'access'   => false,
                 'redirect' => config('badgefactor2.frontend.url').'/badges/'.$badgePage->slug,

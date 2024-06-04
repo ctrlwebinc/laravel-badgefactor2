@@ -6,7 +6,6 @@ use App\Models\User;
 use Carbon\Carbon;
 use Ctrlweb\BadgeFactor2\Models\Badgr\Badge;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
