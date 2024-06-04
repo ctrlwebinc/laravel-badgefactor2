@@ -36,7 +36,6 @@ class BadgeController extends Controller
     {
         $badgePage = BadgePage::where('badgeclass_id', '=', $entityId)->first();
         if (!$badgePage) {
-
             return response()->json([
                 'access'   => false,
                 'redirect' => config('badgefactor2.frontend.url'),
@@ -52,7 +51,6 @@ class BadgeController extends Controller
                 'access' => true,
             ]);
         } else {
-
             return response()->json([
                 'access'   => false,
                 'redirect' => config('badgefactor2.frontend.url').'/badges/'.$badgePage->slug,

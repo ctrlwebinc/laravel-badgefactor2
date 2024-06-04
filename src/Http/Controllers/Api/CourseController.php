@@ -19,6 +19,7 @@ class CourseController extends Controller
 
         if ($course && $currentUser->freeAccess || ECommerceHelper::hasAccess($currentUser, $course)) {
             CourseAccessed::dispatch($currentUser, $course);
+
             return response()->json([
                 'access' => true,
             ]);
