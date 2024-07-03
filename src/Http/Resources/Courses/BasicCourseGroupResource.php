@@ -19,12 +19,13 @@ class BasicCourseGroupResource extends JsonResource
     public function toArray($request): array|JsonSerializable|Arrayable
     {
         return [
-            'id'        => $this->resource->id,
-            'slug'      => $this->resource->slug,
-            'excerpt'   => substr($this->resource->excerpt, 0, 140),
-            'title'     => $this->resource->title,
-            'createdAt' => $this->resource->created_at,
-            'updatedAt' => $this->resource->updated_at,
+            'id'          => $this->resource->id,
+            'slug'        => $this->resource->slug,
+            'excerpt'     => mb_substr(strip_tags($this->resource->description), 0, 134, 'UTF-8').' [...]',
+            'description' => $this->resource->description,
+            'title'       => $this->resource->title,
+            'createdAt'   => $this->resource->created_at,
+            'updatedAt'   => $this->resource->updated_at,
         ];
     }
 }

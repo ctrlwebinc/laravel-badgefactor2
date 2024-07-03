@@ -5,6 +5,11 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class() extends Migration {
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
     public function up(): void
     {
         Schema::create('media', function (Blueprint $table) {
@@ -27,5 +32,15 @@ return new class() extends Migration {
 
             $table->nullableTimestamps();
         });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('media');
     }
 };

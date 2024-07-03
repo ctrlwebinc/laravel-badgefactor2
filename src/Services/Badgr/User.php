@@ -4,7 +4,7 @@ namespace Ctrlweb\BadgeFactor2\Services\Badgr;
 
 use Exception;
 
-class User extends BadgrProvider
+class User extends BadgrAdminProvider
 {
     /**
      * @param string $firstName
@@ -32,13 +32,7 @@ class User extends BadgrProvider
             'password'             => $password,
         ];
 
-        $response = $this->getClient()->post('/v1/user/profile', $payload);
-
-        if (null !== $response && $response->status() === 201) {
-            return $response->json('slug');
-        }
-
-        return false;
+        return $this->getV1Id('POST', '/v1/user/profile', $payload);
     }
 
     /**
@@ -57,17 +51,7 @@ class User extends BadgrProvider
             'currentPassword' => $oldPassword,
         ];
 
-        $response = $this->getClient()->post('/v2/users/'.$entityId, $payload);
-
-        if (null !== $response && $response->status() === 200) {
-            $response = $response->json();
-
-            if (isset($response['status']['success']) && true === $response['status']['success']) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->confirmUpdate('POST', '/v2/users/'.$entityId, $payload);
     }
 
     /**
@@ -79,34 +63,7 @@ class User extends BadgrProvider
      */
     public function get(string $entityId): mixed
     {
-        $response = $this->getClient()->get('/v2/users/'.$entityId);
-
-        return $this->getFirstResult($response);
-    }
-
-    /**
-     * @param string $entityId
-     *
-     * @throws Exception
-     *
-     * @return bool
-     */
-    public function checkVerified(string $entityId): bool
-    {
-        $response = $this->getClient()->get('/v2/users/'.$entityId);
-
-        if (null !== $response && $response->status() === 200) {
-            $response = $response->json();
-
-            if (
-                isset($response['status']['success']) && true === $response['status']['success'] &&
-                isset($response['result'][0]) && isset($response['result'][0]->recipient)
-            ) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->getFirstResult('GET', '/v2/users/'.$entityId);
     }
 
     /**
@@ -132,12 +89,6 @@ class User extends BadgrProvider
             ],
         ];
 
-        $response = $this->getClient()->put('/v2/users/'.$entityId, $payload);
-
-        if (null !== $response && $response->status() === 200) {
-            return true;
-        }
-
-        return false;
+        return $this->confirmUpdate('PUT', '/v2/users/'.$entityId, $payload);
     }
 }

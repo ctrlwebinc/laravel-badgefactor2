@@ -36,7 +36,7 @@
     "extra": {
       "laravel": {
         "providers": [
-          "Ctrlweb\\BadgeFactor2\\CoreServiceProvider"
+          "Ctrlweb\\BadgeFactor2\\Providers\\CoreServiceProvider"
         ],
         "aliases": {
           "BadgeFactor2": "Ctrlweb\\BadgeFactor2\\BadgeFactor2"

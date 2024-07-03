@@ -1,28 +1,35 @@
 <?php
 
-namespace Ctrlweb\Badgefactor2\Models;
+namespace Ctrlweb\BadgeFactor2\Models;
 
+use Ctrlweb\BadgeFactor2\Interfaces\TokenRepositoryInterface;
+use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Ctrlweb\BadgeFactor2\Models\Badgr\Assertion;
-use Ctrlweb\BadgeFactor2\Models\BillingInfo;
 use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 use Ctrlweb\BadgeFactor2\Notifications\ResetPasswordNotification;
+use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrRecipientProvider;
+use Ctrlweb\BadgeFactor2\Services\Badgr\User as BadgrUser;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
+use League\OAuth2\Client\Token\AccessTokenInterface;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRepositoryInterface
 {
     use HasApiTokens;
     use HasFactory;
     use HasRoles;
+    use InteractsWithMedia;
     use Notifiable;
 
     const ADMINISTRATOR = 'administrator';
@@ -41,9 +48,10 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<int, string>
      */
     protected $fillable = [
-
         'id',
         'email',
+        'new_email',
+        'new_email_validation_token',
         'email_verified_at',
         'password',
         'two_factor_secret',
@@ -52,44 +60,45 @@ class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
         'created_at',
         'updated_at',
-        'first_name',
-        'last_name',
-        'description',
-        'website',
-        'slug',
-        'wp_id',
-        'wp_password',
-        'establishment_id',
-        'place',
-        'organisation',
-        'job',
-        'biography',
-        'facebook',
-        'twitter',
-        'linkedin',
-        'photo',
-        'billing_last_name',
-        'billing_first_name',
-        'billing_society',
-        'billing_address_line_1',
-        'billing_address_line_2',
-        'billing_city',
-        'billing_postal_code',
-        'billing_country',
-        'billing_state',
-        'billing_phone',
-        'billing_email',
-        'user_status',
-        'last_connexion',
-        'username',
         'stripe_id',
         'pm_type',
         'pm_last_four',
         'trial_ends_at',
-        'wp_application_password',
+        'first_name',
+        'last_name',
+        'description',
+        'description_visible',
+        'website',
+        'website_visible',
+        'slug',
+        'wp_id',
+        'wp_password',
+        'username',
+        'place',
+        'place_visible',
+        'organisation',
+        'organisation_visible',
+        'job',
+        'new_job',
+        'job_visible',
+        'biography',
+        'biography_visible',
+        'facebook',
+        'facebook_visible',
+        'twitter',
+        'twitter_visible',
+        'linkedin',
+        'linkedin_visible',
+        'photo',
+        'user_status',
+        'badgr_token_set',
+        'last_connexion',
         'badgr_user_state',
         'badgr_user_slug',
         'badgr_password',
+        'badgr_encrypted_password',
+        'establishment_id',
+        'new_establishment_id',
     ];
 
     /**
@@ -101,6 +110,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'remember_token',
         'wp_password',
+        'badgr_token_set',
+        'badgr_password',
+        'badgr_encrypted_password',
     ];
 
     /**
@@ -109,22 +121,44 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<string, string>
      */
     protected $casts = [
-        'created_at'        => 'datetime',
-        'email_verified_at' => 'datetime',
+        'created_at'                  => 'datetime',
+        'updated_at'                  => 'datetime',
+        'email_verified_at'           => 'datetime',
+        'is_validated'                => 'boolean',
+        'badgr_encrypted_password'    => 'encrypted',
+        'description_visible'         => 'boolean',
+        'website_visible'             => 'boolean',
+        'place_visible'               => 'boolean',
+        'organisation_visible'        => 'boolean',
+        'job_visible'                 => 'boolean',
+        'biography_visible'           => 'boolean',
+        'facebook_visible'            => 'boolean',
+        'twitter_visible'             => 'boolean',
+        'linkedin_visible'            => 'boolean',
     ];
 
     protected $with = [
-        'roles', 'billingInfo',
+        'roles',
     ];
+
+    protected $guard_name = 'web';
 
     public static function boot()
     {
         parent::boot();
 
         self::creating(function (User $user) {
-            $user->name = $user->first_name.' '.$user->first_name;
-            $user->password = Hash::make($user->password ?? Str::random(16));
+            if ('' == $user->badgr_encrypted_password) {
+                $user->badgr_encrypted_password = Str::random(16);
+            }
             $user->slug = Str::slug($user->username);
+
+            $user->badgr_user_slug = (new BadgrUser())->add(
+                $user->first_name,
+                $user->last_name,
+                $user->email,
+                $user->badgr_encrypted_password
+            );
         });
 
         self::created(function (User $user) {
@@ -184,13 +218,64 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Course::class);
     }
 
-    public function billingInfo()
-    {
-        return $this->hasOne(BillingInfo::class);
-    }
-
     public function assertions()
     {
-        return $this->hasMany(Assertion::class);
+        return $this->hasMany(Assertion::class, 'recipient_id');
+    }
+
+    public function badge_pages()
+    {
+        return $this->belongsToMany(BadgePage::class, 'approver_badge_page', 'approver_id', 'badge_page_id');
+    }
+
+    public function isVerified(): Attribute
+    {
+        $isVerified = false;
+        if ($this->hasVerifiedEmail()) {
+            $isVerified = true;
+        } else {
+            $badgrUser = User::find($this->id);
+
+            if (null !== $badgrUser) {
+                $recipientService = new BadgrRecipientProvider($badgrUser);
+                if ($recipientService->hasVerifiedEmail()) {
+                    $this->markEmailAsVerified();
+                    $isVerified = true;
+                }
+            }
+        }
+
+        return Attribute::make(
+            get: fn ($value) => $isVerified,
+        );
+    }
+
+    public function registerMediaConversions(Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+            ->width(32)
+            ->height(32);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('photo')->singleFile();
+    }
+
+    public function getTokenSet(): ?AccessTokenInterface
+    {
+        $tokenSet = unserialize($this->badgr_token_set);
+        if (!$tokenSet) {
+            return null;
+        }
+
+        return $tokenSet;
+    }
+
+    public function saveTokenSet(AccessTokenInterface $tokenSet)
+    {
+        $this->refresh();
+        $this->badgr_token_set = serialize($tokenSet);
+        $this->save();
     }
 }

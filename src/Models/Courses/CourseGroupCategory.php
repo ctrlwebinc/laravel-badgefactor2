@@ -3,18 +3,22 @@
 namespace Ctrlweb\BadgeFactor2\Models\Courses;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
 
-class CourseGroupCategory extends Model
+class CourseGroupCategory extends Model implements HasMedia
 {
     use HasTranslations;
+    use InteractsWithMedia;
+    use Searchable;
 
     protected $fillable = [
         'slug',
         'title',
-        'excerpt',
         'subtitle',
-        'image',
         'description',
         'menu_title',
         'is_featured',
@@ -42,5 +46,17 @@ class CourseGroupCategory extends Model
     public function courseGroups()
     {
         return $this->hasMany(CourseGroup::class);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('image')->singleFile();
+    }
+
+    public function registerMediaConversions(Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+            ->width(32)
+            ->height(32);
     }
 }

@@ -3,7 +3,9 @@
 namespace Ctrlweb\BadgeFactor2\Http\Controllers\Api;
 
 use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
+use Ctrlweb\BadgeFactor2\Http\Resources\Badges\BadgePageResource;
 use Ctrlweb\BadgeFactor2\Http\Resources\Courses\CourseGroupResource;
+use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
 use Illuminate\Http\Request;
 
@@ -24,16 +26,25 @@ class CourseGroupController extends Controller
     public function index(string $locale, Request $request)
     {
         $request->validate([
-            'course_group_category' => 'integer',
-            'q'                     => 'nullable',
-            'issuer'                => 'string',
+            'course_group_category' => 'nullable|integer',
+            'q'                     => 'nullable|string',
+            'issuer'                => 'nullable|string',
+            'badge_category'        => 'string',
         ]);
 
-        $query = CourseGroup::query();
+        $badgeCategory = request()->input('badge_category');
 
-        $groups = $query->paginate();
+        if (!empty($badgeCategory) && $badgeCategory !== 'certification') {
+            $query = BadgePage::query();
+            $groups = $query->orderByDesc('updated_at')->paginate(12);
 
-        return CourseGroupResource::collection($groups);
+            return BadgePageResource::collection($groups);
+        } else {
+            $query = CourseGroup::query();
+            $groups = $query->orderByDesc('updated_at')->paginate(12);
+
+            return CourseGroupResource::collection($groups);
+        }
     }
 
     public function show(string $locale, $slug)

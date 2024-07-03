@@ -5,7 +5,7 @@ namespace Ctrlweb\BadgeFactor2\Services\Badgr;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 
-class Issuer extends BadgrProvider
+class Issuer extends BadgrAdminProvider
 {
     /**
      * @throws Exception
@@ -18,17 +18,10 @@ class Issuer extends BadgrProvider
             return json_decode(Cache::get('issuers'));
         }
 
-        $client = $this->getClient();
-        if (!$client) {
-            return false;
-        }
-
-        $response = $client->get('/v2/issuers');
-
-        $response = $this->getResult($response);
+        $response = $this->getResult('GET', '/v2/issuers');
 
         if ($response) {
-            Cache::put('issuers', json_encode($response), 60);
+            Cache::put('issuers', json_encode($response), config('badgefactor2.cache_duration'));
         }
 
         return $response;
@@ -45,12 +38,10 @@ class Issuer extends BadgrProvider
             return Cache::get('issuers_count');
         }
 
-        $response = $this->getClient()->get('/v2/issuers_count');
-
-        $response = $this->getCount($response);
+        $response = $this->getCount('GET', '/v2/issuers_count');
 
         if ($response) {
-            Cache::put('issuers_count', $response, 60);
+            Cache::put('issuers_count', $response, config('badgefactor2.cache_duration'));
         }
 
         return $response;
@@ -94,12 +85,10 @@ class Issuer extends BadgrProvider
             return json_decode(Cache::get('issuer_'.$entityId));
         }
 
-        $response = $this->getClient()->get('/v2/issuers/'.$entityId);
-
-        $response = $this->getFirstResult($response);
+        $response = $this->getFirstResult('GET', '/v2/issuers/'.$entityId);
 
         if ($response) {
-            Cache::put('issuer_'.$entityId, json_encode($response), 60);
+            Cache::put('issuer_'.$entityId, json_encode($response), config('badgefactor2.cache_duration'));
         }
 
         return $response;
@@ -132,11 +121,9 @@ class Issuer extends BadgrProvider
             $payload['image'] = $this->prepareImage($image);
         }
 
-        $response = $this->getClient()->post('/v2/issuers', $payload);
-
         Cache::forget('issuers');
 
-        return $this->getEntityId($response);
+        return $this->getEntityId('POST', '/v2/issuers', $payload);
     }
 
     /**
@@ -173,16 +160,10 @@ class Issuer extends BadgrProvider
             $payload['image'] = $this->prepareImage($image);
         }
 
-        $response = $this->getClient()->put('/v2/issuers/'.$entityId, $payload);
-
         Cache::forget('issuers');
         Cache::forget('issuer_'.$entityId);
 
-        if (null !== $response && $response->status() === 200) {
-            return true;
-        }
-
-        return false;
+        return $this->confirmUpdate('PUT', '/v2/issuers/'.$entityId, $payload);
     }
 
     /**
@@ -194,20 +175,9 @@ class Issuer extends BadgrProvider
      */
     public function delete(string $entityId): bool
     {
-        $client = $this->getClient();
-        if (!$client) {
-            return false;
-        }
-
-        $response = $client->delete('/v2/issuers/'.$entityId);
-
         Cache::forget('issuers');
         Cache::forget('issuer_'.$entityId);
 
-        if (null !== $response && ($response->status() === 204 || $response->status() === 404)) {
-            return true;
-        }
-
-        return false;
+        return $this->confirmDeletion('DELETE', '/v2/issuers/'.$entityId);
     }
 }

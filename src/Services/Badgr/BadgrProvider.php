@@ -2,39 +2,169 @@
 
 namespace Ctrlweb\BadgeFactor2\Services\Badgr;
 
-use Carbon\CarbonInterface;
+use Ctrlweb\BadgeFactor2\Exceptions\ConfigurationException;
+use Ctrlweb\BadgeFactor2\Exceptions\ExpiredTokenException;
+use Ctrlweb\BadgeFactor2\Exceptions\MissingTokenException;
 use Ctrlweb\BadgeFactor2\Models\BadgrConfig;
 use Exception;
-use GuzzleHttp\Promise\PromiseInterface;
-use Illuminate\Http\Client\Response;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Storage;
+use League\OAuth2\Client\Provider\GenericProvider;
+use League\OAuth2\Client\Token\AccessTokenInterface;
 
-class BadgrProvider
+abstract class BadgrProvider
 {
-    private BadgrClient $client;
+    protected $provider;
+    protected $config;
+    protected $providerConfiguration = [];
 
-    public function __construct()
+    protected function buildRequest($method, $url, array $options = [], array $payload = [])
     {
-        $badgrConfig = BadgrConfig::first();
-        if ($badgrConfig) {
-            $this->client = new BadgrClient(
-                $badgrConfig->client_id,
-                $badgrConfig->client_secret,
-                $badgrConfig->redirect_uri,
-                config('badgefactor2.badgr.server_url'),
-                config('badgefactor2.badgr.admin_scopes')
-            );
+        $defaultOptions = [
+            'headers' => [
+                'Accept'       => 'application/json',
+                'Content-Type' => 'application/json',
+            ],
+        ];
+
+        $mergedOptions = array_merge_recursive($defaultOptions, $options);
+        if (!empty($payload)) {
+            $mergedOptions = array_merge_recursive($mergedOptions, ['body' => json_encode($payload)]);
+        }
+
+        return $this->getProvider()->getAuthenticatedRequest($method, $url, $this->getVerifiedToken(), $mergedOptions);
+    }
+
+    protected function getToken(): ?AccessTokenInterface
+    {
+        return $this->getConfig()->getTokenSet();
+    }
+
+    protected function getVerifiedToken(): AccessTokenInterface
+    {
+        $token = $this->getToken();
+        $this->checkToken($token);
+
+        return $token;
+    }
+
+    protected function sendRequest(Request $request): Response
+    {
+        return $this->getProvider()->getHttpClient()->send($request);
+    }
+
+    protected function getConfig(): BadgrConfig
+    {
+        if (null === $this->config) {
+            $this->config = BadgrConfig::first();
+        }
+        if (null === $this->config) {
+            throw new ConfigurationException('No Badgr Config.');
+        }
+
+        return $this->config;
+    }
+
+    protected function makeProvider(): void
+    {
+        $config = $this->getConfig();
+        $httpClient = new Client(['base_uri' => $config->badgr_server_base_url, 'verify' => false]);
+
+        $this->providerConfiguration['redirectUri'] = route('bf2.auth');
+        $this->providerConfiguration['urlAuthorize'] = '/o/authorize';
+        $this->providerConfiguration['urlAccessToken'] = '/o/token';
+        $this->providerConfiguration['urlResourceOwnerDetails'] = '/o/resource';
+
+        $this->addClientInfo();
+        $this->addScopes();
+        $this->provider = new GenericProvider($this->providerConfiguration, ['httpClient' => $httpClient]);
+    }
+
+    protected function getProvider(): GenericProvider
+    {
+        if (null === $this->provider) {
+            $this->makeProvider();
+        }
+
+        return $this->provider;
+    }
+
+    protected function addClientInfo()
+    {
+        $config = $this->getConfig();
+        $this->providerConfiguration['clientId'] = $config->client_id;
+        $this->providerConfiguration['clientSecret'] = $config->client_secret;
+    }
+
+    protected function addScopes()
+    {
+        $config = $this->getConfig();
+        $this->providerConfiguration['scopes'] = 'rw:profile rw:backpack rw:issuer rw:serverAdmin';
+    }
+
+    protected function checkToken($token): void
+    {
+        if (null === $token) {
+            throw new MissingTokenException('No token retreived from token repository');
+        }
+        if ($token->hasExpired()) {
+            throw new ExpiredTokenException('Token has expired.');
         }
     }
 
-    /**
-     * @throws Exception
-     */
-    public function getClient()
+    protected function makeRecoverableRequest(string $method, string $endpoint, array $payload = []): Response
     {
-        return $this->client->getHttpClient(
-            BadgrConfig::first()->getAccessTokenToArray()
-        );
+        try {
+            $request = $this->buildRequest($method, $endpoint, [], $payload);
+            $response = $this->getProvider()->getHttpClient()->send($request);
+
+            return $response;
+        } catch (MissingTokenException $e) {
+            // No need to try refresh on a missing token
+            // Try a new auth cycle
+            // Let exceptions bubble up since they are not recoverable at this point.
+            $this->tryNewAuthCycle();
+            $request = $this->buildRequest($method, $endpoint, [], $payload);
+            $response = $this->getProvider()->getHttpClient()->send($request);
+
+            return $response;
+        } catch (ExpiredTokenException $e) {
+            // Let processing continue for these exceptions since rest of precessing is to try refresh
+        } catch (ClientException $e) {
+            // Check for 401 exception, rethrow anything else
+            if ($e->getCode() != 401) {
+                throw $e;
+            }
+        }
+
+        // Try a refresh, let all exceptions bubble up
+        $this->refreshToken();
+        $request = $this->buildRequest($method, $endpoint, [], $payload);
+        $response = $this->getProvider()->getHttpClient()->send($request);
+
+        return $response;
+    }
+
+    protected function tryNewAuthCycle()
+    {
+        throw new Exception('Code auth cycle cannot be initiated in background.');
+    }
+
+    protected function refreshToken()
+    {
+        $newAccessToken = $this->getProvider()->getAccessToken('refresh_token', [
+            'refresh_token' => $this->getToken()->getRefreshToken(),
+        ]);
+
+        $this->saveToken($newAccessToken);
+    }
+
+    protected function saveToken(AccessTokenInterface $token)
+    {
+        $this->getConfig()->saveTokenSet($token);
     }
 
     /**
@@ -42,14 +172,38 @@ class BadgrProvider
      *
      * @return false|mixed
      */
-    protected function getEntityId(PromiseInterface|Response $response): mixed
+    protected function getEntityId(string $method, string $endpoint, array $payload = []): string|false
     {
-        if ($response->status() === 201) {
-            $response = $response->json();
-            if (isset($response['status']['success']) && true === $response['status']['success'] &&
-                isset($response['result'][0]['entityId'])) {
-                return $response['result'][0]['entityId'];
+        try {
+            $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
+            if ($response->getStatusCode() === 201) {
+                $response = json_decode($response->getBody(), true);
+                if (isset($response['status']['success']) && true === $response['status']['success'] &&
+                    isset($response['result'][0]['entityId'])) {
+                    return $response['result'][0]['entityId'];
+                }
             }
+        } catch (Exception $e) {
+        }
+
+        return false;
+    }
+
+    /**
+     * @param PromiseInterface|Response $response
+     *
+     * @return false|mixed
+     */
+    protected function getV1Id(string $method, string $endpoint, array $payload = []): string|false
+    {
+        try {
+            $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
+            if ($response->getStatusCode() === 201) {
+                $response = json_decode($response->getBody(), true);
+
+                return $response['slug'];
+            }
+        } catch (Exception $e) {
         }
 
         return false;
@@ -60,19 +214,23 @@ class BadgrProvider
      *
      * @return array|false
      */
-    public function getResult(PromiseInterface|Response $response): array|false
+    public function getResult(string $method, string $endpoint, array $payload = []): array|false
     {
-        if ($response->status() === 200) {
-            $response = $response->json();
-            if (
-                isset($response['status']['success']) && true === $response['status']['success'] &&
-                isset($response['result']) && is_array($response['result'])
-            ) {
-                return $response['result'];
+        try {
+            $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
+            if ($response->getStatusCode() === 200) {
+                $response = json_decode($response->getBody(), true);
+                if (
+                    isset($response['status']['success']) && true === $response['status']['success'] &&
+                    isset($response['result']) && is_array($response['result'])
+                ) {
+                    return $response['result'];
+                }
             }
+        } catch (Exception $e) {
         }
 
-        return false;
+        return [];
     }
 
     /**
@@ -80,15 +238,19 @@ class BadgrProvider
      *
      * @return false|int
      */
-    public function getCount(PromiseInterface|Response $response): int|false
+    public function getCount(string $method, string $endpoint, array $payload = []): int|false
     {
-        if ($response->status() === 200) {
-            $response = $response->json();
-            if (
-                isset($response['count']) && is_numeric($response['count'])
-            ) {
-                return intval($response['count']);
+        try {
+            $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
+            if ($response->getStatusCode() === 200) {
+                $response = json_decode($response->getBody(), true);
+                if (
+                    isset($response['count']) && is_numeric($response['count'])
+                ) {
+                    return intval($response['count']);
+                }
             }
+        } catch (Exception $e) {
         }
 
         return false;
@@ -99,14 +261,38 @@ class BadgrProvider
      *
      * @return false|mixed
      */
-    protected function getFirstResult(PromiseInterface|Response $response): mixed
+    public function getFirstResult(string $method, string $endpoint, array $payload = []): mixed
     {
-        if ($response->status() === 200) {
-            $response = $response->json();
+        try {
+            $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
+            if ($response->getStatusCode() === 200) {
+                $response = json_decode($response->getBody(), true);
 
-            if (isset($response['status']['success']) && true === $response['status']['success'] && isset($response['result'][0])) {
-                return $response['result'][0];
+                if (isset($response['status']['success']) && true === $response['status']['success'] && isset($response['result'][0])) {
+                    return $response['result'][0];
+                }
             }
+        } catch (Exception $e) {
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $method
+     * @param string $endpoint
+     * @param array  $payload
+     *
+     * @return mixed
+     */
+    public function getEmptyResponse(string $method, string $endpoint, array $payload = []): mixed
+    {
+        try {
+            $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
+            if ($response->getStatusCode() === 200) {
+                return true;
+            }
+        } catch (Exception $e) {
         }
 
         return false;
@@ -121,9 +307,33 @@ class BadgrProvider
      */
     public function getAllBadgeClassesByIssuerSlugCount(string $issuerId): bool|int
     {
-        $response = $this->getClient()->put('/v2/badgeclasses_count/issuer/'.$issuerId);
+        return $this->getCount('PUT', '/v2/badgeclasses_count/issuer/'.$issuerId);
+    }
 
-        return $this->getCount($response);
+    protected function confirmDeletion(string $method, string $endpoint, array $payload = []): bool
+    {
+        try {
+            $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
+            if (null !== $response && ($response->getStatusCode() === 204 || $response->getStatusCode() === 404)) {
+                return true;
+            }
+        } catch (Exception $e) {
+        }
+
+        return false;
+    }
+
+    protected function confirmUpdate(string $method, string $endpoint, array $payload = []): bool
+    {
+        try {
+            $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
+            if (null !== $response && $response->getStatusCode() === 200) {
+                return true;
+            }
+        } catch (Exception $e) {
+        }
+
+        return false;
     }
 
     /**
@@ -135,63 +345,7 @@ class BadgrProvider
      */
     public function deleteBadgeClass(string $badgeClassId): bool
     {
-        $response = $this->getClient()->delete('/v2/badgeclasses/'.$badgeClassId);
-
-        if (null !== $response && ($response->status() === 204 || $response->status() === 404)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param string      $badgeClassId
-     * @param string      $recipientIdentifier
-     * @param string      $recipientType
-     * @param mixed|null  $issuedOn
-     * @param string|null $evidenceUrl
-     * @param string|null $evidenceNarrative
-     *
-     * @throws Exception
-     *
-     * @return mixed
-     */
-    public function addAssertion(
-        string $badgeClassId,
-        string $recipientIdentifier,
-        string $recipientType = 'email',
-        mixed $issuedOn = null,
-        ?string $evidenceUrl = null,
-        ?string $evidenceNarrative = null
-    ): mixed {
-        $payload = [
-            'recipient' => [
-                'identity' => $recipientIdentifier,
-                'type'     => $recipientType,
-            ],
-        ];
-
-        if ($issuedOn instanceof CarbonInterface) {
-            $payload['issuedOn'] = $issuedOn->format('c');
-        }
-
-        if (null !== $evidenceNarrative || null !== $evidenceUrl) {
-            $evidence = [];
-
-            if (null !== $evidenceNarrative) {
-                $evidence['narrative'] = $evidenceNarrative;
-            }
-
-            if (null !== $evidenceUrl) {
-                $evidence['url'] = $evidenceUrl;
-            }
-
-            $payload['evidence'] = $evidence;
-        }
-
-        $response = $this->getClient()->post('/v2/badgeclasses/'.$badgeClassId.'/assertions', $payload);
-
-        return $this->getEntityId($response);
+        return $this->makeRecoverableRequest('DELETE', '/v2/badgeclasses/'.$badgeClassId);
     }
 
     /**

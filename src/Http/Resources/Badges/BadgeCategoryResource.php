@@ -21,7 +21,6 @@ class BadgeCategoryResource extends JsonResource
             'title'       => $this->title,
             'subtitle'    => $this->subtitle,
             'description' => $this->description,
-            'image'       => $this->image,
             'createdAt'   => $this->created_at,
             'updatedAt'   => $this->updated_at,
         ];

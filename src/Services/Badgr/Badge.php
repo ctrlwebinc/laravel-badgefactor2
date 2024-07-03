@@ -5,7 +5,7 @@ namespace Ctrlweb\BadgeFactor2\Services\Badgr;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 
-class Badge extends BadgrProvider
+class Badge extends BadgrAdminProvider
 {
     /**
      * @throws Exception
@@ -18,18 +18,10 @@ class Badge extends BadgrProvider
             return json_decode(Cache::get('badges'));
         }
 
-        $client = $this->getClient();
-
-        if (!$client) {
-            return false;
-        }
-
-        $response = $this->getClient()->get('/v2/badgeclasses');
-
-        $response = $this->getResult($response);
+        $response = $this->getResult('GET', '/v2/badgeclasses');
 
         if ($response) {
-            Cache::put('badges', json_encode($response), 60);
+            Cache::put('badges', json_encode($response), config('badgefactor2.cache_duration'));
         }
 
         return $response;
@@ -46,12 +38,10 @@ class Badge extends BadgrProvider
             return Cache::get('badges_count');
         }
 
-        $response = $this->getClient()->get('/v2/badgeclasses_count');
-
-        $response = $this->getCount($response);
+        $response = $this->getCount('GET', '/v2/badgeclasses_count');
 
         if ($response) {
-            Cache::put('badges_count', $response, 60);
+            Cache::put('badges_count', $response, config('badgefactor2.cache_duration'));
         }
 
         return $response;
@@ -95,17 +85,10 @@ class Badge extends BadgrProvider
             return json_decode(Cache::get('badge_'.$entityId));
         }
 
-        $client = $this->getClient();
-        if (!$client) {
-            return [];
-        }
-
-        $response = $client->get('/v2/badgeclasses/'.$entityId);
-
-        $response = $this->getFirstResult($response);
+        $response = $this->getFirstResult('GET', '/v2/badgeclasses/'.$entityId);
 
         if ($response) {
-            Cache::put('badge_'.$entityId, json_encode($response), 60);
+            Cache::put('badge_'.$response['entityId'], json_encode($response), config('badgefactor2.cache_duration'));
         }
 
         return $response;
@@ -117,17 +100,10 @@ class Badge extends BadgrProvider
             return Cache::get('badges_by_issuer_'.$entityId);
         }
 
-        $client = $this->getClient();
-        if (!$client) {
-            return [];
-        }
-
-        $response = $client->get('/v2/issuers/'.$entityId.'/badgeclasses');
-
-        $response = $this->getResult($response);
+        $response = $this->getResult('GET', '/v2/issuers/'.$entityId.'/badgeclasses');
 
         if ($response) {
-            Cache::put('badges_by_issuer_'.$entityId, $response, 60);
+            Cache::put('badges_by_issuer_'.$entityId, $response, config('badgefactor2.cache_duration'));
         }
 
         return $response;
@@ -149,21 +125,13 @@ class Badge extends BadgrProvider
             'image'             => $this->prepareImage($image),
             'name'              => $name,
             'issuer'            => $issuer,
+            'description'       => $description,
+            'criteriaNarrative' => $criteriaNarrative,
         ];
-
-        if (null !== $description) {
-            $payload['description'] = $description;
-        }
-
-        if (null !== $criteriaNarrative) {
-            $payload['criteriaNarrative'] = $criteriaNarrative;
-        }
-
-        $response = $this->getClient()->post('/v2/badgeclasses', $payload);
 
         Cache::forget('badges');
 
-        return $this->getEntityId($response);
+        return $this->getEntityId('POST', '/v2/badgeclasses', $payload);
     }
 
     /**
@@ -190,30 +158,18 @@ class Badge extends BadgrProvider
         $payload = [
             'name'              => $name,
             'issuer'            => $issuer,
+            'description'       => $description,
+            'criteriaNarrative' => $criteriaNarrative,
         ];
-
-        if (null !== $description) {
-            $payload['description'] = $description;
-        }
-
-        if (null !== $criteriaNarrative) {
-            $payload['criteriaNarrative'] = $criteriaNarrative;
-        }
 
         if (null !== $image && $this->prepareImage($image)) {
             $payload['image'] = $this->prepareImage($image);
         }
 
-        $response = $this->getClient()->put('/v2/badgeclasses/'.$entityId, $payload);
-
         Cache::forget('badges');
         Cache::forget('badge_'.$entityId);
 
-        if (null !== $response && $response->status() === 200) {
-            return true;
-        }
-
-        return false;
+        return $this->confirmUpdate('PUT', '/v2/badgeclasses/'.$entityId, $payload);
     }
 
     /**
@@ -225,15 +181,9 @@ class Badge extends BadgrProvider
      */
     public function delete(string $entityId): bool
     {
-        $response = $this->getClient()->delete('/v2/badgeclasses/'.$entityId);
-
         Cache::forget('badges');
         Cache::forget('badge_'.$entityId);
 
-        if (null !== $response && ($response->status() === 204 || $response->status() === 404)) {
-            return true;
-        }
-
-        return false;
+        return $this->confirmDeletion('DELETE', '/v2/badgeclasses/'.$entityId);
     }
 }

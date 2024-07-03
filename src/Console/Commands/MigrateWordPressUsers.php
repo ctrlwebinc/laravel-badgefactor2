@@ -3,11 +3,12 @@
 namespace Ctrlweb\BadgeFactor2\Console\Commands;
 
 use Carbon\Carbon;
-use Ctrlweb\BadgeFactor2\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Intervention\Image\Exception\NotReadableException;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class MigrateWordPressUsers extends Command
 {
@@ -35,6 +36,21 @@ class MigrateWordPressUsers extends Command
         parent::__construct();
     }
 
+    private function decryptWPEncryptedUserBadgrPassword(string $password): string
+    {
+        $encrypt_method = env('BF2_ENCRYPTION_ALGORITHM');
+        $secret_key = env('BF2_SECRET_KEY');
+        $secret_iv = env('BF2_SECRET_IV');
+
+        // hash.
+        $key = hash('sha256', $secret_key);
+
+        // iv - encrypt method AES-256-CBC expects 16 bytes - else you will get a warning.
+        $iv = substr(hash('sha256', $secret_iv), 0, 16);
+
+        return openssl_decrypt($password, $encrypt_method, $key, 0, $iv);
+    }
+
     /**
      * Execute the console command.
      *
@@ -48,7 +64,7 @@ class MigrateWordPressUsers extends Command
         $this->info('Migrating users...');
 
         // Identify WP learners.
-        $users = $this->withProgressBar(
+        $this->withProgressBar(
             DB::connection($wordpressDb)
             ->select(
                 "SELECT DISTINCT u.*
@@ -75,9 +91,19 @@ class MigrateWordPressUsers extends Command
                         )
                 );
 
+                $lastConnexion = null;
+                if ($userMeta->firstWhere('meta_key', 'session_tokens')) {
+                    $sessionTokens = unserialize($userMeta->firstWhere('meta_key', 'session_tokens')->meta_value);
+                    $sessionTokens = array_pop($sessionTokens);
+                    $lastConnexion = Carbon::createFromTimestamp($sessionTokens['login'])
+                        ->setTimeZone(config('app.timezone'))
+                        ->toDateTimeString();
+                }
+
                 // Create user.
-                User::withoutEvents(function () use ($wpUser, $userMeta, $bpProfile, $wordpressDb, $prefix) {
-                    $user = User::updateOrCreate(
+                $userModel = config('badgefactor2.user_model');
+                $userModel::withoutEvents(function () use ($wpUser, $userMeta, $bpProfile, $wordpressDb, $prefix, $userModel, $lastConnexion) {
+                    $user = $userModel::updateOrCreate(
                         [
                             'email' => $wpUser->user_email,
                         ],
@@ -105,28 +131,26 @@ class MigrateWordPressUsers extends Command
                             'twitter'          => $bpProfile->firstWhere('field_id', 8) ? $bpProfile->firstWhere('field_id', 8)->value : null,
                             'linkedin'         => $bpProfile->firstWhere('field_id', 9) ? $bpProfile->firstWhere('field_id', 9)->value : null,
                             'user_status'      => 'ACTIVE',
-                            'last_connexion'   => $userMeta->firstWhere('meta_key', 'last_activity') ?
-                                Carbon::parse($userMeta->firstWhere('meta_key', 'last_activity')->meta_value)
-                                    ->setTimeZone(config('app.timezone'))
-                                    ->toDateTimeString() :
-                                null,
+                            'last_connexion'   => $lastConnexion,
                             'username'         => $wpUser->user_login,
                             'badgr_user_state' => $userMeta->firstWhere('meta_key', 'badgr_user_state') ? $userMeta->firstWhere('meta_key', 'badgr_user_state')->meta_value : null,
                             'badgr_user_slug'  => $userMeta->firstWhere('meta_key', 'badgr_user_slug') ? $userMeta->firstWhere('meta_key', 'badgr_user_slug')->meta_value : null,
-                            'badgr_password'   => $userMeta->firstWhere('meta_key', 'badgr_password') ? $userMeta->firstWhere('meta_key', 'badgr_password')->meta_value : null,
                         ]
                     );
+
+                    $user->badgr_encrypted_password = $userMeta->firstWhere('meta_key', 'badgr_password') ? $this->decryptWPEncryptedUserBadgrPassword($userMeta->firstWhere('meta_key', 'badgr_password')->meta_value) : null;
+                    $user->save();
 
                     // Identify and transfer WordPress capabilities.
                     if ($userMeta->firstwhere('meta_key', 'wp_capabilities')->meta_value) {
                         $capabilities = \unserialize($userMeta->firstwhere('meta_key', 'wp_capabilities')->meta_value);
 
                         if (array_key_exists('administrator', $capabilities) && $capabilities['administrator'] === true) {
-                            $user->assignRole(User::ADMINISTRATOR);
+                            $user->assignRole($userModel::ADMINISTRATOR);
                         } elseif (array_key_exists('approver', $capabilities) && $capabilities['approver'] === true) {
-                            $user->assignRole(User::APPROVER);
+                            $user->assignRole($userModel::APPROVER);
                         } else {
-                            $user->assignRole(User::LEARNER);
+                            $user->assignRole($userModel::LEARNER);
                         }
                         if (array_key_exists('customer', $capabilities) && $capabilities['customer'] === true) {
                             $wcOrders = DB::connection($wordpressDb)
@@ -152,9 +176,30 @@ class MigrateWordPressUsers extends Command
 
                                 if (0 !== intval($wcOrderMeta->firstWhere('meta_key', '_order_total')->meta_value)) {
                                     // Give access to specific courses.
-                                    $user->assignRole(User::CLIENT);
+                                    $user->assignRole($userModel::CLIENT);
                                 }
                             }
+                        }
+                    }
+
+                    // Import profile picture, if any.
+                    $avatarsDir = config('badgefactor2.wordpress.avatars_dir');
+                    $avatarImage = null;
+
+                    if (is_dir($avatarsDir.'/'.$wpUser->ID)) {
+                        $matches = glob($avatarsDir.'/'.$wpUser->ID.'/*bpfull.*');
+                        $avatarImage = isset($matches[0]) ? $matches[0] : null;
+                    }
+
+                    if (null !== $avatarImage && !$user->getFirstMedia()) {
+                        try {
+                            $image = Image::make($avatarImage);
+                            $user->addMediaFromBase64($image->encode('data-url'))
+                                ->withCustomProperties([
+                                    'alt' => $user->first_name.' '.$user->last_name,
+                                ])
+                                ->toMediaCollection('photo');
+                        } catch (NotReadableException $e) {
                         }
                     }
                 });

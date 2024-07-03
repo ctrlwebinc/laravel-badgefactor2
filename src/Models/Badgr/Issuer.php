@@ -29,7 +29,7 @@ class Issuer extends Model
                 $issuer->name,
                 $issuer->email,
                 $issuer->url,
-                $issuer->description,
+                $issuer->description ?? '',
                 $issuer->image
             );
 
@@ -42,7 +42,7 @@ class Issuer extends Model
                 $issuer->name,
                 $issuer->email,
                 $issuer->url,
-                $issuer->description,
+                $issuer->description ?? '',
                 $issuer->image
             );
 

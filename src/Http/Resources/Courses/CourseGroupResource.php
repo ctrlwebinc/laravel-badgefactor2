@@ -19,12 +19,14 @@ class CourseGroupResource extends JsonResource
     public function toArray($request): array|JsonSerializable|Arrayable
     {
         return [
+            'type'                     => 'course-group',
             'id'                       => $this->resource->id,
             'slug'                     => $this->resource->slug,
-            'excerpt'                  => substr($this->resource->excerpt, 0, 140),
             'title'                    => $this->resource->title,
+            'subtitle'                 => $this->resource->subtitle,
             'description'              => $this->resource->description,
-            'image'                    => $this->resource->image,
+            'excerpt'                  => mb_substr(strip_tags($this->resource->description), 0, 134, 'UTF-8').' [...]',
+            'image'                    => $this->resource->getMedia('*')->first(),
             'content_specialists'      => ResponsibleResource::collection($this->resource->contentSpecialists ?? null),
             'retroaction_responsibles' => ResponsibleResource::collection($this->resource->retroactionResponsibles ?? null),
             'courses'                  => CourseResource::collection($this->resource->courses ?? null),

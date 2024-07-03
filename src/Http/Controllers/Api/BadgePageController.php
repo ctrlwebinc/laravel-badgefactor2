@@ -4,7 +4,9 @@ namespace Ctrlweb\BadgeFactor2\Http\Controllers\Api;
 
 use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
 use Ctrlweb\BadgeFactor2\Http\Resources\Badges\BadgePageResource;
+use Ctrlweb\BadgeFactor2\Http\Resources\Badgr\AssertionResource;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
+use Ctrlweb\BadgeFactor2\Services\Badgr\Assertion;
 use Illuminate\Http\Request;
 
 /**
@@ -45,6 +47,14 @@ class BadgePageController extends Controller
     public function show(string $locale, $badge)
     {
         return BadgePageResource::make($badge);
+    }
+
+    public function showIssued(string $locale, $slug)
+    {
+        $badgePage = BadgePage::where("slug->{$locale}", '=', $slug)->first();
+        $assertions = app(Assertion::class)->getByBadgeClass($badgePage->badgeclass_id);
+
+        return AssertionResource::collection($assertions);
     }
 
     public function badgePageByCourseGroup(string $locale, $courseGroup)

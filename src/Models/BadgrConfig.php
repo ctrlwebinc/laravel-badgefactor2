@@ -2,33 +2,52 @@
 
 namespace Ctrlweb\BadgeFactor2\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Carbon\Carbon;
+use Ctrlweb\BadgeFactor2\Interfaces\TokenRepositoryInterface;
 use Illuminate\Database\Eloquent\Model;
+use League\OAuth2\Client\Token\AccessTokenInterface;
 
-class BadgrConfig extends Model
+class BadgrConfig extends Model implements TokenRepositoryInterface
 {
-    use HasFactory;
-
     protected $fillable = [
+        'badgr_server_base_url',
         'client_id',
         'client_secret',
-        'redirect_uri',
-        'scopes',
-        'access_token',
-        'refresh_token',
-        'expires_at',
+        'password_client_id',
+        'password_client_secret',
+        'token_set',
     ];
 
     protected $casts = [
-        'expires_at' => 'datetime:Y-m-d H:i:s',
     ];
 
-    public function getAccessTokenToArray()
+    public function getTokenSet(): ?AccessTokenInterface
     {
-        return [
-            'access_token'  => $this->access_token,
-            'refresh_token' => $this->refresh_token,
-            'expires_at'    => $this->expires_at->format('Y-m-d H:i:s'),
-        ];
+        $tokenSet = unserialize($this->token_set);
+        if (!$tokenSet) {
+            return null;
+        }
+
+        return $tokenSet;
+    }
+
+    public function saveTokenSet(AccessTokenInterface $tokenSet)
+    {
+        $this->refresh();
+        $this->token_set = serialize($tokenSet);
+        $this->save();
+    }
+
+    public function getTokenExpiryAttribute()
+    {
+        $tokenSet = $this->getTokenSet();
+        if (null !== $tokenSet) {
+            $expiryTimestamp = $tokenSet->getExpires();
+            if (null !== $expiryTimestamp) {
+                return Carbon::createFromTimestamp($expiryTimestamp);
+            }
+        }
+
+        return null;
     }
 }
