@@ -108,33 +108,34 @@ class MigrateWordPressUsers extends Command
                             'email' => $wpUser->user_email,
                         ],
                         [
-                            'name'             => $bpProfile->firstWhere('field_id', 1) ? $bpProfile->firstWhere('field_id', 1)->value : $wpUser->display_name,
-                            'password'         => Hash::make($wpUser->user_pass),
-                            'created_at'       => Carbon::parse($wpUser->user_registered)
+                            'name'              => $bpProfile->firstWhere('field_id', 1) ? $bpProfile->firstWhere('field_id', 1)->value : $wpUser->display_name,
+                            'password'          => Hash::make($wpUser->user_pass),
+                            'created_at'        => Carbon::parse($wpUser->user_registered)
                                 ->setTimeZone(config('app.timezone'))
                                 ->toDateTimeString(),
-                            'updated_at'       => Carbon::parse($wpUser->user_registered)
+                            'updated_at'        => Carbon::parse($wpUser->user_registered)
                                 ->setTimeZone(config('app.timezone'))
                                 ->toDateTimeString(),
-                            'first_name'       => $userMeta->firstWhere('meta_key', 'first_name')->meta_value,
-                            'last_name'        => $userMeta->firstWhere('meta_key', 'last_name')->meta_value,
-                            'description'      => $userMeta->firstWhere('meta_key', 'description')->meta_value,
-                            'website'          => $bpProfile->firstWhere('field_id', 5) ? $bpProfile->firstWhere('field_id', 5)->value : null,
-                            'slug'             => $wpUser->user_nicename ? Str::slug($wpUser->user_nicename) : Str::slug($wpUser->user_login),
-                            'wp_id'            => $wpUser->ID,
-                            'wp_password'      => $wpUser->user_pass,
-                            'place'            => $bpProfile->firstWhere('field_id', 4) ? $bpProfile->firstWhere('field_id', 4)->value : null,
-                            'organisation'     => $bpProfile->firstWhere('field_id', 2) ? $bpProfile->firstWhere('field_id', 2)->value : null,
-                            'job'              => $bpProfile->firstWhere('field_id', 3) ? $bpProfile->firstWhere('field_id', 3)->value : null,
-                            'biography'        => $bpProfile->firstWhere('field_id', 6) ? $bpProfile->firstWhere('field_id', 6)->value : null,
-                            'facebook'         => $bpProfile->firstWhere('field_id', 7) ? $bpProfile->firstWhere('field_id', 7)->value : null,
-                            'twitter'          => $bpProfile->firstWhere('field_id', 8) ? $bpProfile->firstWhere('field_id', 8)->value : null,
-                            'linkedin'         => $bpProfile->firstWhere('field_id', 9) ? $bpProfile->firstWhere('field_id', 9)->value : null,
-                            'user_status'      => 'ACTIVE',
-                            'last_connexion'   => $lastConnexion,
-                            'username'         => $wpUser->user_login,
-                            'badgr_user_state' => $userMeta->firstWhere('meta_key', 'badgr_user_state') ? $userMeta->firstWhere('meta_key', 'badgr_user_state')->meta_value : null,
-                            'badgr_user_slug'  => $userMeta->firstWhere('meta_key', 'badgr_user_slug') ? $userMeta->firstWhere('meta_key', 'badgr_user_slug')->meta_value : null,
+                            'first_name'        => $userMeta->firstWhere('meta_key', 'first_name')->meta_value,
+                            'last_name'         => $userMeta->firstWhere('meta_key', 'last_name')->meta_value,
+                            'description'       => $userMeta->firstWhere('meta_key', 'description')->meta_value,
+                            'website'           => $bpProfile->firstWhere('field_id', 5) ? $bpProfile->firstWhere('field_id', 5)->value : null,
+                            'slug'              => $wpUser->user_nicename ? Str::slug($wpUser->user_nicename) : Str::slug($wpUser->user_login),
+                            'wp_id'             => $wpUser->ID,
+                            'wp_password'       => $wpUser->user_pass,
+                            'place'             => $bpProfile->firstWhere('field_id', 4) ? $bpProfile->firstWhere('field_id', 4)->value : null,
+                            'organisation'      => $bpProfile->firstWhere('field_id', 2) ? $bpProfile->firstWhere('field_id', 2)->value : null,
+                            'job'               => $bpProfile->firstWhere('field_id', 3) ? $bpProfile->firstWhere('field_id', 3)->value : null,
+                            'biography'         => $bpProfile->firstWhere('field_id', 6) ? $bpProfile->firstWhere('field_id', 6)->value : null,
+                            'facebook'          => $bpProfile->firstWhere('field_id', 7) ? $bpProfile->firstWhere('field_id', 7)->value : null,
+                            'twitter'           => $bpProfile->firstWhere('field_id', 8) ? $bpProfile->firstWhere('field_id', 8)->value : null,
+                            'linkedin'          => $bpProfile->firstWhere('field_id', 9) ? $bpProfile->firstWhere('field_id', 9)->value : null,
+                            'user_status'       => 'ACTIVE',
+                            'last_connexion'    => $lastConnexion,
+                            'username'          => $wpUser->user_login,
+                            'badgr_user_state'  => $userMeta->firstWhere('meta_key', 'badgr_user_state') ? $userMeta->firstWhere('meta_key', 'badgr_user_state')->meta_value : null,
+                            'badgr_user_slug'   => $userMeta->firstWhere('meta_key', 'badgr_user_slug') ? $userMeta->firstWhere('meta_key', 'badgr_user_slug')->meta_value : null,
+                            'email_verified_at' => $userMeta->firstWhere('meta_key', 'when_confirmed_email') ? $userMeta->firstWhere('meta_key', 'when_confirmed_email')->meta_value : null,
                         ]
                     );
 
