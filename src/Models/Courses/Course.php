@@ -69,4 +69,9 @@ class Course extends Model
     {
         return $this->belongsToMany(Cart::class, 'cart_product');
     }
+
+    public function getFreeAttribute(): bool
+    {
+        return (null == $this->regular_price || $this->regular_price < 1);
+    }
 }
