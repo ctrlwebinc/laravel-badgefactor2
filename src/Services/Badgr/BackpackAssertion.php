@@ -18,7 +18,7 @@ class BackpackAssertion extends BadgrRecipientProvider
         return $response;
     }
 
-    public function import(array $payload): array|bool
+    public function import(array $payload): mixed
     {
        
         $response = $this->getEntityId('POST', '/v2/backpack/import', $payload);
@@ -26,7 +26,7 @@ class BackpackAssertion extends BadgrRecipientProvider
         return $response;
     }
 
-    public function delete(string $payload): bool
+    public function delete(string $payload): mixed
     {
        
         $response = $this->getEntityId('DELETE', '/v2/backpack/assertions/' . $payload, [] );
