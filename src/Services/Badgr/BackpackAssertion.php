@@ -17,4 +17,12 @@ class BackpackAssertion extends BadgrRecipientProvider
 
         return $response;
     }
+
+    public function import(array $payload): array|bool
+    {
+       
+        $response = $this->getEntityId('POST', '/v2/backpack/import', $payload);
+        
+        return $response;
+    }
 }
