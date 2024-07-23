@@ -25,4 +25,12 @@ class BackpackAssertion extends BadgrRecipientProvider
         
         return $response;
     }
+
+    public function delete(string $payload): bool
+    {
+       
+        $response = $this->getEntityId('DELETE', '/v2/backpack/assertions/' . $payload, [] );
+        
+        return $response;
+    }
 }
