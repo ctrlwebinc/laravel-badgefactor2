@@ -175,6 +175,7 @@ class Assertion extends Model
                 unset($assertions[$i]['openBadgeId']);
                 unset($assertions[$i]['badgeclassOpenBadgeId']);
                 unset($assertions[$i]['issuerOpenBadgeId']);
+                unset($assertions[$i]['extensions:recipientProfile']);
                 $assertions[$i]['recipient_email'] = $assertions[$i]['recipient']['plaintextIdentity'];
                 unset($assertions[$i]['recipient']);
                 if (isset($user)) {
