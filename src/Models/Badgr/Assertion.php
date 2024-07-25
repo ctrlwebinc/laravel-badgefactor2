@@ -216,4 +216,13 @@ class Assertion extends Model
     {
         return $this->belongsTo(User::class, 'recipient_id', 'id');
     }
+
+    public function portfolio()
+    {        
+        if (class_exists(\App\Models\PortfolioBadge::class)) {
+            return $this->hasOne(\App\Models\PortfolioBadge::class, 'assertion_id', 'entityId');
+        }
+
+        return null;
+    }
 }
