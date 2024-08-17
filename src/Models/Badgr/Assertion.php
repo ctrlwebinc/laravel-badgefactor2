@@ -173,7 +173,6 @@ class Assertion extends Model
             foreach ($assertions as $i => $assertion) {
                 unset($assertions[$i]['entityType']);
                 unset($assertions[$i]['openBadgeId']);
-                unset($assertions[$i]['badgeclassOpenBadgeId']);
                 unset($assertions[$i]['issuerOpenBadgeId']);
                 unset($assertions[$i]['extensions:recipientProfile']);
                 $assertions[$i]['recipient_email'] = $assertions[$i]['recipient']['plaintextIdentity'];
