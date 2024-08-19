@@ -2,7 +2,9 @@
 
 namespace Ctrlweb\BadgeFactor2\Http\Controllers;
 
+use Ctrlweb\BadgeFactor2\Models\Badgr\Assertion;
 use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrAdminProvider;
+use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrProvider;
 use Illuminate\Http\Request;
 
 class BadgeFactor2Controller extends Controller
@@ -31,5 +33,14 @@ class BadgeFactor2Controller extends Controller
         $request->session()->put($this->authHomeUrlParameterName, $request->headers->get('referer'));
 
         return redirect($authorizationUrl);
+    }
+
+    public function getBadgrAssertion(Request $request, string $entityId)
+    {
+        $assertion = Assertion::get($entityId);
+        if (empty($assertion)) {
+            abort(404);
+        }
+        dd($assertion);
     }
 }
