@@ -40,14 +40,24 @@ class BadgeFactor2Controller extends Controller
     public function getBadgrAssertion(Request $request, string $entityId)
     {
         $assertion = app(Assertion::class)->getBySlug($entityId);
-        $image = Image::make($assertion['image']);
+        if (is_array($assertion)) {
+            $image = Image::make($assertion['image']);
+        } else {
+            dd($assertion);
+        }
+
         return $image->response();
     }
 
     public function getBadgrBadge(Request $request, string $entityId)
     {
         $badge = app(Badge::class)->getBySlug($entityId);
-        $image = Image::make($badge['image']);
+        if (is_array($badge)) {
+            $image = Image::make($badge['image']);
+        } else {
+            dd($badge);
+        }
+
         return $image->response();
     }
 }
