@@ -41,10 +41,10 @@ class BadgeFactor2Controller extends Controller
     {
         $assertion = app(Assertion::class)->getBySlug($entityId);
         if (is_array($assertion)) {
-            $image = Image::make($assertion['image']);
-        } else {
-            dd($assertion);
+            $assertion = (object) $assertion;
+
         }
+        $image = Image::make($assertion->image);
 
         return $image->response();
     }
@@ -53,10 +53,9 @@ class BadgeFactor2Controller extends Controller
     {
         $badge = app(Badge::class)->getBySlug($entityId);
         if (is_array($badge)) {
-            $image = Image::make($badge['image']);
-        } else {
-            dd($badge);
+            $badge = (object) $badge;
         }
+        $image = Image::make($badge->image);
 
         return $image->response();
     }
