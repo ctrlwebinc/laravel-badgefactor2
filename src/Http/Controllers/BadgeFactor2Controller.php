@@ -39,8 +39,8 @@ class BadgeFactor2Controller extends Controller
     {
         $assertion = app(Assertion::class)->getBySlug($entityId);
         $imageContent = file_get_contents($assertion['image']);
-        return response()->streamDownload(function () use ($imageContent) {
+        return response()->stream(function () use ($imageContent) {
             echo $imageContent;
-        }, $entityId.'.png');
+        });
     }
 }
