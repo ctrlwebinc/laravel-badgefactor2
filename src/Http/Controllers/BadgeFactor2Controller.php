@@ -2,7 +2,7 @@
 
 namespace Ctrlweb\BadgeFactor2\Http\Controllers;
 
-use Ctrlweb\BadgeFactor2\Models\Badgr\Assertion;
+use Ctrlweb\BadgeFactor2\Services\Badgr\Assertion;
 use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrAdminProvider;
 use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrProvider;
 use Illuminate\Http\Request;
@@ -37,10 +37,11 @@ class BadgeFactor2Controller extends Controller
 
     public function getBadgrAssertion(Request $request, string $entityId)
     {
-        $assertion = Assertion::get($entityId);
+        $assertion = app(BadgrAssertion::class)->getBySlug($entityId);
         if (empty($assertion)) {
             abort(404);
         }
-        dd($assertion);
+        return response()->json($assertion);
+
     }
 }
