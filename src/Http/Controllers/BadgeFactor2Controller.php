@@ -7,6 +7,7 @@ use Ctrlweb\BadgeFactor2\Services\Badgr\Badge;
 use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrAdminProvider;
 use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrProvider;
 use Illuminate\Http\Request;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class BadgeFactor2Controller extends Controller
 {
@@ -39,19 +40,14 @@ class BadgeFactor2Controller extends Controller
     public function getBadgrAssertion(Request $request, string $entityId)
     {
         $assertion = app(Assertion::class)->getBySlug($entityId);
-        $imageContent = file_get_contents($assertion['image']);
-        return response()->streamDownload(function () use ($imageContent) {
-            echo $imageContent;
-        });
+        $image = Image::make($assertion['image']);
+        $image->response();
     }
 
     public function getBadgrBadge(Request $request, string $entityId)
     {
         $badge = app(Badge::class)->getBySlug($entityId);
-        $imageContent = file_get_contents($badge['image']);
-        return response()->streamDownload(function () use ($imageContent) {
-            echo $imageContent;
-        });
-
+        $image = Image::make($badge['image']);
+        $image->response();
     }
 }
