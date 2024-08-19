@@ -41,13 +41,13 @@ class BadgeFactor2Controller extends Controller
     {
         $assertion = app(Assertion::class)->getBySlug($entityId);
         $image = Image::make($assertion['image']);
-        $image->response();
+        return $image->response();
     }
 
     public function getBadgrBadge(Request $request, string $entityId)
     {
         $badge = app(Badge::class)->getBySlug($entityId);
         $image = Image::make($badge['image']);
-        $image->response();
+        return $image->response();
     }
 }
