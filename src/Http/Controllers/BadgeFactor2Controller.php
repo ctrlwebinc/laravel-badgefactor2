@@ -38,6 +38,7 @@ class BadgeFactor2Controller extends Controller
     public function getBadgrAssertion(Request $request, string $entityId)
     {
         $assertion = app(Assertion::class)->getBySlug($entityId);
-        return redirect($assertion['image']);
+        $imageContent = file_get_contents($assertion['image']);
+        return response()->file($imageContent);
     }
 }
