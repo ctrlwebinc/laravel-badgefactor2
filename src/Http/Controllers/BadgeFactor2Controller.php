@@ -42,7 +42,7 @@ class BadgeFactor2Controller extends Controller
         $imageContent = file_get_contents($assertion['image']);
         return response()->streamDownload(function () use ($imageContent) {
             echo $imageContent;
-        }, null, [], 'inline');
+        });
     }
 
     public function getBadgrBadge(Request $request, string $entityId)
@@ -51,7 +51,7 @@ class BadgeFactor2Controller extends Controller
         $imageContent = file_get_contents($badge['image']);
         return response()->streamDownload(function () use ($imageContent) {
             echo $imageContent;
-        }, null, [], 'inline');
+        });
 
     }
 }
