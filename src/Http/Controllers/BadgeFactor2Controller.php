@@ -38,10 +38,6 @@ class BadgeFactor2Controller extends Controller
     public function getBadgrAssertion(Request $request, string $entityId)
     {
         $assertion = app(Assertion::class)->getBySlug($entityId);
-        if (empty($assertion)) {
-            abort(404);
-        }
-        return response()->json($assertion);
-
+        return redirect($assertion['image']);
     }
 }
