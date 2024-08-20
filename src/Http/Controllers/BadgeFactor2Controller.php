@@ -2,8 +2,12 @@
 
 namespace Ctrlweb\BadgeFactor2\Http\Controllers;
 
+use Ctrlweb\BadgeFactor2\Services\Badgr\Assertion;
+use Ctrlweb\BadgeFactor2\Services\Badgr\Badge;
 use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrAdminProvider;
+use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrProvider;
 use Illuminate\Http\Request;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class BadgeFactor2Controller extends Controller
 {
@@ -31,5 +35,28 @@ class BadgeFactor2Controller extends Controller
         $request->session()->put($this->authHomeUrlParameterName, $request->headers->get('referer'));
 
         return redirect($authorizationUrl);
+    }
+
+    public function getBadgrAssertion(Request $request, string $entityId)
+    {
+        $assertion = app(Assertion::class)->getBySlug($entityId);
+        if (is_array($assertion)) {
+            $assertion = (object) $assertion;
+
+        }
+        $image = Image::make($assertion->image);
+
+        return $image->response();
+    }
+
+    public function getBadgrBadge(Request $request, string $entityId)
+    {
+        $badge = app(Badge::class)->getBySlug($entityId);
+        if (is_array($badge)) {
+            $badge = (object) $badge;
+        }
+        $image = Image::make($badge->image);
+
+        return $image->response();
     }
 }

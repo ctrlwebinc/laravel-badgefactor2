@@ -96,4 +96,8 @@ Route::group([
     Route::get('/bf2/auth', [BadgeFactor2Controller::class, 'getAccessTokenFromAuthCode'])
         ->middleware('auth')
         ->name('bf2.auth');
+    Route::get('/badgr/assertions/{entityId}', [BadgeFactor2Controller::class, 'getBadgrAssertion'])
+        ->name('bf2.badgrAssertion');
+    Route::get('/badgr/badges/{entityId}', [BadgeFactor2Controller::class, 'getBadgrBadge'])
+        ->name('bf2.badgrBadge');
 });

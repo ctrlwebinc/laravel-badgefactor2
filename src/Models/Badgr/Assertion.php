@@ -172,9 +172,7 @@ class Assertion extends Model
         if ($assertions) {
             foreach ($assertions as $i => $assertion) {
                 unset($assertions[$i]['entityType']);
-                unset($assertions[$i]['openBadgeId']);
-                unset($assertions[$i]['badgeclassOpenBadgeId']);
-                unset($assertions[$i]['issuerOpenBadgeId']);
+                unset($assertions[$i]['extensions:recipientProfile']);
                 $assertions[$i]['recipient_email'] = $assertions[$i]['recipient']['plaintextIdentity'];
                 unset($assertions[$i]['recipient']);
                 if (isset($user)) {
@@ -215,5 +213,14 @@ class Assertion extends Model
     public function recipient()
     {
         return $this->belongsTo(User::class, 'recipient_id', 'id');
+    }
+
+    public function portfolio()
+    {        
+        if (class_exists(\App\Models\PortfolioBadge::class)) {
+            return $this->hasOne(\App\Models\PortfolioBadge::class, 'assertion_id', 'entityId');
+        }
+
+        return null;
     }
 }
