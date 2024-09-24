@@ -7,6 +7,8 @@ use Ctrlweb\BadgeFactor2\Events\BadgeRequestFormAccessed;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Badge;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 
 /**
  * @tags Emetteurs
@@ -34,6 +36,11 @@ class BadgeController extends Controller
 
     public function validateAccess(string $locale, string $entityId)
     {
+        $bearerToken = Str::remove('Bearer ', $request->header('Authorization'));
+        $sessionToken = substr($bearerToken, strpos($bearerToken, '|') + 1);
+        Session::setId($sessionToken);
+        Session::start();
+
         $badgePage = BadgePage::where('badgeclass_id', '=', $entityId)->first();
         if (!$badgePage) {
             return response()->json([
