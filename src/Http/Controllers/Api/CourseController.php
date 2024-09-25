@@ -19,7 +19,7 @@ class CourseController extends Controller
 
         $allowedEmails = ["aurelie.leclerc@ac-amiens.fr", "vincent.marchand1@ac-amiens.fr", "emilie.arculeo@gmail.com"];
 
-        if ($course && $currentUser->freeAccess || ECommerceHelper::hasAccess($currentUser, $course) || (in_array($currentUser->email, $allowedEmails) && $course->course_group_id == 126)) {
+        if ($course && $currentUser->freeAccess || ECommerceHelper::hasAccess($currentUser, $course) || (in_array(strtolower($currentUser->email), $allowedEmails) && $course->courseGroup?->slug == "conception-universelle-de-lapprentissage")) {
             CourseAccessed::dispatch($currentUser, $course);
 
             return response()->json([
