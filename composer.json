@@ -16,7 +16,7 @@
     "require": {
         "php": "^8.0.2",
         "bordoni/phpass": "dev-main",
-        "doctrine/dbal": "^2.9",
+        "doctrine/dbal": "^2.9 || ^3.1.4 || ^4.0",
         "spatie/laravel-permission": "^6.9"
     },
     "require-dev": {
