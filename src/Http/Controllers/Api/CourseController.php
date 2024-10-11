@@ -6,15 +6,22 @@ use App\Helpers\ECommerceHelper;
 use Ctrlweb\BadgeFactor2\Events\CourseAccessed;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 /**
  * @tags Catégories de groupes de cours
  */
 class CourseController extends Controller
 {
-    public function validateAccess(string $locale, string $slug)
+    public function validateAccess(string $locale, string $slug, Request $request)
     {
         $course = BadgePage::where('slug->fr', $slug)->firstOrFail()->course;
+        $bearerToken = Str::remove('Bearer ', $request->header('Authorization'));
+        $sessionToken = substr($bearerToken, strpos($bearerToken, '|') + 1);
+        Session::setId($sessionToken);
+        Session::start();
         $currentUser = auth()->user();
 
         $allowedEmails = ["aurelie.leclerc@ac-amiens.fr", "vincent.marchand1@ac-amiens.fr", "emilie.arculeo@gmail.com"];

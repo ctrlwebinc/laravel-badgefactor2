@@ -66,7 +66,7 @@ Route::group([
 
 Route::group([
     'prefix'     => 'api/{locale}',
-    'middleware' => ['api', 'locale', 'auth:sanctum'],
+    'middleware' => ['api', 'locale'],
     'namespace'  => 'Ctrlweb\BadgeFactor2\Http\Controllers\Api',
     'domain'     => config('badgefactor2.domain', null),
 ], function () {
