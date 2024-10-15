@@ -27,8 +27,14 @@ class BadgeController extends Controller
         $badge = app(Badge::class)->getBySlug($entityId);
 
         $badgePage = BadgePage::where('badgeclass_id', '=', $entityId)->first();
+
         if($badgePage){
-            $badge->badgePage = $badgePage->slug;
+            
+            if(is_array($badge)) {
+                $badge['badgePage'] = $badgePage->slug;
+            } else {
+                $badge->badgePage = $badgePage->slug;
+            }
         }
 
         return response()->json($badge);
