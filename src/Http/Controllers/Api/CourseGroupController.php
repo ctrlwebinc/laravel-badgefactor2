@@ -36,7 +36,7 @@ class CourseGroupController extends Controller
 
         if (!empty($badgeCategory) && $badgeCategory !== 'certification') {
             $query = BadgePage::query();
-            $groups = $query->orderByDesc('updated_at')->paginate(12);
+            $groups = $query->orderByDesc('id')->paginate(12);
 
             return BadgePageResource::collection($groups);
         } else {
