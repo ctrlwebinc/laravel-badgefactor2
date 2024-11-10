@@ -25,7 +25,12 @@ class CourseGroup extends Model implements HasMedia
         'title',
         'subtitle',
         'description',
+        'balado',
         'course_group_category_id',
+    ];
+
+    protected $casts = [
+        'balado' => 'array',
     ];
 
     protected $translatable = [
