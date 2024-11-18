@@ -24,6 +24,7 @@ class BadgePage extends Model implements HasMedia
     protected $casts = [
         'badgeclass_id'   => 'string',
         'last_updated_at' => 'date',
+        'publication_date' => 'datetime'
     ];
 
     protected $fillable = [
@@ -38,6 +39,8 @@ class BadgePage extends Model implements HasMedia
         'badge_category_id',
         'video_url',
         'last_updated_at',
+        'publication_date',
+        'status'
     ];
 
     public static function findBySlug($slug)
