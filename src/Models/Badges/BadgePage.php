@@ -174,4 +174,9 @@ class BadgePage extends Model implements HasMedia
             ->width(32)
             ->height(32);
     }
+
+    public function scopeIsPublished($query)
+    {
+        return $query->where('status', 'PUBLISHED');
+    }
 }
