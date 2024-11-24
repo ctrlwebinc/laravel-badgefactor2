@@ -61,7 +61,7 @@ class BadgePageController extends Controller
     {
         $badgePages = BadgePage::whereHas('course', function ($query) use ($courseGroup) {
             $query->where('course_group_id', $courseGroup->id);
-        })->get();
+        })->isPublished()->get();
 
         return BadgePageResource::collection($badgePages);
     }
