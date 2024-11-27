@@ -38,6 +38,7 @@ class CourseGroupResource extends JsonResource
             ]),
             'createdAt'                => $this->resource->created_at,
             'updatedAt'                => $this->resource->updated_at,
+            'is_featured'             =>  $this->resource->is_featured,
         ];
     }
 }

@@ -86,6 +86,7 @@ class BadgePageResource extends JsonResource
             )->additional(['without' => ['course_groups']]),
             'createdAt'             => $this->resource->created_at,
             'updatedAt'             => $this->resource->updated_at,
+            'is_featured'             =>  $this->resource->is_featured,
         ];
     }
 }

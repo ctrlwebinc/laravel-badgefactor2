@@ -46,6 +46,7 @@ Route::group([
     // Course Groups.
     Route::apiResource('course-groups', CourseGroupController::class)
     ->only(['index', 'show']);
+    Route::get('course-groups-new', [CourseGroupController::class, 'new_index']);
 
     // Course Group Categories.
     Route::get('course-group-categories', [CourseGroupCategoryController::class, 'index']);
