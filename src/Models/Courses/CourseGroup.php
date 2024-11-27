@@ -27,6 +27,8 @@ class CourseGroup extends Model implements HasMedia
         'description',
         'balado',
         'course_group_category_id',
+        'is_hidden',
+        'is_featured'
     ];
 
     protected $casts = [

@@ -40,7 +40,9 @@ class BadgePage extends Model implements HasMedia
         'video_url',
         'last_updated_at',
         'publication_date',
-        'status'
+        'status',
+        'is_hidden',
+        'is_featured'
     ];
 
     public static function findBySlug($slug)
