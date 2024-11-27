@@ -48,9 +48,7 @@ class IssuerController extends Controller
                     $badge = $badgePage->badge;
                     $issuer = $badge->issuer;
     
-                } catch (\Throwable $th) {
-                    //throw $th;
-                }
+                } catch (\Throwable $th) {}
     
                 return $issuer;
             })->filter(function($issuer){
