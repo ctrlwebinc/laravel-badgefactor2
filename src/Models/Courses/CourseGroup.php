@@ -13,6 +13,7 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
+use Ctrlweb\BadgeFactor2\Models\Tag;
 
 class CourseGroup extends Model implements HasMedia
 {
@@ -126,5 +127,9 @@ class CourseGroup extends Model implements HasMedia
         $this->addMediaConversion('thumb')
             ->width(32)
             ->height(32);
+    }
+
+    public function tags(){
+        return $this->belongsToMany(Tag::class, 'course_group_tags', 'course_group_id', 'tag_id');
     }
 }
