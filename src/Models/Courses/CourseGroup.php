@@ -14,6 +14,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
 use Ctrlweb\BadgeFactor2\Models\Tag;
+use Carbon\Carbon;
 
 class CourseGroup extends Model implements HasMedia
 {
@@ -42,6 +43,7 @@ class CourseGroup extends Model implements HasMedia
         'subtitle',
         'description',
     ];
+
 
     public static function findBySlug($slug)
     {
@@ -131,5 +133,25 @@ class CourseGroup extends Model implements HasMedia
 
     public function tags(){
         return $this->belongsToMany(Tag::class, 'course_group_tags', 'course_group_id', 'tag_id');
+    }
+
+    public static function takeOnlyBrandnew(){
+        return self::where('created_at', '>=', Carbon::now()->subDays(800))
+                ->orderBy('created_at', 'desc') 
+                ->take(10)->get();
+    }
+
+    public function scopeIsBrandnew($query)
+    {
+        $brandnews = self::takeOnlyBrandnew()->map(function($line){
+            return $line->id;
+        })->toArray();
+
+        return $query->whereIn("id", $brandnews); 
+    }
+
+    public function getIsBrandnewAttribute()
+    {     
+        return self::takeOnlyBrandnew()->contains($this);
     }
 }
