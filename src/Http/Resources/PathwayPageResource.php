@@ -28,6 +28,7 @@ class PathwayPageResource extends JsonResource
             'duration'                  => $this->resource->duration,            
             'createdAt'                => $this->resource->created_at,
             'updatedAt'                => $this->resource->updated_at,
+            'image'                     => $this->resource->getMedia('pathwayImages')->first(),
             'is_pathway'                => true,
             'is_autoformation'          => $this->resource->is_autoformation,
             'is_badgepage'              => $this->resource->is_badgepage
