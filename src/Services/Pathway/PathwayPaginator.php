@@ -2,7 +2,7 @@
 
 namespace Ctrlweb\BadgeFactor2\Services\Pathway;
 
-use Ctrlweb\BadgeFactor2\Models\PathwayPage;
+use App\Models\PathwayPage;
 
 class PathwayPaginator 
 {

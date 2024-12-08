@@ -4,7 +4,7 @@ namespace Ctrlweb\BadgeFactor2\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Ctrlweb\BadgeFactor2\Models\PathwayPage;
+use App\Models\PathwayPage;
 use \Illuminate\Pagination\LengthAwarePaginator;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
