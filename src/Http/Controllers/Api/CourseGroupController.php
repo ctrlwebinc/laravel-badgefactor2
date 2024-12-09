@@ -75,29 +75,38 @@ class CourseGroupController extends Controller
             'course_group_category' => 'nullable|integer',
             'q'                     => 'nullable|string',
             'issuer'                => 'nullable|string',
-            'badge_category'        => 'string',
+            'badge_category'        => 'nullable|string',
             'order_by'              => 'nullable|string',
             'is_brandnew'           => 'nullable|boolean',
             'is_featured'           => 'nullable|boolean',
-            'is_pathway'           => 'nullable|boolean'
+            'is_pathway'           => 'nullable|boolean',
+            'badge_categories'       => 'nullable|array'
         ]);
       
         $badgeCategory = request()->input('badge_category');
+        $badgeCategories = request()->input('badge_categories');
 
         $items = [];
         $paginatedCollection = new Collection();
         $pathwayQuery = null;
         
-        if (!empty($badgeCategory) && $badgeCategory !== 'certification') {
+        if ((!empty($badgeCategory) && $badgeCategory !== 'certification') || !empty($badgeCategories)) {
             $query = BadgePage::query()
                     ->when(request()->input('is_pathway'),function($q){
                         return $q->whereRaw('1 = 0');
                     })
                     ->when(request()->input('is_brandnew'),function($q){
-                        return $q->isBrandnew();
+                        return $q->IsBrandnew();
                     })
                     ->when(request()->input('is_featured'),function($q){
                         return $q->where('is_featured', request()->input('is_featured'));
+                    })
+                    ->when(!empty($badgeCategories), function($q) use ($badgeCategories){
+                        $locale = app()->getLocale();
+
+                        return $q->whereHas('badgeCategory', function ( $query) use ($locale, $badgeCategories) {
+                            $query->whereIn("slug->{$locale}", $badgeCategories);
+                        });
                     })
                     ->isPublished()->where('is_hidden', false);
 
@@ -105,7 +114,7 @@ class CourseGroupController extends Controller
             
             $paginatedCollection = BadgePageResource::collection($groups);
 
-            $pathwayQuery = PathwayPaginator::queryPathWays('is_badgepage', true);               
+            $pathwayQuery = PathwayPaginator::queryPathWays('is_badgepage', request()->input('q'));               
         } else {  
 
             $query = CourseGroup::query()
@@ -133,7 +142,7 @@ class CourseGroupController extends Controller
             $groups = $query->orderBy('updated_at', request()->input('order_by') ?? 'desc')->paginate(12);
             $paginatedCollection = CourseGroupResource::collection($groups);
 
-            $pathwayQuery = PathwayPaginator::queryPathWays('is_autoformation', true);
+            $pathwayQuery = PathwayPaginator::queryPathWays('is_autoformation', request()->input('q'));
         }
         
         $perPage = 12 - count($groups);
@@ -142,7 +151,7 @@ class CourseGroupController extends Controller
 
         $pathways = new Collection();
 
-        if($perPage > 0 && !request()->input('issuer') && !request()->input('course_group_category') 
+        if($perPage > 0 && !request()->input('issuer') && !request()->input('course_group_category') && empty($badgeCategories)
             &&  ( !$request->tags || empty($request->tags)) && !request()->input('is_featured') && !request()->input('is_brandnew') ) {
 
 
@@ -151,16 +160,8 @@ class CourseGroupController extends Controller
             // Manually calculate the offset
             $offset = PathwayPaginator::getOffset($currenPage, $perPage, $bridge);   
 
-
-            $pathways = $pathwayQuery->when(request()->input('q'), function($query){
-                            return $query->where(function ($q) {
-                                return $q->whereRaw('LOWER(title) LIKE "%'.strtolower(request()->input('q')).'%"')
-                                    ->orWhereRaw('LOWER(content) LIKE "%'.strtolower(request()->input('q')).'%"');
-                            });
-                        })
-                        ->orderBy('created_at', request()->input('order_by') ?? 'desc')
-                        ->skip($offset)->take($perPage)->get() ;
-            
+            $pathways = $pathwayQuery->orderBy('created_at', request()->input('order_by') ?? 'desc')
+                        ->skip($offset)->take($perPage)->get();
         }else {
             //return void
             $pathwayQuery = $pathwayQuery->whereRaw('1 = 0');

@@ -74,6 +74,7 @@ class BadgePageResource extends JsonResource
             'approval_type'         => $this->resource->approval_type,
             'request_form_url'      => $this->resource->request_form_url,
             'badge_image'           => isset($badge->image) ? $badge->image : null,
+            'issuer'                => $badge != null ? $badge->issuer : null,
             'image'                 => $this->resource->getMedia('*')->first(),
             'video_url'             => $this->video_url,
             'course_group_id'       => $this->resource->course->course_group_id ?? null,
@@ -87,6 +88,7 @@ class BadgePageResource extends JsonResource
             'createdAt'             => $this->resource->created_at,
             'updatedAt'             => $this->resource->updated_at,
             'is_featured'             =>  $this->resource->is_featured,
+            'is_brandnew'             =>  $this->resource->is_brandnew
         ];
     }
 }

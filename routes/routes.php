@@ -64,6 +64,8 @@ Route::group([
 
     // Search
     Route::get('search/{string}', config('badgefactor2.search_controller'));
+
+    Route::get('badge-categories', [BadgePageController::class, 'badgePageCategory']);
 });
 
 Route::group([

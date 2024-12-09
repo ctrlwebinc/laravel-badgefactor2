@@ -2,12 +2,14 @@
 
 namespace Ctrlweb\BadgeFactor2\Http\Controllers\Api;
 
-use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
-use Ctrlweb\BadgeFactor2\Http\Resources\Badges\BadgePageResource;
-use Ctrlweb\BadgeFactor2\Http\Resources\Badgr\AssertionResource;
+use Illuminate\Http\Request;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Assertion;
-use Illuminate\Http\Request;
+use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
+use Ctrlweb\BadgeFactor2\Models\Badges\BadgeCategory;
+use Ctrlweb\BadgeFactor2\Http\Resources\Badgr\AssertionResource;
+use Ctrlweb\BadgeFactor2\Http\Resources\Badges\BadgePageResource;
+use Ctrlweb\BadgeFactor2\Http\Resources\Badges\BadgeCategoryResource;
 
 /**
  * @tags Badges
@@ -64,5 +66,11 @@ class BadgePageController extends Controller
         })->isPublished()->get();
 
         return BadgePageResource::collection($badgePages);
+    }
+
+    public function badgePageCategory()
+    {
+        $categories = BadgeCategory::all();
+        return BadgeCategoryResource::collection($categories);
     }
 }

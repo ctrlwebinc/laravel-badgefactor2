@@ -2,18 +2,19 @@
 
 namespace Ctrlweb\BadgeFactor2\Models\Badges;
 
+use Carbon\Carbon;
+use Laravel\Scout\Searchable;
+use Spatie\MediaLibrary\HasMedia;
+use Ctrlweb\BadgeFactor2\Models\User;
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Translatable\HasTranslations;
+use Illuminate\Database\Eloquent\Builder;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Ctrlweb\BadgeFactor2\Models\Badgr\Badge;
 use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
-use Ctrlweb\BadgeFactor2\Models\User;
-use Ctrlweb\BadgeFactor2\Services\Badgr\Badge as BadgrBadge;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Laravel\Scout\Searchable;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Spatie\Translatable\HasTranslations;
+use Ctrlweb\BadgeFactor2\Services\Badgr\Badge as BadgrBadge;
 
 class BadgePage extends Model implements HasMedia
 {
@@ -180,5 +181,25 @@ class BadgePage extends Model implements HasMedia
     public function scopeIsPublished($query)
     {
         return $query->where('status', 'PUBLISHED');
+    }
+
+    public static function takeOnlyBrandnew(){
+        return self::where('created_at', '>=', Carbon::now()->subDays(800))
+                ->orderBy('created_at', 'desc') 
+                ->take(10)->get();
+    }
+
+    public function scopeIsBrandnew($query)
+    {
+        $brandnews = self::takeOnlyBrandnew()->map(function($line){
+            return $line->id;
+        })->toArray();
+
+        return $query->whereIn("id", $brandnews); 
+    }
+
+    public function getIsBrandnewAttribute()
+    {     
+        return self::takeOnlyBrandnew()->contains($this);
     }
 }
