@@ -7,7 +7,8 @@ use Ctrlweb\BadgeFactor2\Services\Badgr\Badge;
 use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrAdminProvider;
 use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrProvider;
 use Illuminate\Http\Request;
-use Intervention\Image\ImageManagerStatic as Image;
+use Intervention\Image\ImageManager as Image;
+use Intervention\Image\Drivers\Imagick\Driver;
 
 class BadgeFactor2Controller extends Controller
 {
@@ -44,9 +45,11 @@ class BadgeFactor2Controller extends Controller
             $assertion = (object) $assertion;
 
         }
-        $image = Image::make($assertion->image);
+        $manager = new Image(new Driver());
+        $file = file_get_contents($assertion->image);
+        $image = $manager->read($file);
 
-        return $image->response();
+        return response($image->encode(), 200)->header('Content-Type', $image->encode()->mediaType());
     }
 
     public function getBadgrBadge(Request $request, string $entityId)
@@ -55,8 +58,10 @@ class BadgeFactor2Controller extends Controller
         if (is_array($badge)) {
             $badge = (object) $badge;
         }
-        $image = Image::make($badge->image);
+        $manager = new Image(new Driver());
+        $file = file_get_contents($badge->image);
+        $image = $manager->read($file);
 
-        return $image->response();
+        return response($image->encode(), 200)->header('Content-Type', $image->encode()->mediaType());
     }
 }
