@@ -80,7 +80,8 @@ class CourseGroupController extends Controller
             'is_brandnew'           => 'nullable|boolean',
             'is_featured'           => 'nullable|boolean',
             'is_pathway'           => 'nullable|boolean',
-            'badge_categories'       => 'nullable|array'
+            'badge_categories'       => 'nullable|array',
+            'tags'                  => 'nullable|array'
         ]);
       
         $badgeCategory = request()->input('badge_category');
