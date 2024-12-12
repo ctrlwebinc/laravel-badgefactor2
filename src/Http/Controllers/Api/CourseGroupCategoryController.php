@@ -14,7 +14,9 @@ class CourseGroupCategoryController extends Controller
 {
     public function index()
     {
-        $categories = CourseGroupCategory::paginate();
+        $categories = CourseGroupCategory::when(request()->input('is_active'), function($query){
+            return $query->whereHas('courseGroups');
+        })->paginate();
 
         return CourseGroupCategoryResource::collection($categories);
     }
