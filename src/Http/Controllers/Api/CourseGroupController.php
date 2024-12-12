@@ -115,7 +115,7 @@ class CourseGroupController extends Controller
             
             $paginatedCollection = BadgePageResource::collection($groups);
 
-            $pathwayQuery = PathwayPaginator::queryPathWays('is_badgepage', request()->input('q'));               
+            $pathwayQuery = PathwayPaginator::queryPathWays('is_badgepage', true);               
         } else {  
 
             $query = CourseGroup::query()
@@ -143,7 +143,7 @@ class CourseGroupController extends Controller
             $groups = $query->orderBy('updated_at', request()->input('order_by') ?? 'desc')->paginate(12);
             $paginatedCollection = CourseGroupResource::collection($groups);
 
-            $pathwayQuery = PathwayPaginator::queryPathWays('is_autoformation', request()->input('q'));
+            $pathwayQuery = PathwayPaginator::queryPathWays('is_autoformation', true);
         }
         
         $perPage = 12 - count($groups);
