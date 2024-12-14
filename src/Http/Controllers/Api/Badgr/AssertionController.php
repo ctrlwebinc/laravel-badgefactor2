@@ -39,7 +39,7 @@ class AssertionController extends Controller
         $issueDate = Carbon::parse($assertion->issuedOn);
         $user = User::where('email', $assertion->recipient_email)->first();
 
-        $assertionUrl = config('badgefactor2.frontend.url').'/membres/'.$user->slug.'/badges/'.$badge->slug;
+        $assertionUrl = config('badgefactor2.frontend.url').'/membres/'.$user->slug.'/badges/'. $badge->badgePage?->slug;
 
         $fbLink = LinkedIn::generateLink($badge->name, $issueDate->year, $issueDate->month, $assertionUrl, $assertion->entityId);
 
