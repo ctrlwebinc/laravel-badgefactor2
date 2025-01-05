@@ -13,7 +13,7 @@ use Ctrlweb\BadgeFactor2\Services\Pathway\PathwayPaginator;
 use Ctrlweb\BadgeFactor2\Http\Resources\Badges\BadgePageResource;
 use Ctrlweb\BadgeFactor2\Http\Resources\Courses\CourseGroupResource;
 use Ctrlweb\BadgeFactor2\Http\Resources\PathwayPageResource;
-
+use Ctrlweb\BadgeFactor2\Models\Badges\BadgeCategory;
 
 /**
  * @tags Groupes de cours (formations)
@@ -103,15 +103,21 @@ class CourseGroupController extends Controller
                         return $q->where('is_featured', request()->input('is_featured'));
                     })
                     ->when(!empty($badgeCategories), function($q) use ($badgeCategories){
-                        $locale = app()->getLocale();
 
-                        return $q->whereHas('badgeCategory', function ( $query) use ($locale, $badgeCategories) {
-                            $query->whereIn("slug->{$locale}", $badgeCategories);
-                        });
+                        $badgeCategoryIds = [];
+
+                        foreach ($badgeCategories as $category) {
+                            $badgeCategory = BadgeCategory::findBySlug($category)->first();
+
+                            if($badgeCategory) {
+                                $badgeCategoryIds[] = $badgeCategory->id;
+                            }
+                        }
+                        return $q->whereIn("badge_category_id", $badgeCategoryIds);
                     })
                     ->isPublished()->where('is_hidden', false);
 
-            $groups = $query->orderBy('id', request()->input('order_by') ?? 'desc')->paginate(12);
+            $groups = $query->orderBy('created_at', request()->input('order_by') ?? 'desc')->paginate(12);
             
             $paginatedCollection = BadgePageResource::collection($groups);
 
