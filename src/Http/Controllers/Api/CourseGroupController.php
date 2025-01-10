@@ -121,7 +121,8 @@ class CourseGroupController extends Controller
             
             $paginatedCollection = BadgePageResource::collection($groups);
 
-            $pathwayQuery = PathwayPaginator::queryPathWays('is_badgepage', request()->input('q'));               
+            $pathwayQuery = (!request()->input('is_pathway') || request()->input('issuer') || request()->input('is_brandnew') 
+                                || request()->input('is_featured') || request()->input('tags') || request()->input('badge_categories') ) ? PathwayPage::whereRaw('1 = 0') : PathwayPaginator::queryPathWays('is_badgepage', request()->input('q'));               
         } else {  
 
             $query = CourseGroup::query()
@@ -149,7 +150,8 @@ class CourseGroupController extends Controller
             $groups = $query->orderBy('updated_at', request()->input('order_by') ?? 'desc')->paginate(12);
             $paginatedCollection = CourseGroupResource::collection($groups);
 
-            $pathwayQuery = PathwayPaginator::queryPathWays('is_autoformation', request()->input('q'));
+            $pathwayQuery = (!request()->input('is_pathway') || request()->input('issuer') || request()->input('is_brandnew') 
+                                || request()->input('is_featured') || request()->input('tags') || request()->input('badge_categories') ) ? PathwayPage::whereRaw('1 = 0') : PathwayPaginator::queryPathWays('is_badgepage', request()->input('q'));     
         }
         
         $perPage = 12 - count($groups);
