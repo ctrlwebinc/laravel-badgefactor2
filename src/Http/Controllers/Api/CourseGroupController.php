@@ -54,7 +54,7 @@ class CourseGroupController extends Controller
                 });
             })->where('is_hidden', false);
             
-            $groups = $query->orderByDesc('updated_at')->paginate(12);
+            $groups = $query->orderByDesc('id')->paginate(12);
 
             return CourseGroupResource::collection($groups);
         }
@@ -147,11 +147,11 @@ class CourseGroupController extends Controller
                     })           
                     ->where('is_hidden', false);
             
-            $groups = $query->orderBy('updated_at', request()->input('order_by') ?? 'desc')->paginate(12);
+            $groups = $query->orderBy('created_at', request()->input('order_by') ?? 'desc')->paginate(12);
             $paginatedCollection = CourseGroupResource::collection($groups);
 
             $pathwayQuery = (!request()->input('is_pathway') || request()->input('issuer') || request()->input('is_brandnew') 
-                                || request()->input('is_featured') || request()->input('tags') || request()->input('badge_categories') ) ? PathwayPage::whereRaw('1 = 0') : PathwayPaginator::queryPathWays('is_badgepage', request()->input('q'));     
+                                || request()->input('is_featured') || request()->input('tags') || request()->input('badge_categories') ) ? PathwayPage::whereRaw('1 = 0') : PathwayPaginator::queryPathWays('is_autoformation', request()->input('q'));     
         }
         
         $perPage = 12 - count($groups);
