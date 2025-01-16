@@ -184,9 +184,8 @@ class BadgePage extends Model implements HasMedia
     }
 
     public static function takeOnlyBrandnew(){
-        return self::where('created_at', '>=', Carbon::now()->subDays(800))
-                ->orderBy('created_at', 'desc') 
-                ->take(10)->get();
+        return self::where('is_hidden', false)->isPublished()->orderBy('created_at', 'desc') 
+                        ->take(10)->get();
     }
 
     public function scopeIsBrandnew($query)

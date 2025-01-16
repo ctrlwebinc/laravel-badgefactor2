@@ -136,8 +136,13 @@ class CourseGroup extends Model implements HasMedia
     }
 
     public static function takeOnlyBrandnew(){
-        return self::where('created_at', '>=', Carbon::now()->subDays(800))
-                ->orderBy('created_at', 'desc') 
+        return self::query()->whereHas('courses', function($course_query){
+            return $course_query->whereHas('badgePage', function($badge_page_query){
+                return $badge_page_query->isPublished();
+            });
+        })
+        ->where('is_hidden', false)
+        ->orderBy('created_at', 'desc') 
                 ->take(10)->get();
     }
 
@@ -146,7 +151,7 @@ class CourseGroup extends Model implements HasMedia
         $brandnews = self::takeOnlyBrandnew()->map(function($line){
             return $line->id;
         })->toArray();
-
+        
         return $query->whereIn("id", $brandnews); 
     }
 
