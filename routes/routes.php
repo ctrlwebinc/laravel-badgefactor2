@@ -33,6 +33,8 @@ Route::group([
     Route::apiResource('issuers', IssuerController::class)->only(['index', 'show']);
     Route::get('issuers-count', [IssuerController::class, 'count']);
     Route::get('issuers-with-certification', [IssuerController::class, 'issuerWithCertification']);
+    Route::get('issuers-without-certification', [IssuerController::class, 'issuerWithoutCertification']);
+
 
     // Badges.
     Route::get('badges/{entityId}', [BadgeController::class, 'show']);

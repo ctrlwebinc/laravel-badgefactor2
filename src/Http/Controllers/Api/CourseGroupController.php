@@ -91,7 +91,7 @@ class CourseGroupController extends Controller
         $paginatedCollection = new Collection();
         $pathwayQuery = null;
         
-        if ((!empty($badgeCategory) && $badgeCategory !== 'certification') || !empty($badgeCategories)) {
+        if ((!empty($badgeCategory) && $badgeCategory !== 'certification') || !empty($badgeCategories)) {            
             $query = BadgePage::query()
                     ->when(request()->input('is_pathway'),function($q){
                         return $q->whereRaw('1 = 0');
@@ -117,14 +117,14 @@ class CourseGroupController extends Controller
                     })
                     ->isPublished()->where('is_hidden', false);
 
-            $groups = $query->orderBy('created_at', request()->input('order_by') ?? 'desc')->paginate(12);
+            $groups = $query->orderBy('is_featured', 'desc')->orderBy('created_at', request()->input('order_by') ?? 'desc')->paginate(12);
             
             $paginatedCollection = BadgePageResource::collection($groups);
 
             $pathwayQuery = (!request()->input('is_pathway') || request()->input('issuer') || request()->input('is_brandnew') 
                                 || request()->input('is_featured') || request()->input('tags') || request()->input('badge_categories') ) ? PathwayPage::whereRaw('1 = 0') : PathwayPaginator::queryPathWays('is_badgepage', request()->input('q'));               
-        } else {  
-
+        } else { 
+            
             $query = CourseGroup::query()
                     ->when(request()->input('is_pathway'),function($q){
                         return $q->whereRaw('1 = 0');
@@ -147,7 +147,7 @@ class CourseGroupController extends Controller
                     })           
                     ->where('is_hidden', false);
             
-            $groups = $query->orderBy('created_at', request()->input('order_by') ?? 'desc')->paginate(12);
+            $groups = $query->orderBy('is_featured', 'desc')->orderBy('created_at', request()->input('order_by') ?? 'desc')->paginate(12);
             $paginatedCollection = CourseGroupResource::collection($groups);
 
             $pathwayQuery = (!request()->input('is_pathway') || request()->input('issuer') || request()->input('is_brandnew') 
