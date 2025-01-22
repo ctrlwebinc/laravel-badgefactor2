@@ -36,8 +36,45 @@ class IssuerController extends Controller
         
         if($badgeCategory){
 
+            return $this->getIssuerByBadgeCategories([$badgeCategory->id]);
+        }
+
+        return response()->json([]);
+
+    }
+
+    public function issuerWithoutCertification(){
+        $certificationBadgeCategory = BadgeCategory::findBySlug('certification')->first();
+
+        $badgeCategories = BadgeCategory::where('id', '!=', $certificationBadgeCategory->id)->pluck('id');
+        
+        if( !empty($badgeCategories)){
+
+            return $this->getIssuerByBadgeCategories($badgeCategories->toArray(), true);
+        }
+
+        return response()->json([]);
+
+    }
+
+    private function getIssuerByBadgeCategories(Array $badgeCategoryIds, bool $withNull = false) {
+        
+        if(!empty($badgeCategoryIds)){
+            
             $badges = BadgePage::with('badge')
-                ->where("badge_category_id", $badgeCategory->id)                                    
+                ->where(function($query) use ($badgeCategoryIds, $withNull){
+                    return $query->whereIn("badge_category_id", $badgeCategoryIds)
+                                    ->when($withNull, function($q){
+                                        return $q->orWhereNull('badge_category_id');
+                                    });
+                })                  
+                ->when(!$withNull, function($q){
+                    return $q->whereHas('course', function($q){
+                        return $q->whereNotNull('course_group_id');
+                    });
+                })
+                
+                ->isPublished()->where('is_hidden', false)                                  
                 ->get();
             
             $issuers = $badges->map(function($badgePage){
@@ -55,10 +92,10 @@ class IssuerController extends Controller
                 return $issuer; 
             })->unique('entityId') ?? [];
 
-            return response()->json($issuers);
+            return $issuers;
         }
 
-        return response()->json([]);
+        return [];
 
     }
 }
