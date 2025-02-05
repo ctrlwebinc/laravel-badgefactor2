@@ -6,9 +6,8 @@ use Ctrlweb\BadgeFactor2\Services\Badgr\Issuer;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgeCategory;
-use Illuminate\Support\Facades\Cache;
 use Collator;
-
+use App\Helpers\CacheHelper;
 /**
  * @tags Emetteurs
  */
@@ -35,7 +34,7 @@ class IssuerController extends Controller
 
     public function issuerWithCertification(){       
 
-        return Cache::rememberForever('badge_category_certification_with_issuer', function () {
+        return CacheHelper::rememberForeverWithGroup('badge_category_certification', 'badge_category_certification_with_issuer', function () {
             $badgeCategory = BadgeCategory::findBySlug('certification')->first();
             
             if ($badgeCategory) {
@@ -50,7 +49,7 @@ class IssuerController extends Controller
     public function issuerWithoutCertification(){
         
 
-        return Cache::rememberForever('badge_category_certification_without_issuer', function () {
+        return CacheHelper::rememberForeverWithGroup('badge_category_certification', 'badge_category_certification_without_issuer', function () {
 
             $certificationBadgeCategory = BadgeCategory::findBySlug('certification')->first();
 

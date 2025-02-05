@@ -4,7 +4,7 @@ namespace Ctrlweb\BadgeFactor2\Models\Badgr;
 
 use Ctrlweb\BadgeFactor2\Services\Badgr\Issuer as BadgrIssuer;
 use Illuminate\Database\Eloquent\Model;
-use Ctrlweb\BadgeFactor2\Services\CacheService;
+use App\Helpers\CacheHelper;
 
 class Issuer extends Model
 {
@@ -63,7 +63,22 @@ class Issuer extends Model
             return true;
         });
 
-        CacheService::restoreCache(SELF, ['badge_category_certification_*']);
+        $caches = ['badge_category_certification'];        
+
+        foreach ($caches as $key => $cache) {
+
+            static::saved(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+    
+            static::updated(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+        
+            static::deleted(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+        }
 
     }
 

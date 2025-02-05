@@ -5,6 +5,7 @@ namespace Ctrlweb\BadgeFactor2\Models;
 use Ctrlweb\BadgeFactor2\Models\Tag;
 use Illuminate\Database\Eloquent\Model;
 use Ctrlweb\BadgeFactor2\Services\CacheService;
+use App\Helpers\CacheHelper;
 
 class TagGroup extends Model
 {
@@ -18,7 +19,22 @@ class TagGroup extends Model
     {
         parent::boot();
 
-        CacheService::restoreCache(SELF, ['tag_groups_*']);
+        $caches = ['tag_groups'];        
+
+        foreach ($caches as $key => $cache) {
+
+            static::saved(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+    
+            static::updated(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+        
+            static::deleted(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+        }
     }
     
 }

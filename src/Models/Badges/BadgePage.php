@@ -15,7 +15,7 @@ use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Badge as BadgrBadge;
-use Ctrlweb\BadgeFactor2\Services\CacheService;
+use App\Helpers\CacheHelper;
 
 class BadgePage extends Model implements HasMedia
 {
@@ -132,8 +132,22 @@ class BadgePage extends Model implements HasMedia
             }
         });
 
+        $caches = ['search_engine_response', 'badge_category_certification', 'badge_pages'];        
 
-        CacheService::restoreCache(SELF, ['search_engine_response_*', 'badge_category_certification_*', 'badge_pages_']);
+        foreach ($caches as $key => $cache) {
+
+            static::saved(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+    
+            static::updated(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+        
+            static::deleted(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+        }
 
         
     }

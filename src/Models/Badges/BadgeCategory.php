@@ -4,8 +4,8 @@ namespace Ctrlweb\BadgeFactor2\Models\Badges;
 
 use Ctrlweb\BadgeFactor2\Models\BadgeCategory as BadgeFactor2BadgeCategory;
 use Spatie\Translatable\HasTranslations;
-use Illuminate\Support\Facades\Cache;
-use Ctrlweb\BadgeFactor2\Services\CacheService;
+use App\Helpers\CacheHelper;
+
 
 class BadgeCategory extends BadgeFactor2BadgeCategory
 {
@@ -28,7 +28,23 @@ class BadgeCategory extends BadgeFactor2BadgeCategory
     {
         parent::boot();        
 
-        CacheService::restoreCache(SELF, ['badge_category_certification_*', 'badge_categories']);
+        $caches = ['badge_category_certification', 'badge_categories'];
+        
+
+        foreach ($caches as $key => $cache) {
+
+            static::saved(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+    
+            static::updated(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+        
+            static::deleted(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+        }
         
     }
 }

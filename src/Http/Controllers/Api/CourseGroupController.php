@@ -15,7 +15,7 @@ use Ctrlweb\BadgeFactor2\Http\Resources\Courses\CourseGroupResource;
 use Ctrlweb\BadgeFactor2\Http\Resources\Courses\CourseGroupSearchEngineResource;
 use Ctrlweb\BadgeFactor2\Http\Resources\PathwayPageResource;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgeCategory;
-use Illuminate\Support\Facades\Cache;
+use App\Helpers\CacheHelper;
 use Ctrlweb\BadgeFactor2\Http\Resources\Badges\BadgePageSearchEngineResource;
 
 /**
@@ -89,7 +89,7 @@ class CourseGroupController extends Controller
 
         $cacheKeyFinal = 'search_engine_response_' . md5(json_encode($request->all()));
 
-        return Cache::remember($cacheKeyFinal, now()->addDay(), function () use ($locale, $request) {
+        return CacheHelper::rememberWithGroup('search_engine_response', $cacheKeyFinal, now()->addDay(), function () use ($locale, $request) {
             $badgeCategory = $request->input('badge_category');
             $badgeCategories = $request->input('badge_categories');
 

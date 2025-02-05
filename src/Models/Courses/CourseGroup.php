@@ -15,7 +15,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
 use Ctrlweb\BadgeFactor2\Models\Tag;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Cache;
+use App\Helpers\CacheHelper;
 
 class CourseGroup extends Model implements HasMedia
 {
@@ -119,17 +119,23 @@ class CourseGroup extends Model implements HasMedia
             });
         });
 
-        static::saved(function () {
-            Cache::forget('search_engine_response_*'); 
-        });
+        $caches = ['search_engine_response'];        
 
-        static::updated(function () {
-            Cache::forget('search_engine_response_*'); 
-        });
+        foreach ($caches as $key => $cache) {
+
+            static::saved(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
     
-        static::deleted(function () {
-            Cache::forget('search_engine_response_*');
-        });
+            static::updated(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+        
+            static::deleted(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+        }
+        
     }
 
     public function registerMediaCollections(): void

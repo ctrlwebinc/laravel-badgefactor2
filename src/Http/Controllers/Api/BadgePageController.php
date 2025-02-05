@@ -10,7 +10,7 @@ use Ctrlweb\BadgeFactor2\Models\Badges\BadgeCategory;
 use Ctrlweb\BadgeFactor2\Http\Resources\Badgr\AssertionResource;
 use Ctrlweb\BadgeFactor2\Http\Resources\Badges\BadgePageResource;
 use Ctrlweb\BadgeFactor2\Http\Resources\Badges\BadgeCategoryResource;
-use Illuminate\Support\Facades\Cache;
+use App\Helpers\CacheHelper;
 
 
 /**
@@ -63,7 +63,7 @@ class BadgePageController extends Controller
 
     public function badgePageByCourseGroup(string $locale, $courseGroup)
     {
-        $badgePages = Cache::rememberForever('badge_pages_' . $courseGroup->id, function() use ($courseGroup) {
+        $badgePages = CacheHelper::rememberForeverWithGroup('badge_pages', 'badge_pages_' . $courseGroup->id, function() use ($courseGroup) {
             return BadgePage::whereHas('course', function ($query) use ($courseGroup) {
                 $query->where('course_group_id', $courseGroup->id);
             })->isPublished()->get();
@@ -75,7 +75,7 @@ class BadgePageController extends Controller
 
     public function badgePageCategory()
     {
-        $categories = Cache::rememberForever('badge_categories', function() {
+        $categories = CacheHelper::rememberForeverWithGroup('badge_categories', 'badge_categories', function() {
             return BadgeCategory::all();
         });
         
