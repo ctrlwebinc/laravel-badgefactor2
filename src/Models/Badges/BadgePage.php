@@ -132,17 +132,23 @@ class BadgePage extends Model implements HasMedia
             }
         });
 
-        static::saved(function () {
-            Cache::forget('search_engine_response_*');
-        });
+        $caches = ['search_engine_response_*', 'badge_category_certification_*', 'badge_pages_'];
 
-        static::updated(function () {
-            Cache::forget('search_engine_response_*');
-        });
+        foreach ($caches as $key => $cache) {
+
+            static::saved(function () {
+                Cache::forget($cache);
+            });
     
-        static::deleted(function () {
-            Cache::forget('search_engine_response_*');
-        });
+            static::updated(function () {
+                Cache::forget($cache);
+            });
+        
+            static::deleted(function () {
+                Cache::forget($cache);
+            });
+        }
+        
     }
 
     public function approvers()

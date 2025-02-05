@@ -6,6 +6,8 @@ use Ctrlweb\BadgeFactor2\Services\Badgr\Issuer;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgeCategory;
+use Illuminate\Support\Facades\Cache;
+use Collator;
 
 /**
  * @tags Emetteurs
@@ -31,35 +33,44 @@ class IssuerController extends Controller
         return app(Issuer::class)->count();
     }
 
-    public function issuerWithCertification(){
-        $badgeCategory = BadgeCategory::findBySlug('certification')->first();
-        
-        if($badgeCategory){
+    public function issuerWithCertification(){       
 
-            return $this->getIssuerByBadgeCategories([$badgeCategory->id]);
-        }
-
-        return response()->json([]);
+        return Cache::rememberForever('badge_category_certification_with_issuer', function () {
+            $badgeCategory = BadgeCategory::findBySlug('certification')->first();
+            
+            if ($badgeCategory) {
+                return $this->getIssuerByBadgeCategories([$badgeCategory->id]);
+            }
+            
+            return response()->json([]);
+        });
 
     }
 
     public function issuerWithoutCertification(){
-        $certificationBadgeCategory = BadgeCategory::findBySlug('certification')->first();
-
-        $badgeCategories = BadgeCategory::where('id', '!=', $certificationBadgeCategory->id)->pluck('id');
         
-        if( !empty($badgeCategories)){
 
-            return $this->getIssuerByBadgeCategories($badgeCategories->toArray(), true);
-        }
+        return Cache::rememberForever('badge_category_certification_without_issuer', function () {
 
-        return response()->json([]);
+            $certificationBadgeCategory = BadgeCategory::findBySlug('certification')->first();
+
+            $badgeCategories = BadgeCategory::where('id', '!=', $certificationBadgeCategory->id)->pluck('id');
+            
+            if( !empty($badgeCategories)){
+
+                return $this->getIssuerByBadgeCategories($badgeCategories->toArray(), true);
+            }
+
+            return response()->json([]);
+        });
 
     }
 
     private function getIssuerByBadgeCategories(Array $badgeCategoryIds, bool $withNull = false) {
         
         if(!empty($badgeCategoryIds)){
+
+            $collator = new Collator('fr_FR');
             
             $badges = BadgePage::with('badge')
                 ->where(function($query) use ($badgeCategoryIds, $withNull){
@@ -90,7 +101,14 @@ class IssuerController extends Controller
                 return $issuer;
             })->filter(function($issuer){
                 return $issuer; 
-            })->unique('entityId') ?? [];
+            })
+            ->sort(function ($a, $b) use ($collator) {
+                return $collator->compare($a->name, $b->name);
+            })->values()
+            ->unique('entityId')
+            ->map(function($issuer){
+                return ['entityId' => $issuer->entityId, 'name' => $issuer->name];
+            }) ?? [];
 
             return $issuers;
         }

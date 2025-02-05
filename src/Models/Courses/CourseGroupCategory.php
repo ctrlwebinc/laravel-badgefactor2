@@ -37,6 +37,29 @@ class CourseGroupCategory extends Model implements HasMedia
         'is_featured' => 'boolean',
     ];
 
+    public static function boot()
+    {
+        parent::boot();        
+
+        $caches = ['course_group_category_*'];
+
+        foreach ($caches as $key => $cache) {
+
+            static::saved(function () {
+                Cache::forget($cache);
+            });
+    
+            static::updated(function () {
+                Cache::forget($cache);
+            });
+        
+            static::deleted(function () {
+                Cache::forget($cache);
+            });
+        }
+        
+    }
+
     public static function findBySlug($slug)
     {
         return self::where('slug->fr', $slug)
