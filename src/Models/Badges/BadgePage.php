@@ -130,6 +130,18 @@ class BadgePage extends Model implements HasMedia
                 });
             }
         });
+
+        static::saved(function () {
+            Cache::forget('search_engine_response_*');
+        });
+
+        static::updated(function () {
+            Cache::forget('search_engine_response_*');
+        });
+    
+        static::deleted(function () {
+            Cache::forget('search_engine_response_*');
+        });
     }
 
     public function approvers()
@@ -180,7 +192,8 @@ class BadgePage extends Model implements HasMedia
 
     public function scopeIsPublished($query)
     {
-        return $query->where('status', 'PUBLISHED');
+        return $query->where('status', 'PUBLISHED')
+                    ->where('updated_at', '>=', now()->subYears(3));
     }
 
     public static function takeOnlyBrandnew(){

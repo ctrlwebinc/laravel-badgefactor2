@@ -117,6 +117,18 @@ class CourseGroup extends Model implements HasMedia
                 return $q->whereIn('id', $courseGroupIds);
             });
         });
+
+        static::saved(function () {
+            Cache::forget('search_engine_response_*'); 
+        });
+
+        static::updated(function () {
+            Cache::forget('search_engine_response_*'); 
+        });
+    
+        static::deleted(function () {
+            Cache::forget('search_engine_response_*');
+        });
     }
 
     public function registerMediaCollections(): void
