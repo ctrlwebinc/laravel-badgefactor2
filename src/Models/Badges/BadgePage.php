@@ -15,6 +15,7 @@ use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Badge as BadgrBadge;
+use Illuminate\Support\Facades\Cache;
 
 class BadgePage extends Model implements HasMedia
 {

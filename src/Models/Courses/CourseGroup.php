@@ -15,6 +15,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
 use Ctrlweb\BadgeFactor2\Models\Tag;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class CourseGroup extends Model implements HasMedia
 {
