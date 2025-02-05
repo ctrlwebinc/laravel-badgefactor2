@@ -4,6 +4,7 @@ namespace Ctrlweb\BadgeFactor2\Models\Badgr;
 
 use Ctrlweb\BadgeFactor2\Services\Badgr\Issuer as BadgrIssuer;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Issuer extends Model
 {
@@ -33,6 +34,9 @@ class Issuer extends Model
                 $issuer->image
             );
 
+            Cache::forget('badge_category_certification_with_issuer');
+            Cache::forget('badge_category_certification_without_issuer');
+
             return true;
         });
 
@@ -46,6 +50,9 @@ class Issuer extends Model
                 $issuer->image
             );
 
+            Cache::forget('badge_category_certification_with_issuer');
+            Cache::forget('badge_category_certification_without_issuer');
+
             return true;
         });
 
@@ -53,6 +60,9 @@ class Issuer extends Model
             app(BadgrIssuer::class)->delete(
                 $issuer->entityId
             );
+
+            Cache::forget('badge_category_certification_with_issuer');
+            Cache::forget('badge_category_certification_without_issuer');
 
             return true;
         });
