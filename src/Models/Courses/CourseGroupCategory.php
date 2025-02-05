@@ -8,6 +8,7 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
+use Ctrlweb\BadgeFactor2\Services\CacheService;
 
 class CourseGroupCategory extends Model implements HasMedia
 {
@@ -39,24 +40,9 @@ class CourseGroupCategory extends Model implements HasMedia
 
     public static function boot()
     {
-        parent::boot();        
+        parent::boot();
 
-        $caches = ['course_group_category_*'];
-
-        foreach ($caches as $key => $cache) {
-
-            static::saved(function () {
-                Cache::forget($cache);
-            });
-    
-            static::updated(function () {
-                Cache::forget($cache);
-            });
-        
-            static::deleted(function () {
-                Cache::forget($cache);
-            });
-        }
+        CacheService::restoreCache(SELF, ['course_group_category_*']);
         
     }
 

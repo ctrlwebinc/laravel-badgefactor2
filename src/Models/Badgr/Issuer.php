@@ -4,7 +4,7 @@ namespace Ctrlweb\BadgeFactor2\Models\Badgr;
 
 use Ctrlweb\BadgeFactor2\Services\Badgr\Issuer as BadgrIssuer;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Cache;
+use Ctrlweb\BadgeFactor2\Services\CacheService;
 
 class Issuer extends Model
 {
@@ -32,10 +32,7 @@ class Issuer extends Model
                 $issuer->url,
                 $issuer->description ?? '',
                 $issuer->image
-            );
-
-            Cache::forget('badge_category_certification_with_issuer');
-            Cache::forget('badge_category_certification_without_issuer');
+            );            
 
             return true;
         });
@@ -50,8 +47,6 @@ class Issuer extends Model
                 $issuer->image
             );
 
-            Cache::forget('badge_category_certification_with_issuer');
-            Cache::forget('badge_category_certification_without_issuer');
 
             return true;
         });
@@ -61,15 +56,15 @@ class Issuer extends Model
                 $issuer->entityId
             );
 
-            Cache::forget('badge_category_certification_with_issuer');
-            Cache::forget('badge_category_certification_without_issuer');
-
             return true;
         });
 
         static::saving(function (Issuer $issuer) {
             return true;
         });
+
+        CacheService::restoreCache(SELF, ['badge_category_certification_*']);
+
     }
 
     public function getRows()
