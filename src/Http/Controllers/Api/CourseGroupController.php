@@ -89,7 +89,7 @@ class CourseGroupController extends Controller
 
         $cacheKeyFinal = 'search_engine_response_' . md5(json_encode($request->all()));
 
-        return CacheHelper::rememberWithGroup('search_engine_response', $cacheKeyFinal, now()->addDay(), function () use ($locale, $request) {
+        return CacheHelper::rememberWithGroup('search_engine_response', $cacheKeyFinal, (24 * 60), function () use ($locale, $request) {
             $badgeCategory = $request->input('badge_category');
             $badgeCategories = $request->input('badge_categories');
 
