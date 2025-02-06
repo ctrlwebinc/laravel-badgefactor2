@@ -4,6 +4,7 @@ namespace Ctrlweb\BadgeFactor2\Models\Badgr;
 
 use Ctrlweb\BadgeFactor2\Services\Badgr\Issuer as BadgrIssuer;
 use Illuminate\Database\Eloquent\Model;
+use App\Helpers\CacheHelper;
 
 class Issuer extends Model
 {
@@ -31,7 +32,7 @@ class Issuer extends Model
                 $issuer->url,
                 $issuer->description ?? '',
                 $issuer->image
-            );
+            );            
 
             return true;
         });
@@ -45,6 +46,7 @@ class Issuer extends Model
                 $issuer->description ?? '',
                 $issuer->image
             );
+
 
             return true;
         });
@@ -60,6 +62,24 @@ class Issuer extends Model
         static::saving(function (Issuer $issuer) {
             return true;
         });
+
+        $caches = ['badge_category_certification'];        
+
+        foreach ($caches as $key => $cache) {
+
+            static::saved(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+    
+            static::updated(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+        
+            static::deleted(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+        }
+
     }
 
     public function getRows()

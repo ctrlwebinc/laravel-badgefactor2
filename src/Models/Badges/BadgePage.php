@@ -15,6 +15,7 @@ use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Badge as BadgrBadge;
+use App\Helpers\CacheHelper;
 
 class BadgePage extends Model implements HasMedia
 {
@@ -130,6 +131,25 @@ class BadgePage extends Model implements HasMedia
                 });
             }
         });
+
+        $caches = ['search_engine_response', 'badge_category_certification', 'badge_pages'];        
+
+        foreach ($caches as $key => $cache) {
+
+            static::saved(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+    
+            static::updated(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+        
+            static::deleted(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+        }
+
+        
     }
 
     public function approvers()
@@ -180,7 +200,8 @@ class BadgePage extends Model implements HasMedia
 
     public function scopeIsPublished($query)
     {
-        return $query->where('status', 'PUBLISHED');
+        return $query->where('status', 'PUBLISHED')
+                    ->where('updated_at', '>=', now()->subYears(3));
     }
 
     public static function takeOnlyBrandnew(){

@@ -8,6 +8,7 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
+use App\Helpers\CacheHelper;
 
 class CourseGroupCategory extends Model implements HasMedia
 {
@@ -36,6 +37,30 @@ class CourseGroupCategory extends Model implements HasMedia
     protected $casts = [
         'is_featured' => 'boolean',
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        $caches = ['course_group_category'];        
+
+        foreach ($caches as $key => $cache) {
+
+            static::saved(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+    
+            static::updated(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+        
+            static::deleted(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+        }
+
+        
+    }
 
     public static function findBySlug($slug)
     {
