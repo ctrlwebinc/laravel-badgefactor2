@@ -85,7 +85,7 @@ class CourseGroupController extends Controller
             'is_pathway'            => 'nullable|boolean',
             'badge_categories'      => 'nullable|array',
             'tags'                  => 'nullable|array',
-            'increment_per_page'    => 'nullable|boolean'
+            'increment_per_page'    => 'nullable|integer'
         ]);
 
         $cacheKeyFinal = 'search_engine_response_' . md5(json_encode($request->all()));
@@ -99,8 +99,7 @@ class CourseGroupController extends Controller
             $paginatedCollection = new Collection();
             $pathwayQuery = null;
 
-            $itemParPage = (boolval($request->increment_per_page) == true && request()->input('page')) ? ( (intval(request()->input('page')) + 1) * 12) 
-                            : 12;
+            $itemParPage = $request->increment_per_page ? ( intval($request->increment_per_page)  * 12) : 12;
                        
             $tags = $request->tags && !empty($request->tags) ? array_filter($request->tags, function($tag){
                 return $tag != null;
