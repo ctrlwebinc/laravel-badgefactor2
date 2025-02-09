@@ -99,8 +99,8 @@ class CourseGroupController extends Controller
             $paginatedCollection = new Collection();
             $pathwayQuery = null;
 
-            $itemParPage = (boolval($request->increment_per_page) == true && request()->input('page')) ? ( intval(request()->input('page')) * 12) 
-                        : 12;
+            $itemParPage = (boolval($request->increment_per_page) == true && request()->input('page')) ? ( (intval(request()->input('page')) + 1) * 12) 
+                            : 12;
                        
             $tags = $request->tags && !empty($request->tags) ? array_filter($request->tags, function($tag){
                 return $tag != null;
