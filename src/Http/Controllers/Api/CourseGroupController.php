@@ -84,10 +84,12 @@ class CourseGroupController extends Controller
             'is_featured'           => 'nullable|boolean',
             'is_pathway'            => 'nullable|boolean',
             'badge_categories'      => 'nullable|array',
-            'tags'                  => 'nullable|array'
+            'tags'                  => 'nullable|array',
+            'increment_per_page'    => 'nullable|boolean'
         ]);
 
         $cacheKeyFinal = 'search_engine_response_' . md5(json_encode($request->all()));
+        
 
         return CacheHelper::rememberWithGroup('search_engine_response', $cacheKeyFinal, (24 * 60), function () use ($locale, $request) {
             $badgeCategory = $request->input('badge_category');
@@ -97,6 +99,9 @@ class CourseGroupController extends Controller
             $paginatedCollection = new Collection();
             $pathwayQuery = null;
 
+            $itemParPage = (boolval($request->increment_per_page) == true && request()->input('page')) ? ( intval(request()->input('page')) * 12) 
+                        : 12;
+                       
             $tags = $request->tags && !empty($request->tags) ? array_filter($request->tags, function($tag){
                 return $tag != null;
             }) : false;
@@ -115,7 +120,7 @@ class CourseGroupController extends Controller
                             ->where('is_hidden', false)
                             ->orderBy('is_featured', 'desc')
                             ->when($request->input('order_by'), fn ($q) => $q->orderBy('title', $request->input('order_by')), fn ($q) => $q->orderBy('created_at', 'desc'))
-                            ->paginate(12);
+                            ->paginate($itemParPage);
 
                 $paginatedCollection = BadgePageSearchEngineResource::collection($groups);
                 $pathwayQuery = (!request()->input('is_pathway') || request()->input('issuer') || request()->input('is_brandnew') || request()->input('is_featured') || $tags || request()->input('badge_categories')) ? PathwayPage::whereRaw('1 = 0') : PathwayPaginator::queryPathWays('is_badgepage', request()->input('q')); 
@@ -131,7 +136,7 @@ class CourseGroupController extends Controller
                             ->where('is_hidden', false)
                             ->orderBy('is_featured', 'desc')
                             ->when($request->input('order_by'), fn ($q) => $q->orderBy('title', $request->input('order_by')), fn ($q) => $q->orderBy('created_at', 'desc'))
-                            ->paginate(12);
+                            ->paginate($itemParPage);
 
                 $paginatedCollection = CourseGroupSearchEngineResource::collection($groups);
                 $pathwayQuery = (!request()->input('is_pathway') || request()->input('issuer') || request()->input('is_brandnew') || request()->input('is_featured') || $tags || request()->input('badge_categories')) ? PathwayPage::whereRaw('1 = 0') : PathwayPaginator::queryPathWays('is_autoformation', request()->input('q')); 
