@@ -15,7 +15,7 @@ class CourseGroupCategoryController extends Controller
 {
     public function index()
     {
-        $categories = CacheHelper::rememberForeverWithGroup('course_group_category', 'course_group_category_list' . md5(request()->fullUrl()), function() {
+        $categories = CacheHelper::rememberWithGroup('course_group_category', 'course_group_category_list' . md5(request()->fullUrl()), ( 24 * 60 ), function() {
             return CourseGroupCategory::when(request()->input('is_active'), function($query){
                 return $query->whereHas('courseGroups');
             })->paginate();

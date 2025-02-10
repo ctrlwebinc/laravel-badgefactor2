@@ -119,7 +119,7 @@ class CourseGroup extends Model implements HasMedia
             });
         });
 
-        $caches = ['search_engine_response'];        
+        $caches = ['search_engine_response', 'badge_category_certification', 'course_group_category', 'tag_groups'];        
 
         foreach ($caches as $key => $cache) {
 

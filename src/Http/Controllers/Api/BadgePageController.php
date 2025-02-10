@@ -63,7 +63,7 @@ class BadgePageController extends Controller
 
     public function badgePageByCourseGroup(string $locale, $courseGroup)
     {
-        $badgePages = CacheHelper::rememberForeverWithGroup('badge_pages', 'badge_pages_' . $courseGroup->id, function() use ($courseGroup) {
+        $badgePages = CacheHelper::rememberWithGroup('badge_pages', 'badge_pages_' . $courseGroup->id, ( 24 * 60 ), function() use ($courseGroup) {
             return BadgePage::whereHas('course', function ($query) use ($courseGroup) {
                 $query->where('course_group_id', $courseGroup->id);
             })->isPublished()->get();
@@ -75,7 +75,7 @@ class BadgePageController extends Controller
 
     public function badgePageCategory()
     {
-        $categories = CacheHelper::rememberForeverWithGroup('badge_categories', 'badge_categories', function() {
+        $categories = CacheHelper::rememberWithGroup('badge_categories', 'badge_categories', (24 * 60 ), function() {
             return BadgeCategory::all();
         });
         

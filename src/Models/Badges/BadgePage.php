@@ -132,7 +132,7 @@ class BadgePage extends Model implements HasMedia
             }
         });
 
-        $caches = ['search_engine_response', 'badge_category_certification', 'badge_pages'];        
+        $caches = ['search_engine_response', 'badge_category_certification', 'badge_pages', 'badge_categories', 'tag_groups'];        
 
         foreach ($caches as $key => $cache) {
 
