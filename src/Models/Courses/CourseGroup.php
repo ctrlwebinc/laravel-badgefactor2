@@ -16,6 +16,7 @@ use Spatie\Translatable\HasTranslations;
 use Ctrlweb\BadgeFactor2\Models\Tag;
 use Carbon\Carbon;
 use App\Helpers\CacheHelper;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class CourseGroup extends Model implements HasMedia
 {
@@ -134,7 +135,20 @@ class CourseGroup extends Model implements HasMedia
             static::deleted(function () use ($cache) {
                 CacheHelper::forgetGroup($cache);
             });
+            
+            Pivot::created(function($pivot) {
+                CacheHelper::forgetGroup($cache);
+            });
+    
+            Pivot::updated(function($pivot) {
+                CacheHelper::forgetGroup($cache);
+            });
+    
+            Pivot::deleted(function($pivot) {
+                CacheHelper::forgetGroup($cache);
+            });
         }
+
         
     }
 

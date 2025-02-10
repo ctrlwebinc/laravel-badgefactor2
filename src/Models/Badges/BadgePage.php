@@ -16,6 +16,7 @@ use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Badge as BadgrBadge;
 use App\Helpers\CacheHelper;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class BadgePage extends Model implements HasMedia
 {
@@ -145,6 +146,18 @@ class BadgePage extends Model implements HasMedia
             });
         
             static::deleted(function () use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+
+            Pivot::created(function($pivot) {
+                CacheHelper::forgetGroup($cache);
+            });
+    
+            Pivot::updated(function($pivot) {
+                CacheHelper::forgetGroup($cache);
+            });
+    
+            Pivot::deleted(function($pivot) {
                 CacheHelper::forgetGroup($cache);
             });
         }
