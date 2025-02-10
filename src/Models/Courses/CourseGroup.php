@@ -136,15 +136,15 @@ class CourseGroup extends Model implements HasMedia
                 CacheHelper::forgetGroup($cache);
             });
             
-            Pivot::created(function($pivot) {
+            Pivot::created(function($pivot) use ($cache) {
                 CacheHelper::forgetGroup($cache);
             });
     
-            Pivot::updated(function($pivot) {
+            Pivot::updated(function($pivot) use ($cache) {
                 CacheHelper::forgetGroup($cache);
             });
     
-            Pivot::deleted(function($pivot) {
+            Pivot::deleted(function($pivot) use ($cache) {
                 CacheHelper::forgetGroup($cache);
             });
         }
