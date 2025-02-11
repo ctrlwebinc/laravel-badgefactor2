@@ -34,7 +34,7 @@ class IssuerController extends Controller
 
     public function issuerWithCertification(){       
 
-        return CacheHelper::rememberForeverWithGroup('badge_category_certification', 'badge_category_certification_with_issuer', function () {
+        return CacheHelper::rememberWithGroup('badge_category_certification', 'badge_category_certification_with_issuer', (24 * 60 ), function () {
             $badgeCategory = BadgeCategory::findBySlug('certification')->first();
             
             if ($badgeCategory) {
@@ -49,7 +49,7 @@ class IssuerController extends Controller
     public function issuerWithoutCertification(){
         
 
-        return CacheHelper::rememberForeverWithGroup('badge_category_certification', 'badge_category_certification_without_issuer', function () {
+        return CacheHelper::rememberWithGroup('badge_category_certification', 'badge_category_certification_without_issuer', (24 * 26 ), function () {
 
             $certificationBadgeCategory = BadgeCategory::findBySlug('certification')->first();
 

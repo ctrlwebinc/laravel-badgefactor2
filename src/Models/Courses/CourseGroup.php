@@ -16,6 +16,7 @@ use Spatie\Translatable\HasTranslations;
 use Ctrlweb\BadgeFactor2\Models\Tag;
 use Carbon\Carbon;
 use App\Helpers\CacheHelper;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class CourseGroup extends Model implements HasMedia
 {
@@ -119,7 +120,7 @@ class CourseGroup extends Model implements HasMedia
             });
         });
 
-        $caches = ['search_engine_response'];        
+        $caches = ['search_engine_response', 'badge_category_certification', 'course_group_category', 'tag_groups'];        
 
         foreach ($caches as $key => $cache) {
 
@@ -134,7 +135,20 @@ class CourseGroup extends Model implements HasMedia
             static::deleted(function () use ($cache) {
                 CacheHelper::forgetGroup($cache);
             });
+            
+            Pivot::created(function($pivot) use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+    
+            Pivot::updated(function($pivot) use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
+    
+            Pivot::deleted(function($pivot) use ($cache) {
+                CacheHelper::forgetGroup($cache);
+            });
         }
+
         
     }
 

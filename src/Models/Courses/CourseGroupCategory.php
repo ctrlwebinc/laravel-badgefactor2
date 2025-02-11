@@ -42,7 +42,7 @@ class CourseGroupCategory extends Model implements HasMedia
     {
         parent::boot();
 
-        $caches = ['course_group_category'];        
+        $caches = ['course_group_category', 'search_engine_response'];        
 
         foreach ($caches as $key => $cache) {
 

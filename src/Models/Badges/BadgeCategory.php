@@ -28,7 +28,7 @@ class BadgeCategory extends BadgeFactor2BadgeCategory
     {
         parent::boot();        
 
-        $caches = ['badge_category_certification', 'badge_categories'];
+        $caches = ['badge_category_certification', 'badge_categories', 'search_engine_response'];
         
 
         foreach ($caches as $key => $cache) {
