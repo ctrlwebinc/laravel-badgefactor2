@@ -26,7 +26,7 @@ class CourseGroupResource extends JsonResource
             'subtitle'                 => $this->resource->subtitle,
             'description'              => $this->resource->description,
             'excerpt'                  => mb_substr(strip_tags($this->resource->description), 0, 134, 'UTF-8').' [...]',
-            'image'                    => $this->resource->getMedia('*')->first(),
+            'image'                    => $this->resource->getMedia('image')->first(),
             'balado'                   => $this->resource->balado, 
             'content_specialists'      => ResponsibleResource::collection($this->resource->contentSpecialists ?? null),
             'retroaction_responsibles' => ResponsibleResource::collection($this->resource->retroactionResponsibles ?? null),
@@ -41,7 +41,7 @@ class CourseGroupResource extends JsonResource
             'is_featured'             =>  $this->resource->is_featured,
             'is_brandnew'             =>  $this->resource->is_brandnew,
             'seo_meta' => [
-                'image' => $this->resource->meta_image,
+                'image' => $this->resource->getMedia('meta_image')->first(),
                 'title' => $this->resource->meta_title,
                 'description' => $this->resource->meta_description,
             ]

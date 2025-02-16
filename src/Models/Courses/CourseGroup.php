@@ -33,7 +33,6 @@ class CourseGroup extends Model implements HasMedia
         'course_group_category_id',
         'is_hidden',
         'is_featured',
-        'meta_image',
         'meta_title',
         'meta_description'
     ];
@@ -47,6 +46,8 @@ class CourseGroup extends Model implements HasMedia
         'title',
         'subtitle',
         'description',
+        'meta_title',
+        'meta_description'
     ];
 
 

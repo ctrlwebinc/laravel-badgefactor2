@@ -90,7 +90,7 @@ class BadgePageResource extends JsonResource
             'is_featured'             =>  $this->resource->is_featured,
             'is_brandnew'             =>  $this->resource->is_brandnew,
             'seo_meta' => [
-                'image' => $this->resource->meta_image,
+                'image' => $this->resource->getMedia('meta_image')->first(),
                 'title' => $this->resource->meta_title,
                 'description' => $this->resource->meta_description,
             ]

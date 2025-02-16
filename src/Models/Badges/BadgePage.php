@@ -45,7 +45,9 @@ class BadgePage extends Model implements HasMedia
         'publication_date',
         'status',
         'is_hidden',
-        'is_featured'
+        'is_featured',
+        'meta_title',
+        'meta_description'
     ];
 
     public static function findBySlug($slug)
@@ -61,6 +63,8 @@ class BadgePage extends Model implements HasMedia
         'criteria',
         'request_form_url',
         'video_url',
+        'meta_title',
+        'meta_description'
     ];
 
     protected $appends = ['badge'];
