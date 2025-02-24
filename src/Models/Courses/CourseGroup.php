@@ -32,7 +32,9 @@ class CourseGroup extends Model implements HasMedia
         'balado',
         'course_group_category_id',
         'is_hidden',
-        'is_featured'
+        'is_featured',
+        'meta_title',
+        'meta_description'
     ];
 
     protected $casts = [
@@ -44,6 +46,8 @@ class CourseGroup extends Model implements HasMedia
         'title',
         'subtitle',
         'description',
+        'meta_title',
+        'meta_description'
     ];
 
 
