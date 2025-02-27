@@ -2,27 +2,28 @@
 
 namespace Ctrlweb\BadgeFactor2\Models;
 
-use Ctrlweb\BadgeFactor2\Interfaces\TokenRepositoryInterface;
-use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
-use Ctrlweb\BadgeFactor2\Models\Badgr\Assertion;
-use Ctrlweb\BadgeFactor2\Models\Courses\Course;
-use Ctrlweb\BadgeFactor2\Notifications\ResetPasswordNotification;
-use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrRecipientProvider;
-use Ctrlweb\BadgeFactor2\Services\Badgr\User as BadgrUser;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
-use League\OAuth2\Client\Token\AccessTokenInterface;
 use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Permission\Models\Role;
+use Illuminate\Auth\Events\Registered;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Notifications\Notifiable;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Ctrlweb\BadgeFactor2\Models\Courses\Course;
+use Ctrlweb\BadgeFactor2\Models\Badgr\Assertion;
+use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use League\OAuth2\Client\Token\AccessTokenInterface;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Ctrlweb\BadgeFactor2\Services\Badgr\User as BadgrUser;
+use Ctrlweb\BadgeFactor2\Interfaces\TokenRepositoryInterface;
+use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrRecipientProvider;
+use Ctrlweb\BadgeFactor2\Notifications\ResetPasswordNotification;
 
 class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRepositoryInterface
 {
@@ -99,6 +100,7 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
         'badgr_encrypted_password',
         'establishment_id',
         'new_establishment_id',
+        'checked_at'
     ];
 
     /**
@@ -142,6 +144,9 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
     ];
 
     protected $guard_name = 'web';
+
+    protected $appends = ['is_checked']; 
+
 
     public static function boot()
     {
@@ -192,6 +197,11 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
                 $query->where('created_at', '<=', request('end_date'));
             }
         });
+    }
+
+    public function getIsCheckedAttribute(): bool
+    {
+        return $this->checked_at && Carbon::parse($this->checked_at)->isToday() || Carbon::parse($this->checked_at)->isFuture();
     }
 
     public function sendPasswordResetNotification($token)
