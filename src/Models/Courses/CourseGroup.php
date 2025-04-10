@@ -50,6 +50,21 @@ class CourseGroup extends Model implements HasMedia
         'meta_description'
     ];
 
+    public function searchableAs()
+    {
+        return 'course_group_index';
+    }
+
+    public function toSearchableArray()
+    {
+        return [
+            'id' => (string) $this->id,
+            'title' => $this->title,
+            'description' => $this->description,
+            'created_at' => $this->created_at?->timestamp
+        ];
+    }
+
 
     public static function findBySlug($slug)
     {

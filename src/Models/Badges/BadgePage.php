@@ -56,6 +56,21 @@ class BadgePage extends Model implements HasMedia
             ->orWhere('slug->en', $slug);
     }
 
+    public function searchableAs()
+    {
+        return 'badge_page_index';
+    }
+
+    public function toSearchableArray()
+    {
+        return [
+            'id' => (string) $this->id,
+            'title' => $this->title,
+            'content' => $this->content,
+            'created_at' => $this->created_at?->timestamp
+        ];
+    }
+
     protected $translatable = [
         'title',
         'slug',
@@ -193,9 +208,10 @@ class BadgePage extends Model implements HasMedia
     {
         if ($this->badgeclass_id) {
             $badge = app(BadgrBadge::class)->getBySlug($this->badgeclass_id);
+            
             if (is_array($badge)) {
                 return Badge::where('entityId', '=', $badge['entityId'])->first();
-            } else {
+            } else if( isset($badge->entityId) ) {
                 return Badge::where('entityId', '=', $badge->entityId)->first();
             }
         }

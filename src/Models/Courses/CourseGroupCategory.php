@@ -38,6 +38,21 @@ class CourseGroupCategory extends Model implements HasMedia
         'is_featured' => 'boolean',
     ];
 
+    public function searchableAs()
+    {
+        return 'course_group_category_index';
+    }
+
+    public function toSearchableArray()
+    {
+        return [
+            'id' => (string) $this->id,
+            'title' => $this->title,
+            'description' => $this->description,
+            'created_at' => $this->created_at?->timestamp
+        ];
+    }
+
     public static function boot()
     {
         parent::boot();

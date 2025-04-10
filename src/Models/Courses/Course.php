@@ -33,6 +33,21 @@ class Course extends Model
 
     protected $with = ['badgePage'];
 
+    public function searchableAs()
+    {
+        return 'course_index';
+    }
+
+    public function toSearchableArray()
+    {
+        return [
+            'id' => (string) $this->id,
+            'title' => $this->title,
+            'description' => $this->description,
+            'created_at' => $this->created_at?->timestamp
+        ];
+    }
+
     public function generateCourseLink()
     {
         $url = $this->url;
