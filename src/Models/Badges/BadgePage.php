@@ -237,8 +237,9 @@ class BadgePage extends Model implements HasMedia
                     ->where('updated_at', '>=', now()->subYears(3));
     }
 
-    public static function takeOnlyBrandnew(){
-        return self::where('is_hidden', false)->isPublished()->orderBy('created_at', 'desc') 
+    public static function takeOnlyBrandnew()
+    {
+        return self::withoutGlobalScopes()->where('is_hidden', false)->isPublished()->orderBy('created_at', 'desc') 
                         ->take(10)->get();
     }
 
