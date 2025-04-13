@@ -239,7 +239,7 @@ class BadgePage extends Model implements HasMedia
 
     public static function takeOnlyBrandnew()
     {
-        return self::withoutGlobalScopes()->where('is_hidden', false)->isPublished()->orderBy('created_at', 'desc') 
+        return self::withoutGlobalScopes(['issuer'])->where('is_hidden', false)->isPublished()->orderBy('created_at', 'desc') 
                         ->take(10)->get();
     }
 

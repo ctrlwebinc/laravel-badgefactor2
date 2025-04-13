@@ -188,7 +188,7 @@ class CourseGroup extends Model implements HasMedia
     }
 
     public static function takeOnlyBrandnew(){
-        return self::withoutGlobalScopes()->whereHas('courses', function($course_query){
+        return self::withoutGlobalScopes(['issuer'])->whereHas('courses', function($course_query){
             return $course_query->whereHas('badgePage', function($badge_page_query){
                 return $badge_page_query->isPublished();
             });
