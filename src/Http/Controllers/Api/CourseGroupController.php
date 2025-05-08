@@ -90,7 +90,6 @@ class CourseGroupController extends Controller
 
         $cacheKeyFinal = 'search_engine_response_' . md5(json_encode($request->all()));
         
-
         return CacheHelper::rememberWithGroup('search_engine_response', $cacheKeyFinal, (24 * 60), function () use ($locale, $request) {
             $badgeCategory = $request->input('badge_category');
             $badgeCategories = $request->input('badge_categories');
@@ -106,8 +105,8 @@ class CourseGroupController extends Controller
             }) : false;
 
             if ((!empty($badgeCategory) && $badgeCategory !== 'certification') || !empty($badgeCategories)) {            
-
-                $groups = BadgePage::query()
+                
+                $groups = BadgePage::withoutGlobalScopes(['badgeCategory'])
                             ->when($request->input('is_pathway'), fn ($q) => $q->whereRaw('1 = 0'))
                             ->when($request->input('is_brandnew'), fn ($q) => $q->IsBrandnew())
                             ->when($request->input('is_featured'), fn ($q) => $q->where('is_featured', $request->input('is_featured')))
