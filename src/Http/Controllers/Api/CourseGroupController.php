@@ -17,6 +17,7 @@ use Ctrlweb\BadgeFactor2\Http\Resources\PathwayPageResource;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgeCategory;
 use App\Helpers\CacheHelper;
 use Ctrlweb\BadgeFactor2\Http\Resources\Badges\BadgePageSearchEngineResource;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * @tags Groupes de cours (formations)
@@ -87,6 +88,7 @@ class CourseGroupController extends Controller
             'tags'                  => 'nullable|array',
             'increment_per_page'    => 'nullable|integer'
         ]);
+        
 
         $cacheKeyFinal = 'search_engine_response_' . md5(json_encode($request->all()));
         
@@ -104,9 +106,16 @@ class CourseGroupController extends Controller
                 return $tag != null;
             }) : false;
 
-            if ((!empty($badgeCategory) && $badgeCategory !== 'certification') || !empty($badgeCategories)) {            
+            if ((!empty($badgeCategory) && $badgeCategory !== 'certification') || !empty($badgeCategories)) {          
+                
+                $brandnewIds = BadgePage::takeOnlyBrandnew()->pluck('id')->toArray();
                 
                 $groups = BadgePage::withoutGlobalScopes(['badgeCategory'])
+                            ->whereDoesntHave('badgeCategory', function (Builder $q) {
+                                $locale = app()->getLocale();
+
+                                $q->where("slug->{$locale}", '=', 'certification');
+                            })
                             ->when($request->input('is_pathway'), fn ($q) => $q->whereRaw('1 = 0'))
                             ->when($request->input('is_brandnew'), fn ($q) => $q->IsBrandnew())
                             ->when($request->input('is_featured'), fn ($q) => $q->where('is_featured', $request->input('is_featured')))
@@ -117,6 +126,10 @@ class CourseGroupController extends Controller
                             ->isPublished()
                             ->where('is_hidden', false)
                             ->orderBy('is_featured', 'desc')
+                            ->when(!empty($brandnewIds), function ($q) use ($brandnewIds) {
+                                $ids = implode(',', $brandnewIds);
+                                $q->orderByRaw("FIELD(id, $ids) DESC");
+                            })
                             ->when($request->input('order_by'), fn ($q) => $q->orderBy('title', $request->input('order_by')), fn ($q) => $q->orderBy('created_at', 'desc'))
                             ->paginate($itemParPage);
 
@@ -124,6 +137,7 @@ class CourseGroupController extends Controller
                 $pathwayQuery = (!request()->input('is_pathway') || request()->input('issuer') || request()->input('is_brandnew') || request()->input('is_featured') || $tags || request()->input('badge_categories')) ? PathwayPage::whereRaw('1 = 0') : PathwayPaginator::queryPathWays('is_badgepage', request()->input('q')); 
             } else { 
                 $cacheKey = 'course_groups_' . md5(json_encode($request->all()));
+                $brandnewIds = CourseGroup::takeOnlyBrandnew()->pluck('id')->toArray();
 
                 $groups = CourseGroup::query()
                             ->when($request->input('is_pathway'), fn ($q) => $q->whereRaw('1 = 0'))
@@ -133,6 +147,10 @@ class CourseGroupController extends Controller
                             ->when($tags, fn ($q) => $q->whereHas("tags", fn ($tagQuery) => $tagQuery->whereIn("tags.id", $tags)))
                             ->where('is_hidden', false)
                             ->orderBy('is_featured', 'desc')
+                            ->when(!empty($brandnewIds), function ($q) use ($brandnewIds) {
+                                $ids = implode(',', $brandnewIds);
+                                $q->orderByRaw("FIELD(id, $ids) DESC");
+                            })
                             ->when($request->input('order_by'), fn ($q) => $q->orderBy('title', $request->input('order_by')), fn ($q) => $q->orderBy('created_at', 'desc'))
                             ->paginate($itemParPage);
 

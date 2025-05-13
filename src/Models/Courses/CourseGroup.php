@@ -195,7 +195,7 @@ class CourseGroup extends Model implements HasMedia
         })
         ->where('is_hidden', false)
         ->orderBy('created_at', 'desc') 
-                ->take(10)->get();
+                ->take(4)->get();
     }
 
     public function scopeIsBrandnew($query)
