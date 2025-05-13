@@ -125,10 +125,15 @@ class CourseGroupController extends Controller
                             })
                             ->isPublished()
                             ->where('is_hidden', false)
-                            ->orderBy('is_featured', 'desc')
-                            ->when(!empty($brandnewIds), function ($q) use ($brandnewIds) {
-                                $ids = implode(',', $brandnewIds);
-                                $q->orderByRaw("FIELD(id, $ids) DESC");
+                            ->when(true, function ($q) use ($brandnewIds) {
+                                $idsString = implode(',', $brandnewIds);
+                                $q->orderByRaw("
+                                    CASE 
+                                        WHEN is_featured = 1 THEN 0
+                                        WHEN id IN ($idsString) THEN 1
+                                        ELSE 2
+                                    END ASC
+                                ");
                             })
                             ->when($request->input('order_by'), fn ($q) => $q->orderBy('title', $request->input('order_by')), fn ($q) => $q->orderBy('created_at', 'desc'))
                             ->paginate($itemParPage);
@@ -146,10 +151,15 @@ class CourseGroupController extends Controller
                             ->whereHas('courses', fn ($q) => $q->whereHas('badgePage', fn ($bq) => $bq->isPublished()))
                             ->when($tags, fn ($q) => $q->whereHas("tags", fn ($tagQuery) => $tagQuery->whereIn("tags.id", $tags)))
                             ->where('is_hidden', false)
-                            ->orderBy('is_featured', 'desc')
-                            ->when(!empty($brandnewIds), function ($q) use ($brandnewIds) {
-                                $ids = implode(',', $brandnewIds);
-                                $q->orderByRaw("FIELD(id, $ids) DESC");
+                            ->when(true, function ($q) use ($brandnewIds) {
+                                $idsString = implode(',', $brandnewIds);
+                                $q->orderByRaw("
+                                    CASE 
+                                        WHEN is_featured = 1 THEN 0
+                                        WHEN id IN ($idsString) THEN 1
+                                        ELSE 2
+                                    END ASC
+                                ");
                             })
                             ->when($request->input('order_by'), fn ($q) => $q->orderBy('title', $request->input('order_by')), fn ($q) => $q->orderBy('created_at', 'desc'))
                             ->paginate($itemParPage);
