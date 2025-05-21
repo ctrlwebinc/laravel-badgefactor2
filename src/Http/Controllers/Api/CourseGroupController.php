@@ -88,88 +88,124 @@ class CourseGroupController extends Controller
             'tags'                  => 'nullable|array',
             'increment_per_page'    => 'nullable|integer'
         ]);
-        
 
         $cacheKeyFinal = 'search_engine_response_' . md5(json_encode($request->all()));
-        
+
         return CacheHelper::rememberWithGroup('search_engine_response', $cacheKeyFinal, (24 * 60), function () use ($locale, $request) {
-            $badgeCategory = $request->input('badge_category');
+            $badgeCategory   = $request->input('badge_category');
             $badgeCategories = $request->input('badge_categories');
 
-            $items = [];
-            $paginatedCollection = new Collection();
-            $pathwayQuery = null;
+            $items            = [];
+            $paginatedCollection = new \Illuminate\Support\Collection();
+            $pathwayQuery     = null;
 
-            $itemParPage = $request->increment_per_page ? ( intval($request->increment_per_page)  * 12) : 12;
-                       
-            $tags = $request->tags && !empty($request->tags) ? array_filter($request->tags, function($tag){
-                return $tag != null;
-            }) : false;
+            $itemParPage = $request->increment_per_page ? (intval($request->increment_per_page) * 12) : 12;
 
-            if ((!empty($badgeCategory) && $badgeCategory !== 'certification') || !empty($badgeCategories)) {          
-                
+            $tags = $request->tags && !empty($request->tags)
+                ? array_filter($request->tags, function ($tag) {
+                    return $tag != null;
+                })
+                : false;
+
+            if ((!empty($badgeCategory) && $badgeCategory !== 'certification') || !empty($badgeCategories)) {
                 $brandnewIds = BadgePage::takeOnlyBrandnew()->pluck('id')->toArray();
-                
-                $groups = BadgePage::withoutGlobalScopes(['badgeCategory'])
-                            ->whereDoesntHave('badgeCategory', function (Builder $q) {
-                                $locale = app()->getLocale();
 
-                                $q->where("slug->{$locale}", '=', 'certification');
-                            })
-                            ->when($request->input('is_pathway'), fn ($q) => $q->whereRaw('1 = 0'))
-                            ->when($request->input('is_brandnew'), fn ($q) => $q->IsBrandnew())
-                            ->when($request->input('is_featured'), fn ($q) => $q->where('is_featured', $request->input('is_featured')))
-                            ->when(!empty($badgeCategories), function ($q) use ($badgeCategories) {
-                                $badgeCategoryIds = collect($badgeCategories)->map(fn ($category) => BadgeCategory::findBySlug($category)->first()?->id)->filter()->toArray();
-                                return $q->whereIn("badge_category_id", $badgeCategoryIds);
-                            })
-                            ->isPublished()
-                            ->where('is_hidden', false)
-                            ->when(true, function ($q) use ($brandnewIds) {
-                                $idsString = implode(',', $brandnewIds);
-                                $q->orderByRaw("
-                                    CASE 
-                                        WHEN is_featured = 1 THEN 0
-                                        WHEN id IN ($idsString) THEN 1
-                                        ELSE 2
-                                    END ASC
-                                ");
-                            })
-                            ->when($request->input('order_by'), fn ($q) => $q->orderBy('title', $request->input('order_by')), fn ($q) => $q->orderBy('created_at', 'desc'))
-                            ->paginate($itemParPage);
+                $groups = BadgePage::withoutGlobalScopes(['badgeCategory'])
+                    ->whereDoesntHave('badgeCategory', function (Builder $q) {
+                        $localeInner = app()->getLocale();
+                        $q->where("slug->{$localeInner}", '=', 'certification');
+                    })
+                    ->when($request->input('is_pathway'), fn($q) => $q->whereRaw('1 = 0'))
+                    ->when($request->input('is_brandnew'), fn($q) => $q->IsBrandnew())
+                    ->when($request->input('is_featured'), fn($q) => $q->where('is_featured', $request->input('is_featured')))
+                    ->when(!empty($badgeCategories), function ($q) use ($badgeCategories) {
+                        $badgeCategoryIds = collect($badgeCategories)
+                            ->map(fn($category) => BadgeCategory::findBySlug($category)->first()?->id)
+                            ->filter()
+                            ->toArray();
+                        return $q->whereIn("badge_category_id", $badgeCategoryIds);
+                    })
+                    ->isPublished()
+                    ->where('is_hidden', false)
+                    ->when(true, function ($q) use ($brandnewIds) {
+                        $idsString = implode(',', $brandnewIds);
+                        $q->orderByRaw("
+                            CASE 
+                                WHEN is_featured = 1 THEN 0
+                                WHEN id IN ($idsString) THEN 1
+                                ELSE 2
+                            END ASC
+                        ");
+                    })
+                    ->when(
+                        $request->input('order_by'),
+                        function ($q) use ($request, $locale) {
+                            return $q->orderByRaw("JSON_UNQUOTE(JSON_EXTRACT(title, '$.\"{$locale}\"')) COLLATE utf8mb4_unicode_ci " . $request->input('order_by'));
+                        },
+                        function ($q) {
+                            return $q->orderBy('created_at', 'desc');
+                        }
+                    )
+                    ->paginate($itemParPage);
 
                 $paginatedCollection = BadgePageSearchEngineResource::collection($groups);
-                $pathwayQuery = (!request()->input('is_pathway') || request()->input('issuer') || request()->input('is_brandnew') || request()->input('is_featured') || $tags || request()->input('badge_categories')) ? PathwayPage::whereRaw('1 = 0') : PathwayPaginator::queryPathWays('is_badgepage', request()->input('q')); 
-            } else { 
+
+                $pathwayQuery = (
+                    !request()->input('is_pathway') ||
+                    request()->input('issuer') ||
+                    request()->input('is_brandnew') ||
+                    request()->input('is_featured') ||
+                    $tags ||
+                    request()->input('badge_categories')
+                )
+                    ? PathwayPage::whereRaw('1 = 0')
+                    : PathwayPaginator::queryPathWays('is_badgepage', request()->input('q'));
+            } else {
                 $cacheKey = 'course_groups_' . md5(json_encode($request->all()));
                 $brandnewIds = CourseGroup::takeOnlyBrandnew()->pluck('id')->toArray();
 
                 $groups = CourseGroup::query()
-                            ->when($request->input('is_pathway'), fn ($q) => $q->whereRaw('1 = 0'))
-                            ->when($request->input('is_brandnew'), fn ($q) => $q->IsBrandnew())
-                            ->when($request->input('is_featured'), fn ($q) => $q->where('is_featured', $request->input('is_featured')))
-                            ->whereHas('courses', fn ($q) => $q->whereHas('badgePage', fn ($bq) => $bq->isPublished()))
-                            ->when($tags, fn ($q) => $q->whereHas("tags", fn ($tagQuery) => $tagQuery->whereIn("tags.id", $tags)))
-                            ->where('is_hidden', false)
-                            ->when(true, function ($q) use ($brandnewIds) {
-                                $idsString = implode(',', $brandnewIds);
-                                $q->orderByRaw("
-                                    CASE 
-                                        WHEN is_featured = 1 THEN 0
-                                        WHEN id IN ($idsString) THEN 1
-                                        ELSE 2
-                                    END ASC
-                                ");
-                            })
-                            ->when($request->input('order_by'), fn ($q) => $q->orderBy('title', $request->input('order_by')), fn ($q) => $q->orderBy('created_at', 'desc'))
-                            ->paginate($itemParPage);
+                    ->when($request->input('is_pathway'), fn($q) => $q->whereRaw('1 = 0'))
+                    ->when($request->input('is_brandnew'), fn($q) => $q->IsBrandnew())
+                    ->when($request->input('is_featured'), fn($q) => $q->where('is_featured', $request->input('is_featured')))
+                    ->whereHas('courses', fn($q) => $q->whereHas('badgePage', fn($bq) => $bq->isPublished()))
+                    ->when($tags, fn($q) => $q->whereHas("tags", fn($tagQuery) => $tagQuery->whereIn("tags.id", $tags)))
+                    ->where('is_hidden', false)
+                    ->when(true, function ($q) use ($brandnewIds) {
+                        $idsString = implode(',', $brandnewIds);
+                        $q->orderByRaw("
+                            CASE 
+                                WHEN is_featured = 1 THEN 0
+                                WHEN id IN ($idsString) THEN 1
+                                ELSE 2
+                            END ASC
+                        ");
+                    })
+                    ->when(
+                        $request->input('order_by'),
+                        function ($q) use ($request, $locale) {
+                            return $q->orderByRaw("JSON_UNQUOTE(JSON_EXTRACT(title, '$.\"{$locale}\"')) COLLATE utf8mb4_unicode_ci " . $request->input('order_by'));
+                        },
+                        function ($q) {
+                            return $q->orderBy('created_at', 'desc');
+                        }
+                    )
+                    ->paginate($itemParPage);
 
                 $paginatedCollection = CourseGroupSearchEngineResource::collection($groups);
-                $pathwayQuery = (!request()->input('is_pathway') || request()->input('issuer') || request()->input('is_brandnew') || request()->input('is_featured') || $tags || request()->input('badge_categories')) ? PathwayPage::whereRaw('1 = 0') : PathwayPaginator::queryPathWays('is_autoformation', request()->input('q')); 
+                $pathwayQuery = (
+                    !request()->input('is_pathway') ||
+                    request()->input('issuer') ||
+                    request()->input('is_brandnew') ||
+                    request()->input('is_featured') ||
+                    $tags ||
+                    request()->input('badge_categories')
+                )
+                    ? PathwayPage::whereRaw('1 = 0')
+                    : PathwayPaginator::queryPathWays('is_autoformation', request()->input('q'));
             }
 
-
-            $items = $paginatedCollection->getCollection()->toArray();            
+            $items = $paginatedCollection->getCollection()->toArray();
             $itemPathways = PathwayPageResource::collection($pathwayQuery->get())->collection->toArray();
 
             if (!empty($itemPathways)) {
@@ -184,6 +220,8 @@ class CourseGroupController extends Controller
             );
         });
     }
+
+
 
 
     public function show(string $locale, $slug)
