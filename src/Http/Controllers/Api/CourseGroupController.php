@@ -171,7 +171,7 @@ class CourseGroupController extends Controller
                     ->whereHas('courses', fn($q) => $q->whereHas('badgePage', fn($bq) => $bq->isPublished()))
                     ->when($tags, fn($q) => $q->whereHas("tags", fn($tagQuery) => $tagQuery->whereIn("tags.id", $tags)))
                     ->where('is_hidden', false)
-                    ->when(true, function ($q) use ($brandnewIds) {
+                    ->when(!empty( $brandnewIds ), function ($q) use ($brandnewIds) {
                         $idsString = implode(',', $brandnewIds);
                         $q->orderByRaw("
                             CASE 
