@@ -127,7 +127,7 @@ class CourseGroupController extends Controller
                     })
                     ->isPublished()
                     ->where('is_hidden', false)
-                    ->when(true, function ($q) use ($brandnewIds) {
+                    ->when(!empty( $brandnewIds ) , function ($q) use ($brandnewIds) {
                         $idsString = implode(',', $brandnewIds);
                         $q->orderByRaw("
                             CASE 
