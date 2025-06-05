@@ -10,22 +10,25 @@ class PathwayPaginator
 
         $pathwayQuery = PathwayPage::where($witch, true)
                         ->when($search, function($query) use ($search){
+                            
+                            return $query->where(function($q) use ($search) {
 
-                            $locale = app()->getLocale();
+                                $locale = app()->getLocale();
 
-                            return $query->whereRaw(
-                                    "LOWER(
-                                    CONVERT(title->'$.$locale' USING utf8mb4)) LIKE ?",
-                                    "%{$search}%"
-                                )->orWhereRaw(
-                                    "LOWER(
-                                    CONVERT(slug->'$.$locale' USING utf8mb4)) LIKE ?",
-                                    "%{$search}%"
-                                )->orWhereRaw(
-                                    "LOWER(
-                                    CONVERT(content->'$.$locale' USING utf8mb4)) LIKE ?",
-                                    "%{$search}%"
-                                );
+                                return $q->whereRaw(
+                                        "LOWER(
+                                        CONVERT(title->'$.$locale' USING utf8mb4)) LIKE ?",
+                                        "%{$search}%"
+                                    )->orWhereRaw(
+                                        "LOWER(
+                                        CONVERT(slug->'$.$locale' USING utf8mb4)) LIKE ?",
+                                        "%{$search}%"
+                                    )->orWhereRaw(
+                                        "LOWER(
+                                        CONVERT(content->'$.$locale' USING utf8mb4)) LIKE ?",
+                                        "%{$search}%"
+                                    );
+                            });
                            
                         });
 
