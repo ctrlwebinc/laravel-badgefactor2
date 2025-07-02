@@ -66,7 +66,6 @@ class BadgePage extends Model implements HasMedia
         return [
             'id' => (string) $this->id,
             'title' => $this->title,
-            'content' => $this->content,
             'created_at' => $this->created_at?->timestamp
         ];
     }
