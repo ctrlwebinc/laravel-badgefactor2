@@ -23,6 +23,7 @@ class Badge extends Model
         'name'              => 'string',
         'description'       => 'string',
         'criteriaNarrative' => 'string',
+        'expires'           => 'json',
         //'badgeclass_id'     => 'string',
         //'badgePage.title'   => 'json',
         //'slug'              => 'json',
@@ -45,6 +46,10 @@ class Badge extends Model
         //'request_form_url',
     ];
 
+    protected $casts = [
+        'expires' => 'array',
+    ];
+
     protected static function booted(): void
     {
         static::creating(function (Badge $badge) {
@@ -53,7 +58,8 @@ class Badge extends Model
                 $badge->name,
                 $badge->issuer,
                 $badge->description,
-                $badge->criteriaNarrative
+                $badge->criteriaNarrative,
+                $badge->expires
             );
 
             if (!$badgeclassId) {
@@ -88,7 +94,8 @@ class Badge extends Model
                 $badge->issuer,
                 $badge->description,
                 $badge->criteriaNarrative,
-                $badge->image
+                $badge->image,
+                $badge->expires
             );
 
             /*
@@ -120,6 +127,7 @@ class Badge extends Model
         });
     }
 
+
     public function getRows()
     {
         $badges = app(BadgrBadge::class)->all();
@@ -133,6 +141,8 @@ class Badge extends Model
                 $row['issuer_id'] = $row['issuer'];
                 unset($row['issuer']);
 
+                $row['expires'] = json_encode( (array) $row['expires'] );
+                
                 /*
                 $badgePage = $badgePages->where('badgeclass_id', $row['entityId'])->first();
                 $row['badgeclass_id'] = !empty($badgePage) ? $badgePage->badgeclass_id : '';
@@ -147,7 +157,7 @@ class Badge extends Model
                 $row['last_updated_at'] = !empty($badgePage) && !empty($badgePage->last_updated_at) ? $badgePage->last_updated_at : '';
                 */
 
-                return $row->except(['alignments', 'tags', 'extensions', 'expires'])
+                return $row->except(['alignments', 'tags', 'extensions'])
                     ->toArray();
             });
 

@@ -118,7 +118,7 @@ class Badge extends BadgrAdminProvider
      *
      * @return mixed
      */
-    public function add(string $image, string $name, string $issuer, ?string $description, ?string $criteriaNarrative): mixed
+    public function add(string $image, string $name, string $issuer, ?string $description, ?string $criteriaNarrative, ?array $expires): mixed
     {
         $issuer = json_decode($issuer)->entityId;
         $payload = [
@@ -128,6 +128,10 @@ class Badge extends BadgrAdminProvider
             'description'       => $description,
             'criteriaNarrative' => $criteriaNarrative,
         ];
+
+        if ( null !== $expires && is_array( $expires ) ) {
+            $payload['expires'] = $expires;
+        }
 
         Cache::forget('badges');
 
@@ -152,7 +156,8 @@ class Badge extends BadgrAdminProvider
         string $issuer,
         ?string $description,
         ?string $criteriaNarrative,
-        ?string $image
+        ?string $image,
+        ?array $expires
     ): bool {
         $issuer = json_decode($issuer)->entityId;
         $payload = [
@@ -164,6 +169,10 @@ class Badge extends BadgrAdminProvider
 
         if (null !== $image && $this->prepareImage($image)) {
             $payload['image'] = $this->prepareImage($image);
+        }
+
+        if ( null !== $expires && is_array( $expires ) ) {
+            $payload['expires'] = $expires;
         }
 
         Cache::forget('badges');

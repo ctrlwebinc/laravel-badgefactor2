@@ -39,4 +39,27 @@ class CourseController extends Controller
             ], 302);
         }
     }
+
+    public function updateCourseExpires(string $locale, string $slug, Request $request)
+    {
+        $course = BadgePage::where('slug->fr', $slug)->firstOrFail()->course;
+        $bearerToken = Str::remove('Bearer ', $request->header('Authorization'));
+        $sessionToken = substr($bearerToken, strpos($bearerToken, '|') + 1);
+        Session::setId($sessionToken);
+        Session::start();
+        $currentUser = auth()->user();
+
+
+        if ($course && ECommerceHelper::hasAccess($currentUser, $course) ) {
+            return response()->json([
+                'access' => true,
+                'currentUser' => $currentUser,
+                'course' => $course
+            ]);
+        } else {
+            return response()->json([
+                'access'   => false
+            ], 302);
+        }
+    }
 }
