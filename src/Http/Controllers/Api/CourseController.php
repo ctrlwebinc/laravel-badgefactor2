@@ -2,13 +2,13 @@
 
 namespace Ctrlweb\BadgeFactor2\Http\Controllers\Api;
 
-use App\Helpers\ECommerceHelper;
 use Ctrlweb\BadgeFactor2\Events\CourseAccessed;
 use Ctrlweb\BadgeFactor2\Http\Controllers\Controller;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use App\Helpers\ECommerceHelper;
 
 /**
  * @tags Catégories de groupes de cours
@@ -39,27 +39,5 @@ class CourseController extends Controller
             ], 302);
         }
     }
-
-    public function updateCourseExpires(string $locale, string $slug, Request $request)
-    {
-        $course = BadgePage::where('slug->fr', $slug)->firstOrFail()->course;
-        $bearerToken = Str::remove('Bearer ', $request->header('Authorization'));
-        $sessionToken = substr($bearerToken, strpos($bearerToken, '|') + 1);
-        Session::setId($sessionToken);
-        Session::start();
-        $currentUser = auth()->user();
-
-
-        if ($course && ECommerceHelper::hasAccess($currentUser, $course) ) {
-            return response()->json([
-                'access' => true,
-                'currentUser' => $currentUser,
-                'course' => $course
-            ]);
-        } else {
-            return response()->json([
-                'access'   => false
-            ], 302);
-        }
-    }
+    
 }

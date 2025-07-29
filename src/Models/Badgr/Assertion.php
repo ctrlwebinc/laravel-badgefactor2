@@ -17,7 +17,7 @@ class Assertion extends Model
     public $incrementing = false;
 
     protected $casts = [
-        'issedOn' => 'datetime',
+        'issuedOn' => 'datetime',
         'expires' => 'datetime',
     ];
 
@@ -47,13 +47,14 @@ class Assertion extends Model
                 'email',
                 $assertion->issuedOn,
                 $assertion->evidenceUrl,
-                $assertion->evidenceNarrative
+                $assertion->evidenceNarrative,
+                $assertion->expires
             );
 
             return $assertionId;
         });
 
-        static::updating(function (self $assertion) {
+        static::updating(function (self $assertion) {            
             return app(BadgrAssertion::class)->update(
                 $assertion->entityId,
                 [
@@ -61,6 +62,7 @@ class Assertion extends Model
                     'issuedOn'          => $assertion->issuedOn,
                     'evidenceNarrative' => $assertion->evidenceNarrative,
                     'evidenceUrl'       => $assertion->evidenceUrl,
+                    'expires'       => $assertion->expires,
                 ]
             );
         });

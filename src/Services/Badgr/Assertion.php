@@ -60,7 +60,7 @@ class Assertion extends BadgrAdminProvider
         return $response;
     }
 
-    public function add(string $issuer, string $badge, string $recipient, string $recipientType = 'email', ?Carbon $issuedOn = null, ?string $evidenceUrl = null, ?string $evidenceNarrative = null): mixed
+    public function add(string $issuer, string $badge, string $recipient, string $recipientType = 'email', ?Carbon $issuedOn = null, ?string $evidenceUrl = null, ?string $evidenceNarrative = null, ?Carbon $expires = null): mixed
     {
         $issuerId = json_decode($issuer)->entityId;
         $badgeId = json_decode($badge)->entityId;
@@ -88,6 +88,10 @@ class Assertion extends BadgrAdminProvider
             $payload['evidence'] = [$evidence];
         }
 
+        if (null !== $expires) {
+            $payload['expires'] = $expires->format('c');
+        }
+
         $entityId = $this->getEntityId('POST', '/v2/badgeclasses/'.$badgeId.'/assertions', $payload);
 
         if ($entityId) {
@@ -106,7 +110,11 @@ class Assertion extends BadgrAdminProvider
         if (isset($parameters['issuedOn']) && 0 !== strlen($parameters['issuedOn'])) {
             $payload['issuedOn'] = $parameters['issuedOn']->format('c');
         }
-
+       
+        if (isset($parameters['expires']) && 0 !== strlen($parameters['expires'])) {
+            $payload['expires'] = $parameters['expires']->format('c');
+        }
+      
         $evidence = [];
         if (isset($parameters['evidenceNarrative']) && (null !== $parameters['evidenceNarrative']) && (0 !== strlen($parameters['evidenceNarrative']))) {
             $evidence['narrative'] = $parameters['evidenceNarrative'];

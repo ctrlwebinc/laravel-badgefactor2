@@ -78,7 +78,6 @@ Route::group([
 ], function () {
     // Courses.
     Route::get('courses/{course}/validate-access', [CourseController::class, 'validateAccess']);
-    Route::post('courses/{course}/update-expires', [CourseController::class, 'updateCourseExpires']);
     Route::get('backpack/assertions/{learnerEmail}', [BackpackAssertionController::class, 'indexByEmail']);
 });
 
