@@ -29,6 +29,11 @@ class Course extends Model
         'badge_page_id',
         'course_group_id',
         'regular_price',
+        'expires'
+    ];
+
+    protected $casts = [
+        'expires' => 'json',
     ];
 
     protected $with = ['badgePage'];
