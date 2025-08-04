@@ -50,6 +50,8 @@ class BadgePage extends Model implements HasMedia
         'meta_description'
     ];
 
+    protected $with = [ 'badgeCategory' ];
+
     public static function findBySlug($slug)
     {
         return self::where('slug->fr', $slug)

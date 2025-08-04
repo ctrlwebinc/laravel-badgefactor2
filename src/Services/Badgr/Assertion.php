@@ -114,7 +114,7 @@ class Assertion extends BadgrAdminProvider
         if (isset($parameters['expires']) && 0 !== strlen($parameters['expires'])) {
             $payload['expires'] = $parameters['expires']->format('c');
         }
-      
+        
         $evidence = [];
         if (isset($parameters['evidenceNarrative']) && (null !== $parameters['evidenceNarrative']) && (0 !== strlen($parameters['evidenceNarrative']))) {
             $evidence['narrative'] = $parameters['evidenceNarrative'];
@@ -139,7 +139,7 @@ class Assertion extends BadgrAdminProvider
         }
 
         $result = $this->getFirstResult('PUT', '/v2/assertions/'.$entityId, $payload);
-
+        
         if ($result) {
             Cache::put('assertion_'.$entityId, json_encode($result), config('badgefactor2.cache_duration'));
             Cache::forget('assertions_by_badgeclass_'.$result['badgeclass']);

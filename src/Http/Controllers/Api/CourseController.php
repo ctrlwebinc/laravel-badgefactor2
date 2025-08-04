@@ -29,8 +29,14 @@ class CourseController extends Controller
         if ($course && $currentUser->freeAccess || ECommerceHelper::hasAccess($currentUser, $course) || (in_array(strtolower($currentUser->email), $allowedEmails) && $course->courseGroup?->slug == "conception-universelle-de-lapprentissage")) {
             CourseAccessed::dispatch($currentUser, $course);
 
+            $courseOrder = ECommerceHelper::getSucessfulCourseOrder($currentUser, $course);
+            $item = $courseOrder->items()->where('product_type', \App\Models\Course::class)
+                        ->where('product_id', $course->id)->first();
+
             return response()->json([
                 'access' => true,
+                'expires_at' => $item->expires_at
+                
             ]);
         } else {
             return response()->json([
