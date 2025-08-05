@@ -26,24 +26,34 @@ class CourseController extends Controller
 
         $allowedEmails = ["aurelie.leclerc@ac-amiens.fr", "vincent.marchand1@ac-amiens.fr", "emilie.arculeo@gmail.com"];
 
-        if ($course && $currentUser->freeAccess || ECommerceHelper::hasAccess($currentUser, $course) || (in_array(strtolower($currentUser->email), $allowedEmails) && $course->courseGroup?->slug == "conception-universelle-de-lapprentissage")) {
+        if ($course && $currentUser && $currentUser->freeAccess || 
+            ECommerceHelper::hasAccess($currentUser, $course) || 
+            (in_array(strtolower($currentUser->email), $allowedEmails) && $course->courseGroup?->slug == "conception-universelle-de-lapprentissage")) {
+
             CourseAccessed::dispatch($currentUser, $course);
 
             $courseOrder = ECommerceHelper::getSucessfulCourseOrder($currentUser, $course);
-            $item = $courseOrder->items()->where('product_type', \App\Models\Course::class)
-                        ->where('product_id', $course->id)->first();
+
+            $item = null;
+            $expires_at = null;
+
+            if ($courseOrder) {
+                $item = $courseOrder->items()->where('product_type', \App\Models\Course::class)
+                    ->where('product_id', $course->id)->first();
+                $expires_at = $item?->expires_at;
+            }
 
             return response()->json([
                 'access' => true,
-                'expires_at' => $item->expires_at
-                
+                'expires_at' => $expires_at
             ]);
-        } else {
-            return response()->json([
-                'access'   => false,
-                'redirect' => config('badgefactor2.frontend.url').'/badges/'.$course->badgePage->slug,
-            ], 302);
         }
+        else {
+                return response()->json([
+                    'access'   => false,
+                    'redirect' => config('badgefactor2.frontend.url').'/badges/'.$course->badgePage->slug,
+                ], 302);
+            }
     }
     
 }
