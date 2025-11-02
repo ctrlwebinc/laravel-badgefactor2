@@ -184,6 +184,9 @@ abstract class BadgrProvider
                 }
             }
         } catch (Exception $e) {
+
+            dd($e->getMessage(), $method, $endpoint, $payload);
+
         }
 
         return false;
