@@ -37,6 +37,22 @@ class Assertion extends Model
         'expires'                => 'dateTime',
     ];
 
+    protected $fillable = [
+        'entityId',
+        'badgeclass_id',
+        'issuer_id',
+        'image',
+        'recipient_email',
+        'recipient_id',
+        'issuedOn',
+        'narrative',
+        'evidenceUrl',
+        'evidenceNarrative',
+        'revoked',
+        'revocationReason',
+        'expires',
+    ];
+
     protected static function booted(): void
     {
         static::creating(function (self $assertion) {
