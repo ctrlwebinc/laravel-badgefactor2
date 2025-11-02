@@ -56,6 +56,11 @@ class Assertion extends Model
     protected static function booted(): void
     {
         static::creating(function (self $assertion) {
+
+            dd("creating assertion", $assertion, $assertion->issuer,
+                $assertion->badgeclass,
+                $assertion->recipient);
+                
             $assertionId = app(BadgrAssertion::class)->add(
                 $assertion->issuer,
                 $assertion->badgeclass,
