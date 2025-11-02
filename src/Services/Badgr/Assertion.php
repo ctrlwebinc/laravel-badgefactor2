@@ -62,6 +62,8 @@ class Assertion extends BadgrAdminProvider
 
     public function add(string $issuer, string $badge, string $recipient, string $recipientType = 'email', ?Carbon $issuedOn = null, ?string $evidenceUrl = null, ?string $evidenceNarrative = null, ?Carbon $expires = null): mixed
     {
+        dd($issuer, $badge, $recipient);
+
         $issuerId = json_decode($issuer)->entityId;
         $badgeId = json_decode($badge)->entityId;
         $recipientMail = json_decode($recipient)->email;
