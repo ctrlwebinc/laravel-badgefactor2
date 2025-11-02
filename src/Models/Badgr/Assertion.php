@@ -67,8 +67,14 @@ class Assertion extends Model
                 $assertion->evidenceNarrative,
                 $assertion->expires
             );
+
+            if( !$assertionId ){
+                return false;
+            }
+
+            $assertion->entityId = $assertionId;
             
-            return $assertionId;
+            return true;
         });
 
         static::updating(function (self $assertion) {            
