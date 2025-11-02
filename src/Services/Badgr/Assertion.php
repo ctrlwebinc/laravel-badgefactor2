@@ -100,7 +100,7 @@ class Assertion extends BadgrAdminProvider
             Cache::forget('assertions_by_badgeclass_'.$badgeId);
             Cache::forget('assertions_by_issuer_'.$issuerId);
         }
-        
+        dd( $entityId );
         return $entityId;
     }
 
