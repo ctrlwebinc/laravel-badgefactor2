@@ -22,6 +22,7 @@ class AssertionIssued
      */
     public function __construct(Assertion $assertion)
     {
+        dd('event assertion issued', $assertion);
         $this->assertion = $assertion;
     }
 }
