@@ -95,13 +95,12 @@ class Assertion extends BadgrAdminProvider
 
         
         $entityId = $this->getEntityId('POST', '/v2/badgeclasses/'.$badgeId.'/assertions', $payload);
-        dd($entityId);
 
         if ($entityId) {
             Cache::forget('assertions_by_badgeclass_'.$badgeId);
             Cache::forget('assertions_by_issuer_'.$issuerId);
         }
-
+        
         return $entityId;
     }
 
