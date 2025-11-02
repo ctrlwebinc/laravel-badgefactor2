@@ -95,7 +95,7 @@ class Assertion extends Model
      * @var array
      */
     protected $dispatchesEvents = [
-        'created' => AssertionIssued::class,
+        //'created' => AssertionIssued::class,
     ];
 
     public function getRows()
