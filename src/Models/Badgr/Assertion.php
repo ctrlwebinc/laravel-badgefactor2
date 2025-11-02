@@ -67,7 +67,7 @@ class Assertion extends Model
                 $assertion->evidenceNarrative,
                 $assertion->expires
             );
-            dd($assertionId, "création assertion");
+            
             return $assertionId;
         });
 
