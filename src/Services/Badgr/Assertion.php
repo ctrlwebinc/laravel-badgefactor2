@@ -93,9 +93,9 @@ class Assertion extends BadgrAdminProvider
             $payload['expires'] = $expires->format('c');
         }
 
-        dd($payload, $issuerId, $badgeId);
-
+        
         $entityId = $this->getEntityId('POST', '/v2/badgeclasses/'.$badgeId.'/assertions', $payload);
+        dd($entityId);
 
         if ($entityId) {
             Cache::forget('assertions_by_badgeclass_'.$badgeId);
