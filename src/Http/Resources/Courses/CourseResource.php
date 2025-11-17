@@ -11,6 +11,15 @@ class CourseResource extends JsonResource
 {
     public function toArray($request)
     {
+        $token = $request->bearerToken();
+
+        if ( $token ) {
+            $model = \Laravel\Sanctum\PersonalAccessToken::findToken($token);
+            if ($model) {
+                Auth::setUser($model->tokenable);
+            }
+        }
+        
         return [
             'id'                      => $this->resource->id,
             'title'                   => $this->resource->title,
