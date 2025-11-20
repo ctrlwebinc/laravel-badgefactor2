@@ -168,8 +168,13 @@ class CourseGroupController extends Controller
                     ->when($request->input('is_pathway'), fn($q) => $q->whereRaw('1 = 0'))
                     ->when($request->input('is_brandnew'), fn($q) => $q->IsBrandnew())
                     ->when($request->input('is_featured'), fn($q) => $q->where('is_featured', $request->input('is_featured')))
-                    ->whereHas('courses', fn($q) => $q->whereHas('badgePage', fn($bq) => $bq->isPublished()))
+                    //->whereHas('courses', fn($q) => $q->whereHas('badgePage', fn($bq) => $bq->isPublished()))
                     ->when($tags, fn($q) => $q->whereHas("tags", fn($tagQuery) => $tagQuery->whereIn("tags.id", $tags)))
+                    ->withoutGlobalScopes(['issuer'])->whereHas('courses', function($course_query){
+                        return $course_query->whereHas('badgePage', function($badge_page_query){
+                            return $badge_page_query->withoutGlobalScopes(['issuer'])->isPublished();
+                        });
+                    })
                     ->where('is_hidden', false)
                     ->when(!empty( $brandnewIds ), function ($q) use ($brandnewIds) {
                         $idsString = implode(',', $brandnewIds);
