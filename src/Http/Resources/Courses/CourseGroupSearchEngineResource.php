@@ -53,7 +53,7 @@ class CourseGroupSearchEngineResource extends JsonResource
             'title'                    => $this->resource->title,
             'image'                    => $this->resource->getMedia('*')->first(),
             'courses'                  => $courses,
-            'course_group_category'    => $this->resource->courseGroupCategory->title,
+            'course_group_category'    => $this->resource->courseGroupCategory?->title ?? '',
             'createdAt'                => $this->resource->created_at,
             'updatedAt'                => $this->resource->updated_at,
             'is_featured'             =>  $this->resource->is_featured,
