@@ -176,22 +176,30 @@ class CourseGroupController extends Controller
                         });
                     })
                     ->where('is_hidden', false)
-                    ->when(!empty( $brandnewIds ), function ($q) use ($brandnewIds) {
-                        $idsString = implode(',', $brandnewIds);
-                        $q->orderByRaw("
-                            CASE 
-                                WHEN is_featured = 1 THEN 0
-                                WHEN id IN ($idsString) THEN 1
-                                ELSE 2
-                            END ASC
-                        ");
-                    })
                     ->when(
-                        $request->input('order_by'),
+                        $request->filled('order_by'),
+                        // 1) Cas : ORDER_BY personnalisé → on ne force pas les brandnew
                         function ($q) use ($request, $locale) {
-                            return $q->orderByRaw("JSON_UNQUOTE(JSON_EXTRACT(title, '$.\"{$locale}\"')) COLLATE utf8mb4_unicode_ci " . $request->input('order_by'));
+                            return $q->orderByRaw(
+                                "JSON_UNQUOTE(JSON_EXTRACT(title, '$.\"{$locale}\"')) " .
+                                "COLLATE utf8mb4_unicode_ci " . $request->input('order_by')
+                            );
                         },
-                        function ($q) {
+                        // 2) Cas : ORDER BY par défaut → brandnew d’abord, puis created_at desc
+                        function ($q) use ($brandnewIds) {
+                            if (!empty($brandnewIds)) {
+                                $idsString = implode(',', array_map('intval', $brandnewIds));
+
+                                // Brand new en premier
+                                $q->orderByRaw("
+                                    CASE 
+                                        WHEN id IN ($idsString) THEN 0
+                                        ELSE 1
+                                    END ASC
+                                ");
+                            }
+
+                            // Puis tri “classique” par date
                             return $q->orderBy('created_at', 'desc');
                         }
                     )
