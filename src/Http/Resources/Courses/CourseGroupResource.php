@@ -36,6 +36,8 @@ class CourseGroupResource extends JsonResource
                     'course_groups',
                 ],
             ]),
+            'tags'                    => $this->resource->tag_course_groups,
+            'ia_use_level'           =>  $this->resource::IA_USE_LEVEL_OPTIONS[$this->resource->ia_use_level] ?? null,
             'createdAt'                => $this->resource->created_at,
             'updatedAt'                => $this->resource->updated_at,
             'is_featured'             =>  $this->resource->is_featured,

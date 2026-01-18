@@ -17,12 +17,20 @@ use Ctrlweb\BadgeFactor2\Models\Tag;
 use Carbon\Carbon;
 use App\Helpers\CacheHelper;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use App\Models\TagCourseGroup;
 
 class CourseGroup extends Model implements HasMedia
 {
     use HasTranslations;
     use InteractsWithMedia;
     use Searchable;
+
+    public const IA_USE_LEVEL_OPTIONS = [
+        'none' => 'Aucune utilisation d’IAg',
+        'limited_assistance' => 'Assistance limitée de l’IAg',
+        'shared_production' => 'Production partagée avec l’IAg',
+        'major_production' => 'Production majoritairement assistée par l’IAg',
+    ];
 
     protected $fillable = [
         'slug',
@@ -34,7 +42,8 @@ class CourseGroup extends Model implements HasMedia
         'is_hidden',
         'is_featured',
         'meta_title',
-        'meta_description'
+        'meta_description',
+        'ia_use_level'
     ];
 
     protected $casts = [
@@ -49,6 +58,11 @@ class CourseGroup extends Model implements HasMedia
         'meta_title',
         'meta_description'
     ];
+
+    public function tag_course_groups()
+    {
+        return $this->belongsToMany(TagCourseGroup::class);
+    }
 
     public function searchableAs()
     {
