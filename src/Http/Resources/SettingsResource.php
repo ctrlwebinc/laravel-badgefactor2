@@ -34,6 +34,7 @@ class SettingsResource extends JsonResource
             'website_name'                        => $this->website_name,
             'website_slogan'                      => $this->website_slogan,
             'logo'                                => $this->getMedia('logo')->first(),
+            'mobile_logo'                         => $this->getMedia('mobile_logo')->first(),
             'alternative_logo'                    => $this->getMedia('alternative_logo')->first(),
             'members_slug'                        => $this->members_slug,
             'badges_slug'                         => $this->badges_slug,
