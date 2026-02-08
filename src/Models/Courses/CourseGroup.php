@@ -115,9 +115,13 @@ class CourseGroup extends Model implements HasMedia
             if (request()->input('q')) {
                 $query->where(function ($q) {
                     return $q->whereRaw('LOWER(title) LIKE "%'.strtolower(request()->input('q')).'%"')
-                        ->orWhereRaw('LOWER(description) LIKE "%'.strtolower(request()->input('q')).'%"');
+                        ->orWhereRaw('LOWER(description) LIKE "%'.strtolower(request()->input('q')).'%"')
+                        ->orWhereHas('tag_course_groups', function (Builder $tagQ)  {
+                            $tagQ->whereRaw('LOWER(name) LIKE "%' . strtolower( request()->input('q') ). '%"');
+                        });
                 });
             }
+
         });
 
         self::addGlobalScope('course_group_categorie', function ($query) {
