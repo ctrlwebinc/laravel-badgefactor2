@@ -27,6 +27,7 @@ class RegisterWordPressUser implements ShouldQueue
                     'first_name'    => $event->user->first_name,
                     'last_name'     => $event->user->last_name,
                     'user_nicename' => $event->user->first_name.' '.$event->user->last_name,
+                    'slug'          => $event->user->slug,
                 ]
             );
     }
