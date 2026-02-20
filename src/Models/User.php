@@ -24,6 +24,7 @@ use Ctrlweb\BadgeFactor2\Services\Badgr\User as BadgrUser;
 use Ctrlweb\BadgeFactor2\Interfaces\TokenRepositoryInterface;
 use Ctrlweb\BadgeFactor2\Services\Badgr\BadgrRecipientProvider;
 use Ctrlweb\BadgeFactor2\Notifications\ResetPasswordNotification;
+use App\Helpers\SlugGeneratorHelper;
 
 class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRepositoryInterface
 {
@@ -156,8 +157,9 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
             if ('' == $user->badgr_encrypted_password) {
                 $user->badgr_encrypted_password = Str::random(16);
             }
-            $user->slug = Str::slug($user->username);
 
+            $user->slug = SlugGeneratorHelper::generate('users', 'slug');
+            
             $user->badgr_user_slug = (new BadgrUser())->add(
                 $user->first_name,
                 $user->last_name,
