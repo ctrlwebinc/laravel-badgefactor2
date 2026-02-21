@@ -158,8 +158,7 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
                 $user->badgr_encrypted_password = Str::random(16);
             }
 
-            //$user->slug = SlugGeneratorHelper::generate('users', 'slug');
-            $user->slug = Str::slug($user->username);
+            $user->slug = SlugGeneratorHelper::generate('users', 'slug');
 
             $user->badgr_user_slug = (new BadgrUser())->add(
                 $user->first_name,
