@@ -184,6 +184,11 @@ abstract class BadgrProvider
                 }
             }
         } catch (Exception $e) {
+            \Log::error('BadgrProvider exception', [
+                    'message' => $e->getMessage(),
+                    'method' => $method,
+                    'endpoint' => $endpoint
+            ]);
         }
 
         return false;
