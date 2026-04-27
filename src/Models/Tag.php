@@ -3,11 +3,12 @@
 namespace Ctrlweb\BadgeFactor2\Models;
 
 
-use Illuminate\Database\Eloquent\Model;
-use Ctrlweb\BadgeFactor2\Models\TagGroup;
-use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
-use Ctrlweb\BadgeFactor2\Services\CacheService;
 use App\Helpers\CacheHelper;
+use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
+use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
+use Ctrlweb\BadgeFactor2\Models\TagGroup;
+use Ctrlweb\BadgeFactor2\Services\CacheService;
+use Illuminate\Database\Eloquent\Model;
 
 class Tag extends Model
 {
@@ -44,5 +45,9 @@ class Tag extends Model
 
     public function course_groups(){
         return $this->belongsToMany(CourseGroup::class, 'course_group_tags', 'tag_id', 'course_group_id');
+    }
+
+    public function badgePages(){
+        return $this->belongsToMany(BadgePage::class, 'badge_page_tags', 'tag_id', 'badge_page_id');
     }
 }

@@ -116,6 +116,7 @@ class CourseGroupController extends Controller
                 $brandnewIds = BadgePage::takeOnlyBrandnew()->pluck('id')->toArray();
 
                 $query = BadgePage::withoutGlobalScopes(['badgeCategory'])
+                    ->when($tags, fn($q) => $q->whereHas("tags", fn($tagQuery) => $tagQuery->whereIn("tags.id", $tags)))
                     ->whereDoesntHave('badgeCategory', function (Builder $q) {
                         $localeInner = app()->getLocale();
                         $q->where("slug->{$localeInner}", '=', 'certification');
@@ -194,8 +195,12 @@ class CourseGroupController extends Controller
                     ->when($request->input('is_pathway'), fn($q) => $q->whereRaw('1 = 0'))
                     ->when($request->input('is_brandnew'), fn($q) => $q->IsBrandnew())
                     ->when($request->input('is_featured'), fn($q) => $q->where('is_featured', $request->input('is_featured')))
-                    ->whereHas('courses', fn($q) => $q->whereHas('badgePage', fn($bq) => $bq->withoutGlobalScopes(['q'])->isPublished()))
-                    ->when($tags, fn($q) => $q->whereHas("tags", fn($tagQuery) => $tagQuery->whereIn("tags.id", $tags)))
+                    ->whereHas('courses', function($q) use ($tags) {
+                        $q->whereHas('badgePage', function($badgePageQuery) use ($tags) {
+                            $badgePageQuery->isPublished()
+                                ->when($tags, fn($q) => $q->whereHas("tags", fn($tagQuery) => $tagQuery->whereIn("tags.id", $tags)));
+                        });
+                    })
                     ->where('is_hidden', false);
 
                 // ---------- ORDER 1 : groupe featured -> brandnew -> reste ----------

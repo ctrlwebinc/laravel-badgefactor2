@@ -2,21 +2,22 @@
 
 namespace Ctrlweb\BadgeFactor2\Models\Badges;
 
+use App\Helpers\CacheHelper;
 use Carbon\Carbon;
-use Laravel\Scout\Searchable;
-use Spatie\MediaLibrary\HasMedia;
-use Ctrlweb\BadgeFactor2\Models\User;
-use Illuminate\Database\Eloquent\Model;
-use Spatie\Translatable\HasTranslations;
-use Illuminate\Database\Eloquent\Builder;
-use Spatie\MediaLibrary\InteractsWithMedia;
 use Ctrlweb\BadgeFactor2\Models\Badgr\Badge;
 use Ctrlweb\BadgeFactor2\Models\Courses\Course;
 use Ctrlweb\BadgeFactor2\Models\Courses\CourseGroup;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Ctrlweb\BadgeFactor2\Models\Tag;
+use Ctrlweb\BadgeFactor2\Models\User;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Badge as BadgrBadge;
-use App\Helpers\CacheHelper;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Laravel\Scout\Searchable;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\Translatable\HasTranslations;
 
 class BadgePage extends Model implements HasMedia
 {
@@ -256,5 +257,9 @@ class BadgePage extends Model implements HasMedia
     public function getIsBrandnewAttribute()
     {     
         return self::takeOnlyBrandnew()->contains($this);
+    }
+
+    public function tags(){
+        return $this->belongsToMany(Tag::class, 'badge_page_tags', 'badge_page_id', 'tag_id');
     }
 }

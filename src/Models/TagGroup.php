@@ -9,7 +9,7 @@ use App\Helpers\CacheHelper;
 
 class TagGroup extends Model
 {
-    protected $fillable = [ "name"];
+    protected $fillable = [ "name", "name_in_file", "value_prefix_in_file", "url_in_file", "is_numeric" ];
 
     public function tags(){
         return $this->hasMany(Tag::class);
