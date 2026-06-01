@@ -2,6 +2,8 @@
 
 namespace Ctrlweb\BadgeFactor2\Http\Controllers\Api;
 
+use App\Models\PortfolioBadge;
+use Ctrlweb\BadgeFactor2\Models\User;
 use Illuminate\Http\Request;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Assertion;
@@ -56,9 +58,37 @@ class BadgePageController extends Controller
     public function showIssued(string $locale, $slug)
     {
         $badgePage = BadgePage::where("slug->{$locale}", '=', $slug)->first();
-        $assertions = app(Assertion::class)->getByBadgeClass($badgePage->badgeclass_id);
+        $assertions = collect(app(Assertion::class)->getByBadgeClass($badgePage->badgeclass_id))
+            ->filter(fn ($assertion) => $this->shouldShowIssuedAssertion($assertion))
+            ->values();
 
         return AssertionResource::collection($assertions);
+    }
+
+    private function shouldShowIssuedAssertion(array $assertion): bool
+    {
+        $email = data_get($assertion, 'recipient.plaintextIdentity');
+        $assertionId = data_get($assertion, 'entityId');
+
+        if (!$email) {
+            return true;
+        }
+
+        $recipient = User::where('email', '=', $email)->first();
+
+        if (!$recipient) {
+            return true;
+        }
+
+        if ((bool) $recipient->is_profile_private || (bool) $recipient->hide_profile_from_search_engines) {
+            return false;
+        }
+
+        $portfolioBadge = PortfolioBadge::where('user_id', $recipient->id)
+            ->where('assertion_id', $assertionId)
+            ->first();
+
+        return !$portfolioBadge || !(bool) $portfolioBadge->is_private;
     }
 
     public function badgePageByCourseGroup(string $locale, $courseGroup)
