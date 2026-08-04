@@ -21,6 +21,17 @@ abstract class BadgrProvider
     protected $config;
     protected $providerConfiguration = [];
 
+    /**
+     * Why the last call failed, kept so callers can surface it instead of
+     * only writing it to a log nobody may be able to read.
+     */
+    protected ?string $lastError = null;
+
+    public function getLastError(): ?string
+    {
+        return $this->lastError;
+    }
+
     protected function buildRequest($method, $url, array $options = [], array $payload = [])
     {
         $defaultOptions = [
@@ -146,12 +157,48 @@ abstract class BadgrProvider
      */
     protected function logBadgrException(string $badgrMethod, string $method, string $endpoint, \Throwable $e): void
     {
+        $this->lastError = $this->describeException($e);
+
         \Log::error('Badgr API call failed: ' . $e->getMessage(), [
             'badgr_method' => $badgrMethod,
             'http_method' => $method,
             'endpoint' => $endpoint,
             'exception' => get_class($e),
         ]);
+    }
+
+    /**
+     * Turn an exception into something an administrator can act on. Badgr's
+     * own validation errors are the useful part of a 4xx body, so they are
+     * surfaced as-is; the rest is summarised, since "cURL error 28" tells an
+     * admin nothing about what to do next.
+     */
+    protected function describeException(\Throwable $e): string
+    {
+        if ($e instanceof ClientException && $e->getResponse()) {
+            $body = json_decode((string) $e->getResponse()->getBody(), true);
+
+            $fieldErrors = [];
+            foreach ($body['fieldErrors'] ?? [] as $field => $messages) {
+                $fieldErrors[] = $field . ': ' . implode(' ', (array) $messages);
+            }
+            foreach ($body['validationErrors'] ?? [] as $message) {
+                $fieldErrors[] = (string) $message;
+            }
+
+            if ($fieldErrors) {
+                return 'Badgr a refusé la demande (' . implode(' | ', $fieldErrors) . ').';
+            }
+
+            return 'Badgr a répondu ' . $e->getResponse()->getStatusCode() . '.';
+        }
+
+        if ($e instanceof \GuzzleHttp\Exception\ConnectException) {
+            return 'Le serveur Badgr n\'a pas répondu dans le délai imparti. '
+                . 'Il est injoignable ou bloqué sur un appel externe.';
+        }
+
+        return $e->getMessage();
     }
 
     protected function checkToken($token): void

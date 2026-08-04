@@ -5,6 +5,7 @@ namespace Ctrlweb\BadgeFactor2\Models\Badgr;
 use Ctrlweb\BadgeFactor2\Models\Badges\BadgePage;
 use Ctrlweb\BadgeFactor2\Services\Badgr\Badge as BadgrBadge;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 use Spatie\Translatable\HasTranslations;
 
 class Badge extends Model
@@ -53,7 +54,9 @@ class Badge extends Model
     protected static function booted(): void
     {
         static::creating(function (Badge $badge) {
-            $badgeclassId = app(BadgrBadge::class)->add(
+            $service = app(BadgrBadge::class);
+
+            $badgeclassId = $service->add(
                 $badge->image,
                 $badge->name,
                 $badge->issuer,
@@ -63,7 +66,16 @@ class Badge extends Model
             );
 
             if (!$badgeclassId) {
-                return false;
+                // Returning false here silently cancels the save: the caller
+                // gets a model that was never persisted, and Nova redirects
+                // as if the badge had been created. Whoever tried to create
+                // the badge is left with no badge and no explanation, which
+                // is how this stayed unexplained for months. Fail loudly
+                // instead, carrying the reason the API call gave us.
+                throw ValidationException::withMessages([
+                    'name' => $service->getLastError()
+                        ?? 'La création du badge dans Badgr a échoué.',
+                ]);
             }
 
             // Badgr assigns the entityId (this model's primary key) when the
