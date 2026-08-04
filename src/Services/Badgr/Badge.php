@@ -133,9 +133,17 @@ class Badge extends BadgrAdminProvider
             $payload['expires'] = $expires;
         }
 
+        $badgeclassId = $this->getEntityId('POST', '/v2/badgeclasses', $payload);
+
+        // Invalidate AFTER the write, never before. Clearing first opens a
+        // window as long as the API call itself, and any concurrent read
+        // during that window re-caches a list that does not contain what we
+        // are creating - for the full cache duration (24h by default). The
+        // badge then appears to not exist: its detail page 404s and it is
+        // missing from listings until something else clears the cache.
         Cache::forget('badges');
 
-        return $this->getEntityId('POST', '/v2/badgeclasses', $payload);
+        return $badgeclassId;
     }
 
     /**
@@ -175,10 +183,14 @@ class Badge extends BadgrAdminProvider
             $payload['expires'] = $expires;
         }
 
+        $updated = $this->confirmUpdate('PUT', '/v2/badgeclasses/'.$entityId, $payload);
+
+        // Invalidated after the write for the same reason as add(): clearing
+        // beforehand lets a concurrent read cache the pre-update state.
         Cache::forget('badges');
         Cache::forget('badge_'.$entityId);
 
-        return $this->confirmUpdate('PUT', '/v2/badgeclasses/'.$entityId, $payload);
+        return $updated;
     }
 
     /**
@@ -190,9 +202,11 @@ class Badge extends BadgrAdminProvider
      */
     public function delete(string $entityId): bool
     {
+        $deleted = $this->confirmDeletion('DELETE', '/v2/badgeclasses/'.$entityId);
+
         Cache::forget('badges');
         Cache::forget('badge_'.$entityId);
 
-        return $this->confirmDeletion('DELETE', '/v2/badgeclasses/'.$entityId);
+        return $deleted;
     }
 }

@@ -121,9 +121,14 @@ class Issuer extends BadgrAdminProvider
             $payload['image'] = $this->prepareImage($image);
         }
 
+        $issuerId = $this->getEntityId('POST', '/v2/issuers', $payload);
+
+        // Invalidate AFTER the write, never before: clearing first lets a
+        // concurrent read re-cache a list without the issuer we are creating,
+        // for the full cache duration (24h by default).
         Cache::forget('issuers');
 
-        return $this->getEntityId('POST', '/v2/issuers', $payload);
+        return $issuerId;
     }
 
     /**
@@ -160,10 +165,12 @@ class Issuer extends BadgrAdminProvider
             $payload['image'] = $this->prepareImage($image);
         }
 
+        $updated = $this->confirmUpdate('PUT', '/v2/issuers/'.$entityId, $payload);
+
         Cache::forget('issuers');
         Cache::forget('issuer_'.$entityId);
 
-        return $this->confirmUpdate('PUT', '/v2/issuers/'.$entityId, $payload);
+        return $updated;
     }
 
     /**
@@ -175,9 +182,11 @@ class Issuer extends BadgrAdminProvider
      */
     public function delete(string $entityId): bool
     {
+        $deleted = $this->confirmDeletion('DELETE', '/v2/issuers/'.$entityId);
+
         Cache::forget('issuers');
         Cache::forget('issuer_'.$entityId);
 
-        return $this->confirmDeletion('DELETE', '/v2/issuers/'.$entityId);
+        return $deleted;
     }
 }
