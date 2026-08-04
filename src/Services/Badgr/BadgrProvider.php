@@ -105,6 +105,24 @@ abstract class BadgrProvider
         $this->providerConfiguration['scopes'] = 'rw:profile rw:backpack rw:issuer rw:serverAdmin';
     }
 
+    /**
+     * All the "get" and "confirm" helpers below silently return an empty
+     * or false result on any exception (network error, expired/invalid
+     * token, unexpected Badgr response...). That makes failures invisible
+     * to callers, which in turn makes Sushi-backed models (Badge, Issuer)
+     * appear to have zero rows with no trace of why. Log it so failures
+     * are at least visible in the logs instead of silently disappearing.
+     */
+    protected function logBadgrException(string $badgrMethod, string $method, string $endpoint, \Throwable $e): void
+    {
+        \Log::error('Badgr API call failed: ' . $e->getMessage(), [
+            'badgr_method' => $badgrMethod,
+            'http_method' => $method,
+            'endpoint' => $endpoint,
+            'exception' => get_class($e),
+        ]);
+    }
+
     protected function checkToken($token): void
     {
         if (null === $token) {
@@ -184,11 +202,7 @@ abstract class BadgrProvider
                 }
             }
         } catch (Exception $e) {
-            \Log::error('BadgrProvider exception', [
-                    'message' => $e->getMessage(),
-                    'method' => $method,
-                    'endpoint' => $endpoint
-            ]);
+            $this->logBadgrException(__FUNCTION__, $method, $endpoint, $e);
         }
 
         return false;
@@ -209,6 +223,7 @@ abstract class BadgrProvider
                 return $response['slug'];
             }
         } catch (Exception $e) {
+            $this->logBadgrException(__FUNCTION__, $method, $endpoint, $e);
         }
 
         return false;
@@ -233,6 +248,7 @@ abstract class BadgrProvider
                 }
             }
         } catch (Exception $e) {
+            $this->logBadgrException(__FUNCTION__, $method, $endpoint, $e);
         }
 
         return [];
@@ -256,6 +272,7 @@ abstract class BadgrProvider
                 }
             }
         } catch (Exception $e) {
+            $this->logBadgrException(__FUNCTION__, $method, $endpoint, $e);
         }
 
         return false;
@@ -278,6 +295,7 @@ abstract class BadgrProvider
                 }
             }
         } catch (Exception $e) {
+            $this->logBadgrException(__FUNCTION__, $method, $endpoint, $e);
         }
 
         return false;
@@ -298,6 +316,7 @@ abstract class BadgrProvider
                 return true;
             }
         } catch (Exception $e) {
+            $this->logBadgrException(__FUNCTION__, $method, $endpoint, $e);
         }
 
         return false;
@@ -323,6 +342,7 @@ abstract class BadgrProvider
                 return true;
             }
         } catch (Exception $e) {
+            $this->logBadgrException(__FUNCTION__, $method, $endpoint, $e);
         }
 
         return false;
@@ -336,6 +356,7 @@ abstract class BadgrProvider
                 return true;
             }
         } catch (Exception $e) {
+            $this->logBadgrException(__FUNCTION__, $method, $endpoint, $e);
         }
 
         return false;
