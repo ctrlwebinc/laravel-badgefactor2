@@ -66,6 +66,14 @@ class Badge extends Model
                 return false;
             }
 
+            // Badgr assigns the entityId (this model's primary key) when the
+            // badgeclass is created. Without writing it back, the saved model
+            // keeps a null key: the API response returns "id": null, callers
+            // can't reference the badge they just created, and anything keyed
+            // on entityId (e.g. linking a BadgePage to badgeclass_id) silently
+            // targets the wrong record.
+            $badge->entityId = $badgeclassId;
+
             /*
             $badgePage = new BadgePage();
             $badgePage->badgeclass_id = $badgeclassId;

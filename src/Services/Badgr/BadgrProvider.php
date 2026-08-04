@@ -80,15 +80,9 @@ abstract class BadgrProvider
             // exception.
             'timeout' => 30,
             'connect_timeout' => 10,
-            // Requests with a sizeable body (e.g. a base64-encoded badge
-            // image) trigger curl's "Expect: 100-continue" handshake. Local
-            // nginx/dev TLS setups often don't answer that intermediate
-            // response correctly, causing the request to hang before it
-            // ever reaches the server. Disabling it sends the body directly.
-            'expect' => false,
         ]);
 
-        $this->providerConfiguration['redirectUri'] = route('bf2.auth');
+        $this->providerConfiguration['redirectUri'] = $this->authRedirectUri();
         $this->providerConfiguration['urlAuthorize'] = '/o/authorize';
         $this->providerConfiguration['urlAccessToken'] = '/o/token';
         $this->providerConfiguration['urlResourceOwnerDetails'] = '/o/resource';
@@ -96,6 +90,28 @@ abstract class BadgrProvider
         $this->addClientInfo();
         $this->addScopes();
         $this->provider = new GenericProvider($this->providerConfiguration, ['httpClient' => $httpClient]);
+    }
+
+    /**
+     * The redirect URI is only ever used by the interactive authorization
+     * code flow (the browser round-trip that first obtains a token). Every
+     * server-to-server API call reuses the stored token and never needs it.
+     *
+     * Resolving it through route('bf2.auth') unconditionally meant that any
+     * context where that named route isn't registered - a queued job, a
+     * console command, an app booted with cached routes that predate this
+     * package - threw RouteNotFoundException here, inside makeProvider().
+     * That exception surfaced far from its cause: callers like getResult()
+     * caught it and returned an empty array, so badge lists silently came
+     * back empty with no indication that anything had gone wrong.
+     */
+    protected function authRedirectUri(): string
+    {
+        if (\Illuminate\Support\Facades\Route::has('bf2.auth')) {
+            return route('bf2.auth');
+        }
+
+        return rtrim((string) config('app.url'), '/') . '/bf2/auth';
     }
 
     protected function getProvider(): GenericProvider
@@ -152,7 +168,7 @@ abstract class BadgrProvider
     {
         try {
             $request = $this->buildRequest($method, $endpoint, [], $payload);
-            $response = $this->getProvider()->getHttpClient()->send($request);
+            $response = $this->sendRequest($request);
 
             return $response;
         } catch (MissingTokenException $e) {
@@ -161,7 +177,7 @@ abstract class BadgrProvider
             // Let exceptions bubble up since they are not recoverable at this point.
             $this->tryNewAuthCycle();
             $request = $this->buildRequest($method, $endpoint, [], $payload);
-            $response = $this->getProvider()->getHttpClient()->send($request);
+            $response = $this->sendRequest($request);
 
             return $response;
         } catch (ExpiredTokenException $e) {
@@ -176,7 +192,7 @@ abstract class BadgrProvider
         // Try a refresh, let all exceptions bubble up
         $this->refreshToken();
         $request = $this->buildRequest($method, $endpoint, [], $payload);
-        $response = $this->getProvider()->getHttpClient()->send($request);
+        $response = $this->sendRequest($request);
 
         return $response;
     }
