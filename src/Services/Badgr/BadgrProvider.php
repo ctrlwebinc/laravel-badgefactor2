@@ -71,7 +71,22 @@ abstract class BadgrProvider
     protected function makeProvider(): void
     {
         $config = $this->getConfig();
-        $httpClient = new Client(['base_uri' => $config->badgr_server_base_url, 'verify' => false]);
+        $httpClient = new Client([
+            'base_uri' => $config->badgr_server_base_url,
+            'verify' => false,
+            // Without an explicit timeout, Guzzle waits forever (default: 0).
+            // A stuck/unreachable Badgr instance would then hang every
+            // request indefinitely instead of failing with a catchable
+            // exception.
+            'timeout' => 30,
+            'connect_timeout' => 10,
+            // Requests with a sizeable body (e.g. a base64-encoded badge
+            // image) trigger curl's "Expect: 100-continue" handshake. Local
+            // nginx/dev TLS setups often don't answer that intermediate
+            // response correctly, causing the request to hang before it
+            // ever reaches the server. Disabling it sends the body directly.
+            'expect' => false,
+        ]);
 
         $this->providerConfiguration['redirectUri'] = route('bf2.auth');
         $this->providerConfiguration['urlAuthorize'] = '/o/authorize';
@@ -239,13 +254,30 @@ abstract class BadgrProvider
         try {
             $response = $this->makeRecoverableRequest($method, $endpoint, $payload);
             if ($response->getStatusCode() === 200) {
-                $response = json_decode($response->getBody(), true);
+                $decoded = json_decode($response->getBody(), true);
                 if (
-                    isset($response['status']['success']) && true === $response['status']['success'] &&
-                    isset($response['result']) && is_array($response['result'])
+                    isset($decoded['status']['success']) && true === $decoded['status']['success'] &&
+                    isset($decoded['result']) && is_array($decoded['result'])
                 ) {
-                    return $response['result'];
+                    return $decoded['result'];
                 }
+
+                // The request succeeded (HTTP 200) but the payload wasn't in
+                // the shape we expect. This previously fell straight through
+                // to "return []" with zero trace of why.
+                \Log::warning('Badgr API returned 200 with an unexpected response shape', [
+                    'badgr_method' => __FUNCTION__,
+                    'http_method' => $method,
+                    'endpoint' => $endpoint,
+                    'body' => mb_substr((string) $response->getBody(), 0, 500),
+                ]);
+            } else {
+                \Log::warning('Badgr API returned a non-200 status', [
+                    'badgr_method' => __FUNCTION__,
+                    'http_method' => $method,
+                    'endpoint' => $endpoint,
+                    'status' => $response->getStatusCode(),
+                ]);
             }
         } catch (Exception $e) {
             $this->logBadgrException(__FUNCTION__, $method, $endpoint, $e);

@@ -130,9 +130,16 @@ class Badge extends Model
 
     public function getRows()
     {
+        // Calling ->all() twice used to fetch the same data twice: once to
+        // check it's truthy, once more (moments later) to actually use it.
+        // The second call could land on a cache hit that the first call had
+        // just populated, returning a differently-shaped payload than a
+        // cache miss would (json_decode()'d stdClass objects vs the raw
+        // API response). Fetch once and reuse it for both.
         $badges = app(BadgrBadge::class)->all();
+
         if ($badges) {
-            $badges = collect(app(BadgrBadge::class)->all());
+            $badges = collect($badges);
 
             $badgePages = BadgePage::with('course')->get();
 
