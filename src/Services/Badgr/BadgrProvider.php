@@ -194,11 +194,51 @@ abstract class BadgrProvider
         }
 
         if ($e instanceof \GuzzleHttp\Exception\ConnectException) {
-            return 'Le serveur Badgr n\'a pas répondu dans le délai imparti. '
-                . 'Il est injoignable ou bloqué sur un appel externe.';
+            return $this->describeTimeout();
         }
 
         return $e->getMessage();
+    }
+
+    /**
+     * Tells apart the two reasons a Badgr call can time out.
+     *
+     * "No response" covers two very different situations: Badgr being
+     * unreachable, or Badgr being reachable but stuck on work it does after
+     * creating the badge - notifying an external service, which it does
+     * inline and without a timeout of its own. They call for opposite
+     * responses, and on environments where the logs are out of reach the
+     * message shown on screen is the only thing to go on, so probe a read
+     * and say which one it is.
+     */
+    protected function describeTimeout(): string
+    {
+        $start = microtime(true);
+
+        try {
+            $request = $this->buildRequest('GET', '/v2/issuers_count');
+            $this->getProvider()->getHttpClient()->send($request, ['timeout' => 8]);
+            $elapsed = round((microtime(true) - $start) * 1000);
+
+            return sprintf(
+                'Badgr répond aux lectures (%d ms) mais la création a expiré : le serveur est '
+                . 'joignable et reste bloqué sur un traitement qu\'il effectue après avoir créé '
+                . 'le badge, typiquement sa notification vers un service externe. Le réseau '
+                . 'n\'est pas en cause.',
+                $elapsed
+            );
+        } catch (MissingTokenException | ExpiredTokenException $tokenFailure) {
+            // The probe never left the application, so it says nothing about
+            // whether Badgr is up - report what it did find instead of
+            // blaming the network.
+            return 'La création a expiré, et la vérification n\'a pas pu être faite : '
+                . 'le jeton d\'accès à Badgr est absent ou expiré. Il faut le renouveler '
+                . 'avant de pouvoir conclure sur l\'état du serveur.';
+        } catch (\Throwable $probeFailure) {
+            return 'Badgr ne répond ni en écriture ni en lecture : le serveur est injoignable '
+                . 'ou arrêté. Il s\'agit d\'un problème de réseau ou de service, pas de la '
+                . 'création du badge elle-même.';
+        }
     }
 
     protected function checkToken($token): void
