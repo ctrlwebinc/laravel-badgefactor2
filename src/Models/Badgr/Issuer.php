@@ -4,6 +4,7 @@ namespace Ctrlweb\BadgeFactor2\Models\Badgr;
 
 use Ctrlweb\BadgeFactor2\Services\Badgr\Issuer as BadgrIssuer;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 use App\Helpers\CacheHelper;
 
 class Issuer extends Model
@@ -26,13 +27,32 @@ class Issuer extends Model
     protected static function booted(): void
     {
         static::creating(function (Issuer $issuer) {
-            app(BadgrIssuer::class)->add(
+            $service = app(BadgrIssuer::class);
+
+            $issuerId = $service->add(
                 $issuer->name,
                 $issuer->email,
                 $issuer->url,
                 $issuer->description ?? '',
                 $issuer->image
-            );            
+            );
+
+            if (!$issuerId) {
+                // Renvoyer true ici laisserait croire à une réussite : on
+                // repartirait avec un émetteur qui n'existe nulle part, et le
+                // badge créé ensuite se rattacherait au vide. Échouer en
+                // portant la raison donnée par l'API.
+                throw ValidationException::withMessages([
+                    'name' => $service->getLastError()
+                        ?? "La création de l'organisation dans Badgr a échoué.",
+                ]);
+            }
+
+            // Badgr attribue l'entityId, qui est la clé primaire de ce modèle.
+            // Sans cette écriture, l'émetteur enregistré garde une clé nulle :
+            // l'appelant ne peut plus désigner ce qu'il vient de créer, et le
+            // badge qu'on y rattache viserait un identifiant vide.
+            $issuer->entityId = $issuerId;
 
             return true;
         });
