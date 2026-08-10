@@ -56,10 +56,15 @@ class Badge extends Model
         static::creating(function (Badge $badge) {
             $service = app(BadgrBadge::class);
 
+            // L'attribut porte le nom issuer_id : c'est celui déclaré dans
+            // $schema et celui que remplit le champ Select de la ressource Nova.
+            // Lire $badge->issuer rendait null, et l'émetteur transmis à l'API
+            // était vide — la création échouait sans qu'aucun champ ne paraisse
+            // en cause.
             $badgeclassId = $service->add(
                 $badge->image,
                 $badge->name,
-                $badge->issuer,
+                $badge->issuer_id,
                 $badge->description,
                 $badge->criteriaNarrative,
                 $badge->expires

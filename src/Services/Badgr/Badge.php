@@ -110,7 +110,7 @@ class Badge extends BadgrAdminProvider
     }
 
     /**
-     * @param string      $image
+     * @param string|null $image
      * @param string      $name
      * @param string      $issuer
      * @param string|null $description
@@ -118,13 +118,16 @@ class Badge extends BadgrAdminProvider
      *
      * @return mixed
      */
-    public function add(string $image, string $name, string $issuer, ?string $description, ?string $criteriaNarrative, ?array $expires): mixed
+    public function add(?string $image, string $name, string $issuer, ?string $description, ?string $criteriaNarrative, ?array $expires): mixed
     {
-        $issuer = json_decode($issuer)->entityId;
         $payload = [
-            'image'             => $this->prepareImage($image),
+            // prepareImage() attend un chemin de stockage existant et sa
+            // signature refuse null. Sans ce garde-fou, créer un badge sans
+            // visuel levait un TypeError avant même l'appel à l'API, au lieu
+            // de laisser Badgr répondre ce qu'il exige.
+            'image'             => $image ? $this->prepareImage($image) : null,
             'name'              => $name,
-            'issuer'            => $issuer,
+            'issuer'            => $this->resolveIssuerId($issuer),
             'description'       => $description,
             'criteriaNarrative' => $criteriaNarrative,
         ];
@@ -144,6 +147,28 @@ class Badge extends BadgrAdminProvider
         Cache::forget('badges');
 
         return $badgeclassId;
+    }
+
+    /**
+     * Identifiant Badgr de l'émetteur, quelle que soit la forme reçue.
+     *
+     * Cette méthode faisait auparavant json_decode($issuer)->entityId, en
+     * supposant que l'appelant transmettait l'objet émetteur sérialisé. Les
+     * appelants passent l'identifiant seul : json_decode() rendait alors null
+     * et la lecture de ->entityId interrompait toute création de badge.
+     *
+     * Les deux formes sont désormais acceptées, car les deux existent dans le
+     * code appelant et aucune n'est fautive en soi.
+     */
+    private function resolveIssuerId(string $issuer): string
+    {
+        $decoded = json_decode($issuer);
+
+        if (is_object($decoded) && !empty($decoded->entityId)) {
+            return $decoded->entityId;
+        }
+
+        return $issuer;
     }
 
     /**
