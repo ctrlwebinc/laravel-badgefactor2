@@ -159,7 +159,12 @@ class BadgePage extends Model implements HasMedia
                     })
                     ->orWhereHas('course.courseGroup', function (Builder $courseGroupQuery) use ($search) {
                         $courseGroupQuery
-                            ->withoutGlobalScope('q')
+                            ->withoutGlobalScopes([
+                                'q',
+                                'course_group_categorie',
+                                'issuer',
+                                'badge_category',
+                            ])
                             ->whereHas('tag_course_groups', function (Builder $tagQuery) use ($search) {
                                 $tagQuery->whereRaw('LOWER(name) LIKE ?', [$search]);
                             });

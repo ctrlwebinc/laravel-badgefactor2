@@ -89,7 +89,7 @@ class CourseGroupController extends Controller
             'increment_per_page'    => 'nullable|integer'
         ]);
 
-        $cacheKeyFinal = 'search_engine_response_v2_' . md5(json_encode($request->all()));
+        $cacheKeyFinal = 'search_engine_response_v3_' . md5(json_encode($request->all()));
 
         return CacheHelper::rememberWithGroup('search_engine_response', $cacheKeyFinal, (24 * 60), function () use ($locale, $request) {
             $badgeCategory   = $request->input('badge_category');
@@ -115,11 +115,31 @@ class CourseGroupController extends Controller
                 // IDs brandnew globaux pour BadgePage
                 $brandnewIds = BadgePage::takeOnlyBrandnew()->pluck('id')->toArray();
 
+                $search = $request->filled('q')
+                    ? '%' . mb_strtolower((string) $request->input('q')) . '%'
+                    : null;
+
                 $query = BadgePage::withoutGlobalScopes(['badgeCategory'])
                     ->when($tags, fn($q) => $q->whereHas("tags", fn($tagQuery) => $tagQuery->whereIn("tags.id", $tags)))
-                    ->whereDoesntHave('badgeCategory', function (Builder $q) {
-                        $localeInner = app()->getLocale();
-                        $q->where("slug->{$localeInner}", '=', 'certification');
+                    ->where(function (Builder $resultQuery) use ($locale, $search) {
+                        $resultQuery->whereDoesntHave('badgeCategory', function (Builder $categoryQuery) use ($locale) {
+                            $categoryQuery->where("slug->{$locale}", '=', 'certification');
+                        });
+
+                        if ($search) {
+                            $resultQuery->orWhereHas('course.courseGroup', function (Builder $courseGroupQuery) use ($search) {
+                                $courseGroupQuery
+                                    ->withoutGlobalScopes([
+                                        'q',
+                                        'course_group_categorie',
+                                        'issuer',
+                                        'badge_category',
+                                    ])
+                                    ->whereHas('tag_course_groups', function (Builder $tagQuery) use ($search) {
+                                        $tagQuery->whereRaw('LOWER(name) LIKE ?', [$search]);
+                                    });
+                            });
+                        }
                     })
                     ->when($request->input('is_pathway'), fn($q) => $q->whereRaw('1 = 0'))
                     ->when($request->input('is_brandnew'), fn($q) => $q->IsBrandnew())
