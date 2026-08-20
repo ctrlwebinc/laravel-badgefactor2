@@ -129,29 +129,42 @@ class BadgePage extends Model implements HasMedia
         });
 
         self::addGlobalScope('q', function (Builder $query) {
-            if (request('q')) {
-                $keywords = strtolower(request('q'));
-                $locale = app()->getLocale();
-                $query->whereRaw(
-                    "LOWER(
-                    CONVERT(title->'$.$locale' USING utf8mb4)) LIKE ?",
-                    "%{$keywords}%"
-                )->orWhereRaw(
-                    "LOWER(
-                    CONVERT(slug->'$.$locale' USING utf8mb4)) LIKE ?",
-                    "%{$keywords}%"
-                )->orWhereRaw(
-                    "LOWER(
-                    CONVERT(content->'$.$locale' USING utf8mb4)) LIKE ?",
-                    "%{$keywords}%"
-                )->orWhereHas('course', function ($query) use ($keywords, $locale) {
-                    $query->whereRaw(
-                        "LOWER(
-                        CONVERT(title->'$.$locale' USING utf8mb4)) LIKE ?",
-                        "%{$keywords}%"
-                    );
-                });
+            if (!request()->filled('q')) {
+                return;
             }
+
+            $keywords = mb_strtolower((string) request()->input('q'));
+            $locale = app()->getLocale();
+            $search = "%{$keywords}%";
+
+            $query->where(function (Builder $searchQuery) use ($search, $locale) {
+                $searchQuery
+                    ->whereRaw(
+                        "LOWER(CONVERT(title->'$.$locale' USING utf8mb4)) LIKE ?",
+                        [$search]
+                    )
+                    ->orWhereRaw(
+                        "LOWER(CONVERT(slug->'$.$locale' USING utf8mb4)) LIKE ?",
+                        [$search]
+                    )
+                    ->orWhereRaw(
+                        "LOWER(CONVERT(content->'$.$locale' USING utf8mb4)) LIKE ?",
+                        [$search]
+                    )
+                    ->orWhereHas('course', function (Builder $courseQuery) use ($search, $locale) {
+                        $courseQuery->whereRaw(
+                            "LOWER(CONVERT(title->'$.$locale' USING utf8mb4)) LIKE ?",
+                            [$search]
+                        );
+                    })
+                    ->orWhereHas('course.courseGroup', function (Builder $courseGroupQuery) use ($search) {
+                        $courseGroupQuery
+                            ->withoutGlobalScope('q')
+                            ->whereHas('tag_course_groups', function (Builder $tagQuery) use ($search) {
+                                $tagQuery->whereRaw('LOWER(name) LIKE ?', [$search]);
+                            });
+                    });
+            });
         });
 
         $caches = ['search_engine_response', 'badge_category_certification', 'badge_pages', 'badge_categories', 'tag_groups'];        
