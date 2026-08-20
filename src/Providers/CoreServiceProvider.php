@@ -2,6 +2,8 @@
 
 namespace Ctrlweb\BadgeFactor2\Providers;
 
+use App\Helpers\CacheHelper;
+use App\Models\TagCourseGroup;
 use Ctrlweb\BadgeFactor2\Console\Commands\FixBadgeCategories;
 use Ctrlweb\BadgeFactor2\Console\Commands\ImportBadgeRequestFormLinks;
 use Ctrlweb\BadgeFactor2\Console\Commands\MigrateWooCommerceData;
@@ -22,6 +24,7 @@ class CoreServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->configureRateLimiting();
+        $this->registerTagCourseGroupCacheInvalidation();
 
         if ($this->app->runningInConsole()) {
             $this->registerPublishing();
@@ -36,6 +39,24 @@ class CoreServiceProvider extends ServiceProvider
         }
 
         $this->registerResources();
+    }
+
+    /**
+     * Invalidate search results when a course-group tag changes.
+     */
+    protected function registerTagCourseGroupCacheInvalidation(): void
+    {
+        if (!class_exists(TagCourseGroup::class) || !class_exists(CacheHelper::class)) {
+            return;
+        }
+
+        TagCourseGroup::saved(function () {
+            CacheHelper::forgetGroup('search_engine_response');
+        });
+
+        TagCourseGroup::deleted(function () {
+            CacheHelper::forgetGroup('search_engine_response');
+        });
     }
 
     /**
