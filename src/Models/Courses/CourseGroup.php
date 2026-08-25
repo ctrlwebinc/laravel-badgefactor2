@@ -111,17 +111,17 @@ class CourseGroup extends Model implements HasMedia
         parent::boot();
 
         self::addGlobalScope('q', function (Builder $query) {
-            $locale = app()->getLocale();
-            if (request()->input('q')) {
-                $query->where(function ($q) {
-                    return $q->whereRaw('LOWER(title) LIKE "%'.strtolower(request()->input('q')).'%"')
-                        ->orWhereRaw('LOWER(description) LIKE "%'.strtolower(request()->input('q')).'%"')
-                        ->orWhereHas('tag_course_groups', function (Builder $tagQ)  {
-                            $tagQ->whereRaw('LOWER(name) LIKE "%' . strtolower( request()->input('q') ). '%"');
+            if (request()->filled('q')) {
+                $search = '%' . mb_strtolower((string) request()->input('q')) . '%';
+
+                $query->where(function (Builder $searchQuery) use ($search) {
+                    return $searchQuery->whereRaw('LOWER(title) LIKE ?', [$search])
+                        ->orWhereRaw('LOWER(description) LIKE ?', [$search])
+                        ->orWhereHas('tag_course_groups', function (Builder $tagQuery) use ($search) {
+                            $tagQuery->whereRaw('LOWER(name) LIKE ?', [$search]);
                         });
                 });
             }
-
         });
 
         self::addGlobalScope('course_group_categorie', function ($query) {
