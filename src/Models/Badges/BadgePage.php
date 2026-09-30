@@ -134,27 +134,27 @@ class BadgePage extends Model implements HasMedia
             }
 
             $keywords = mb_strtolower((string) request()->input('q'));
-            $locale = app()->getLocale();
+            $path = '$."'.app()->getLocale().'"';
             $search = "%{$keywords}%";
 
-            $query->where(function (Builder $searchQuery) use ($search, $locale) {
+            $query->where(function (Builder $searchQuery) use ($search, $path) {
                 $searchQuery
                     ->whereRaw(
-                        "LOWER(CONVERT(title->'$.$locale' USING utf8mb4)) LIKE ?",
-                        [$search]
+                        "LOWER(CONVERT(JSON_EXTRACT(title, ?) USING utf8mb4)) LIKE ?",
+                        [$path, $search]
                     )
                     ->orWhereRaw(
-                        "LOWER(CONVERT(slug->'$.$locale' USING utf8mb4)) LIKE ?",
-                        [$search]
+                        "LOWER(CONVERT(JSON_EXTRACT(slug, ?) USING utf8mb4)) LIKE ?",
+                        [$path, $search]
                     )
                     ->orWhereRaw(
-                        "LOWER(CONVERT(content->'$.$locale' USING utf8mb4)) LIKE ?",
-                        [$search]
+                        "LOWER(CONVERT(JSON_EXTRACT(content, ?) USING utf8mb4)) LIKE ?",
+                        [$path, $search]
                     )
-                    ->orWhereHas('course', function (Builder $courseQuery) use ($search, $locale) {
+                    ->orWhereHas('course', function (Builder $courseQuery) use ($search, $path) {
                         $courseQuery->whereRaw(
-                            "LOWER(CONVERT(title->'$.$locale' USING utf8mb4)) LIKE ?",
-                            [$search]
+                            "LOWER(CONVERT(JSON_EXTRACT(title, ?) USING utf8mb4)) LIKE ?",
+                            [$path, $search]
                         );
                     })
                     ->orWhereHas('course.courseGroup', function (Builder $courseGroupQuery) use ($search) {

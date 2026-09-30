@@ -80,7 +80,7 @@ class CourseGroupController extends Controller
             'q'                     => 'nullable|string',
             'issuer'                => 'nullable|string',
             'badge_category'        => 'nullable|string',
-            'order_by'              => 'nullable|string',
+            'order_by'              => 'nullable|string|in:asc,desc,ASC,DESC',
             'is_brandnew'           => 'nullable|boolean',
             'is_featured'           => 'nullable|boolean',
             'is_pathway'            => 'nullable|boolean',
@@ -178,10 +178,11 @@ class CourseGroupController extends Controller
 
                 // ---------- ORDER 2 : tri dans chaque groupe ----------
                 if ($request->filled('order_by')) {
-                    // on suppose order_by = 'asc' ou 'desc'
+                    $direction = strtolower((string) $request->input('order_by')) === 'desc' ? 'desc' : 'asc';
+
                     $query->orderByRaw(
-                        "JSON_UNQUOTE(JSON_EXTRACT(title, '$.\"{$locale}\"')) " .
-                        "COLLATE utf8mb4_unicode_ci " . $request->input('order_by')
+                        "JSON_UNQUOTE(JSON_EXTRACT(title, ?)) COLLATE utf8mb4_unicode_ci {$direction}",
+                        ['$."'.$locale.'"']
                     );
                 } else {
                     $query->orderBy('created_at', 'desc');
@@ -245,9 +246,11 @@ class CourseGroupController extends Controller
 
                 // ---------- ORDER 2 : tri dans chaque groupe ----------
                 if ($request->filled('order_by')) {
+                    $direction = strtolower((string) $request->input('order_by')) === 'desc' ? 'desc' : 'asc';
+
                     $query->orderByRaw(
-                        "JSON_UNQUOTE(JSON_EXTRACT(title, '$.\"{$locale}\"')) " .
-                        "COLLATE utf8mb4_unicode_ci " . $request->input('order_by')
+                        "JSON_UNQUOTE(JSON_EXTRACT(title, ?)) COLLATE utf8mb4_unicode_ci {$direction}",
+                        ['$."'.$locale.'"']
                     );
                 } else {
                     $query->orderBy('created_at', 'desc');

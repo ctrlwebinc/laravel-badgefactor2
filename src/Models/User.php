@@ -146,8 +146,19 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
 
     protected $guard_name = 'web';
 
-    protected $appends = ['is_checked']; 
+    protected $appends = ['is_checked'];
 
+    /**
+     * Colonnes de la table, lues une fois par processus : liste blanche du tri `?order=`.
+     */
+    protected static function sortableColumns($model): array
+    {
+        static $columns = [];
+
+        return $columns[$model->getTable()] ??= $model->getConnection()
+            ->getSchemaBuilder()
+            ->getColumnListing($model->getTable());
+    }
 
     public static function boot()
     {
@@ -177,15 +188,25 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia, TokenRe
         });
 
         self::addGlobalScope('query', function ($query) {
-            if (request('q')) {
-                $query->whereRaw("concat(first_name, ' ', last_name) LIKE '%".request('q')."%'")
-                    ->orWhereRaw("concat(last_name, ' ', first_name) LIKE '%".request('q')."%'");
+            $search = request('q');
+
+            if (is_string($search) && $search !== '') {
+                $like = '%'.addcslashes($search, '%_\\').'%';
+
+                $query->where(function ($searchQuery) use ($like) {
+                    $searchQuery->whereRaw("concat(first_name, ' ', last_name) LIKE ?", [$like])
+                        ->orWhereRaw("concat(last_name, ' ', first_name) LIKE ?", [$like]);
+                });
             }
         });
 
         self::addGlobalScope('order', function ($query) {
-            if (request('order')) {
-                $query->orderBy(request('order'));
+            $order = request('order');
+
+            // Colonne réelle de la table uniquement : ni chemin JSON (->), ni alias,
+            // ni valeur partagée avec un autre usage de `order` (asc/desc) qui finirait en 500.
+            if (is_string($order) && in_array($order, self::sortableColumns($query->getModel()), true)) {
+                $query->orderBy($order);
             }
         });
 

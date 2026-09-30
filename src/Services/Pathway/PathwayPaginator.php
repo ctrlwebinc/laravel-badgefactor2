@@ -13,20 +13,18 @@ class PathwayPaginator
                             
                             return $query->where(function($q) use ($search) {
 
-                                $locale = app()->getLocale();
+                                $path = '$."'.app()->getLocale().'"';
+                                $like = "%{$search}%";
 
                                 return $q->whereRaw(
-                                        "LOWER(
-                                        CONVERT(title->'$.$locale' USING utf8mb4)) LIKE ?",
-                                        "%{$search}%"
+                                        "LOWER(CONVERT(JSON_EXTRACT(title, ?) USING utf8mb4)) LIKE ?",
+                                        [$path, $like]
                                     )->orWhereRaw(
-                                        "LOWER(
-                                        CONVERT(slug->'$.$locale' USING utf8mb4)) LIKE ?",
-                                        "%{$search}%"
+                                        "LOWER(CONVERT(JSON_EXTRACT(slug, ?) USING utf8mb4)) LIKE ?",
+                                        [$path, $like]
                                     )->orWhereRaw(
-                                        "LOWER(
-                                        CONVERT(content->'$.$locale' USING utf8mb4)) LIKE ?",
-                                        "%{$search}%"
+                                        "LOWER(CONVERT(JSON_EXTRACT(content, ?) USING utf8mb4)) LIKE ?",
+                                        [$path, $like]
                                     );
                             });
                            
