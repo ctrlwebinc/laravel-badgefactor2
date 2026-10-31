@@ -106,6 +106,12 @@ class CourseGroup extends Model implements HasMedia
         return $this->belongsToMany(TargetAudience::class, 'course_group_target_audience');
     }
 
+    public function relatedCourseGroups()
+    {
+        return $this->belongsToMany(self::class, 'course_group_related', 'course_group_id', 'related_course_group_id')
+            ->orderBy('course_group_related.id');
+    }
+
     public function courses(): HasMany
     {
         return $this->hasMany(Course::class);
