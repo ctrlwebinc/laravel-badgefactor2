@@ -30,6 +30,7 @@ class CourseGroupResource extends JsonResource
             'balado'                   => $this->resource->balado, 
             'content_specialists'      => ResponsibleResource::collection($this->resource->contentSpecialists ?? null),
             'retroaction_responsibles' => ResponsibleResource::collection($this->resource->retroactionResponsibles ?? null),
+            'target_audiences'         => $this->resource->targetAudiences->pluck('title'),
             'courses'                  => CourseResource::collection($this->resource->courses ?? null),
             'course_group_category'    => CourseGroupCategoryResource::make($this->resource->courseGroupCategory ?? null)->additional([
                 'without' => [

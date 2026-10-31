@@ -101,6 +101,11 @@ class CourseGroup extends Model implements HasMedia
         return $this->belongsToMany(Responsible::class, 'course_group_retroaction_responsible');
     }
 
+    public function targetAudiences()
+    {
+        return $this->belongsToMany(TargetAudience::class, 'course_group_target_audience');
+    }
+
     public function courses(): HasMany
     {
         return $this->hasMany(Course::class);

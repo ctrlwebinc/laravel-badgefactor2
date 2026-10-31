@@ -34,4 +34,9 @@ class TargetAudience extends Model
     {
         return $this->belongsToMany(Course::class);
     }
+
+    public function courseGroups()
+    {
+        return $this->belongsToMany(CourseGroup::class, 'course_group_target_audience');
+    }
 }
