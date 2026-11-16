@@ -257,10 +257,31 @@ class BadgePage extends Model implements HasMedia
                     ->where('updated_at', '>=', now()->subYears(3));
     }
 
+    /**
+     * Les 10 pages de badge les plus récentes : ce sont elles qui portent « Nouveauté ».
+     *
+     * Le calcul ne doit dépendre que de l'onglet du moteur (`badge_category`), jamais
+     * des filtres. Les scopes globaux lisent la requête : en ne retirant que `issuer`
+     * et `q`, un filtre (sous-catégorie, groupe de cours…) restreignait aussi ce top
+     * 10, et les plus récentes du sous-ensemble filtré devenaient des « nouveautés ».
+     * On retire donc tous les scopes et on n'applique que la catégorie de l'onglet,
+     * comme le faisait le scope `badgeCategory` sans filtre.
+     */
     public static function takeOnlyBrandnew()
     {
-        return self::withoutGlobalScopes(['issuer', 'q'])->where('is_hidden', false)->isPublished()->orderBy('created_at', 'desc') 
-                        ->take(10)->get();
+        $badgeCategory = request()->input('badge_category');
+        $locale = app()->getLocale();
+
+        return self::withoutGlobalScopes()
+            ->where('is_hidden', false)
+            ->isPublished()
+            ->when($badgeCategory, fn (Builder $query) => $query->whereHas(
+                'badgeCategory',
+                fn (Builder $q) => $q->where("slug->{$locale}", '=', $badgeCategory)
+            ))
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
     }
 
     public function scopeIsBrandnew($query)

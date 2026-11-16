@@ -216,16 +216,37 @@ class CourseGroup extends Model implements HasMedia
         return $this->belongsToMany(Tag::class, 'course_group_tags', 'course_group_id', 'tag_id');
     }
 
-    public static function takeOnlyBrandnew(){
-        return self::where('is_hidden', false)
-                ->withoutGlobalScopes(['issuer', 'q'])->whereHas('courses', function($course_query){
-                                return $course_query->whereHas('badgePage', function($badge_page_query){
-                                    return $badge_page_query->withoutGlobalScopes(['issuer', 'q'])->isPublished();
-                                });
-                            })
-                ->orderBy('created_at', 'desc') 
-                ->take(4)->get();
-                
+    /**
+     * Les 4 groupes de cours les plus récents : ce sont eux qui portent « Nouveauté ».
+     *
+     * Même règle que BadgePage::takeOnlyBrandnew : seul l'onglet du moteur
+     * (`badge_category`) compte. Les scopes globaux lisent la requête ; en ne
+     * retirant que `issuer` et `q`, le filtre de catégorie de groupe de cours
+     * restreignait ce top 4, et les plus récents de la catégorie filtrée devenaient
+     * des « nouveautés » qu'ils n'étaient pas sans filtre. On retire tous les scopes
+     * (y compris sur les pages de badge) et on reproduit seulement celui de l'onglet.
+     */
+    public static function takeOnlyBrandnew()
+    {
+        $badgeCategory = request()->input('badge_category');
+        $locale = app()->getLocale();
+
+        return self::withoutGlobalScopes()
+            ->where('is_hidden', false)
+            ->whereHas('courses', fn ($courseQuery) => $courseQuery->whereHas(
+                'badgePage',
+                fn ($badgePageQuery) => $badgePageQuery->withoutGlobalScopes()->isPublished()
+            ))
+            ->when($badgeCategory, function ($query) use ($badgeCategory, $locale) {
+                $badgePageIds = BadgePage::withoutGlobalScopes()
+                    ->whereHas('badgeCategory', fn (Builder $q) => $q->where("slug->{$locale}", '=', $badgeCategory))
+                    ->pluck('id');
+
+                return $query->whereIn('id', Course::whereIn('badge_page_id', $badgePageIds)->pluck('course_group_id'));
+            })
+            ->orderBy('created_at', 'desc')
+            ->take(4)
+            ->get();
     }
 
     public function scopeIsBrandnew($query)
